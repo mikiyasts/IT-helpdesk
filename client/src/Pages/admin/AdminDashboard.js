@@ -9,7 +9,9 @@ import BarChart from "../../component/BarChart"
 import PieChart from "../../component/PieChart"
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+
 function AdminDashboard() {
+  
 const navigate=useNavigate()
   const getCsrfToken = () => {
     const cookieValue = document.cookie

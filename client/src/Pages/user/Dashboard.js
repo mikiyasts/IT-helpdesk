@@ -1,9 +1,18 @@
-import React, { useState } from 'react'
+import React, { useState,useEffect } from 'react'
 import Header from '../../component/Header'
 import Table from '../../component/DataTable'
-
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 function Dashboard() {
 
+  const navigate=useNavigate()
+  const getCsrfToken = () => {
+    const cookieValue = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('csrftoken='))
+        ?.split('=')[1];
+    return cookieValue || '';
+};
   const [popup,setPopup]=useState(false);
 
   const [request,setRequest]=useState({
@@ -24,6 +33,23 @@ function Dashboard() {
 
     })
   }
+
+
+  useEffect(()=>{
+    axios.get("http://localhost:8000/api/getuser/",{ withCredentials: true ,headers: {
+      'X-CSRFToken': getCsrfToken(),
+  }}).then(res=>{
+    const role=res.data && res.data.role
+      console.log("token",res);
+      console.log("token",role);
+      if(role!=="employee"){
+        navigate("/")
+      }
+    }).catch(err=>{
+      console.log("err",err);
+      
+    })
+  })
   console.log(request);
   return (
     <div className='user-dashboard_page'>
