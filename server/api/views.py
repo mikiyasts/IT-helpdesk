@@ -61,11 +61,32 @@ def login(request):
     path='/',
     httponly=True,         
     secure=False,         # Set to True in production
-    samesite='Lax'      # Change to 'Lax' or 'None' based on your requirements
+    samesite='None'      # Change to 'Lax' or 'None' based on your requirements
 )
 
     
     return response
+@api_view(['POST'])
+def logout(request):
+    # Retrieve the token from cookies
+    token_key = request.COOKIES.get('auth_token')
+
+    if token_key:
+        try:
+            token = Token.objects.get(key=token_key)
+            token.delete()  # Delete the token to log out the user
+
+            # Clear the cookie
+            response = Response({'message': 'Logged out successfully.'}, status=status.HTTP_200_OK)
+            response.delete_cookie('auth_token')  # Clear the cookie
+            return response
+
+        except Token.DoesNotExist:
+            return Response({'error': 'Token does not exist.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    return Response({'error': 'User is not authenticated.'}, status=status.HTTP_401_UNAUTHORIZED)
+
+
 @api_view(['GET'])
 def GetUser(request):
     token = request.COOKIES.get('auth_token')
