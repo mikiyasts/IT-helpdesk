@@ -58,21 +58,29 @@ def login(request):
     response.set_cookie(
         key='auth_token',
         value=token.key,
-        httponly=True,         
-        secure=True,           
-        samesite='Lax'         
+        path='/',
+        # httponly=True,         
+        # secure=True,           
+        # samesite='Lax'         
     )
     
     return response
 @api_view(['GET'])
 def GetUser(request):
-        token = request.COOKIES.get('auth_token')
-        if token:
+    token = request.COOKIES.get('auth_token')
+    print(f"Received token: {token}")  # Add debug logging
+
+    if token:
+        try:
             user = Token.objects.get(key=token).user
             serializer = UserSerializer(user)
             return Response(serializer.data)
-        else:
+        except Token.DoesNotExist:
+            print("Token not found")  # Add debug logging
             return Response("Unauthorized", status=status.HTTP_401_UNAUTHORIZED)
+    else:
+        print("No token provided")  # Add debug logging
+        return Response("Unauthorized", status=status.HTTP_401_UNAUTHORIZED)
 
 @api_view(['GET'])
 @authentication_classes([SessionAuthentication, TokenAuthentication])
