@@ -14,14 +14,13 @@ function Login() {
 
   const submitLogin = (e) => {
     e.preventDefault()
-    axios.post("http://localhost:8000/api/login/", loginform)
+    axios.post("http://localhost:8000/api/login/",loginform,{ withCredentials: true })
     .then(res => {
-      document.cookie="auth_token"
+      // document.cookie=`auth_token=${res.data && res.data.token && res.data.token}`
       console.log("loged in",res);
-      console.log(document.cookie);
-      axios.get("http://localhost:8000/api/getuser/").then(res=>{
+      // console.log(document.cookie);
+      axios.get("http://localhost:8000/api/getuser/",{ withCredentials: true }).then(res=>{
         console.log("token",res);
-        
       }).catch(err=>{
         console.log("err",err);
         
