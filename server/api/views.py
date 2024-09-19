@@ -7,7 +7,7 @@ from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.response import Response
 
 from tickets.models import Ticket,TicketCategory
-from .serializers import TicketCategorySerializer, TicketSerializer, UserSerializer
+from .serializers import TicketCategorySerializer, TicketSerializer, UserGetSerializer, UserSerializer
 from rest_framework.authtoken.models import Token
 from rest_framework import status
 from users.models import User
@@ -74,7 +74,7 @@ def GetUser(request):
     if token:
         try:
             user = Token.objects.get(key=token).user
-            serializer = UserSerializer(user)
+            serializer = UserGetSerializer(user)
             return Response(serializer.data)
         except Token.DoesNotExist:
             print("Token not found")  # Add debug logging
