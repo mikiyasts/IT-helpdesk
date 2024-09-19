@@ -6,7 +6,8 @@ urlpatterns = [
   path('',views.api_endpoints),
   path('signup/', views.signup),
   path('login/', views.login),
-  path('test_token/', views.test_token),
+  path('getuser/', views.GetUser),
+  
   
   
   

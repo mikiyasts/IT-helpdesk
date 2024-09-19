@@ -65,6 +65,16 @@ def login(request):
     
     return response
 @api_view(['GET'])
+def GetUser(request):
+        token = request.COOKIES.get('auth_token')
+        if token:
+            user = Token.objects.get(key=token).user
+            serializer = UserSerializer(user)
+            return Response(serializer.data)
+        else:
+            return Response("Unauthorized", status=status.HTTP_401_UNAUTHORIZED)
+
+@api_view(['GET'])
 @authentication_classes([SessionAuthentication, TokenAuthentication])
 @permission_classes([IsAuthenticated])
 def test_token(request):
