@@ -10,7 +10,7 @@ import PieChart from "../../component/PieChart"
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 function AdminDashboard() {
-const navigate
+const navigate=useNavigate()
   const getCsrfToken = () => {
     const cookieValue = document.cookie
         .split('; ')
@@ -26,11 +26,8 @@ const navigate
     const role=res.data && res.data.role
       console.log("token",res);
       console.log("token",role);
-      if(role==="employee"){
-        navigate("/dashboard")
-      }
-      if(role==="admin"){
-        navigate("/admin")
+      if(role!=="admin"){
+        navigate("/")
       }
     }).catch(err=>{
       console.log("err",err);
