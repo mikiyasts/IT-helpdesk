@@ -2,8 +2,10 @@ import React, { useState } from "react";
 import Logo from "../asset/Image/logo.png"
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import axios from "axios"
+import { useNavigate } from "react-router-dom";
 function Login() {
   const [tab, setTab] = useState("signin");
+  const navigate=useNavigate()
   const [forgotPopup, setforgotPopup] = useState(false)
   const [loginform, Setloginform] = useState({ username: "", password: "" })
 
@@ -13,9 +15,15 @@ function Login() {
   const submitLogin = (e) => {
     e.preventDefault()
     axios.post("http://localhost:8000/api/login/", loginform)
+<<<<<<< HEAD
     .then(res => console.log(res))
+=======
+    .then(res => {
+      navigate("/")
+    })
+>>>>>>> 8ceec412dca4477b02cf7e9f0ed9f0fe2cd66d93
     .catch(err => console.log(err))
-    console.log("login");
+    console.log(loginform);
   }
   const handleLoginchange = (e) => {
     Setloginform(prev => {
