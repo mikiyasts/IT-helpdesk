@@ -191,14 +191,16 @@
   color: var(--font-color-primary);
 }
 .login-container,.signup-container{
- 
   width: 100%;
   display: flex;
   flex-direction: column;
   gap:2rem;
   display: none;
+  overflow: scroll;
 }
-.signup-container{
+
+
+.login-container::-webkit-scrollbar,.signup-container::-webkit-scrollbar,.signup-container{
   display: none;
 }
 .login-form{

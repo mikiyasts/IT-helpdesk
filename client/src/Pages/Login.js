@@ -8,6 +8,13 @@ function Login() {
 
   
 
+
+
+  const submitLogin=(e)=>{
+    e.preventdefault()
+    console.log("login");
+    
+  }
   return (
     <div className="login-page">
       {/* popup*/}
@@ -37,7 +44,7 @@ function Login() {
           </div>
           {/* signin container */}
           <div className={`login-container ${tab==="signin"&&"active-signin"}`}>
-            <form className="login-form">
+            <form className="login-form" onSubmit={submitLogin}>
               <div className="login-header">
                 <h1>Welcome Back !</h1>
               </div>
@@ -81,6 +88,15 @@ function Login() {
                 <input type="fullname" name="fullname" id="fullname" />
               </div>
               <div className="form-ctrl">
+                <label htmlFor="brach">Branch</label>
+                <select name="branch" id="branch">
+                  <option value="">Select Your Branch</option>
+                  <option value="farm">Farm</option>
+                  <option value="lideta">Lideta</option>
+                  <option value="mekanissa">Mekanissa</option>
+                </select>
+              </div>
+              <div className="form-ctrl">
                 <label htmlFor="department">Department</label>
                 <select name="department" id="department">
                   <option value="">Select Your Department</option>
@@ -92,7 +108,7 @@ function Login() {
               </div>
               <div className="form-ctrl">
                 <label htmlFor="password">Password</label>
-                <input type="password" name="password" id="password" />
+                <input type="password" name="password" id="spassword" />
               </div>
               <div className="forgot-signin sigup-btn-conatiner">
                 <button className="btn-login">Sign Up</button>
