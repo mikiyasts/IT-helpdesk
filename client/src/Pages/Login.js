@@ -15,13 +15,18 @@ function Login() {
   const submitLogin = (e) => {
     e.preventDefault()
     axios.post("http://localhost:8000/api/login/", loginform)
-<<<<<<< HEAD
-    .then(res => console.log(res))
-=======
     .then(res => {
-      navigate("/")
+      document.cookie="auth_token"
+      console.log("loged in",res);
+      console.log(document.cookie);
+      axios.get("http://localhost:8000/api/getuser/").then(res=>{
+        console.log("token",res);
+        
+      }).catch(err=>{
+        console.log("err",err);
+        
+      })
     })
->>>>>>> 8ceec412dca4477b02cf7e9f0ed9f0fe2cd66d93
     .catch(err => console.log(err))
     console.log(loginform);
   }
