@@ -9,6 +9,11 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta(object):
         model = User 
         fields = ['id', 'username', 'password', 'email',"department","branch"]
+        
+class UserGetSerializer(serializers.ModelSerializer):
+    class Meta(object):
+        model = User 
+        fields = '__all__'
 
 
 #ticket app
