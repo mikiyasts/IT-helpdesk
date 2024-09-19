@@ -8,18 +8,28 @@ function Login() {
   const navigate=useNavigate()
   const [forgotPopup, setforgotPopup] = useState(false)
   const [loginform, Setloginform] = useState({ username: "", password: "" })
-
+  const getCsrfToken = () => {
+    const cookieValue = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('csrftoken='))
+        ?.split('=')[1];
+    return cookieValue || '';
+};
 
 
 
   const submitLogin = (e) => {
     e.preventDefault()
-    axios.post("http://localhost:8000/api/login/",loginform,{ withCredentials: true })
+    axios.post("http://localhost:8000/api/login/",loginform,{ withCredentials: true ,headers: {
+      'X-CSRFToken': getCsrfToken(),
+  }})
     .then(res => {
       // document.cookie=`auth_token=${res.data && res.data.token && res.data.token}`
       console.log("loged in",res);
       // console.log(document.cookie);
-      axios.get("http://localhost:8000/api/getuser/",{ withCredentials: true }).then(res=>{
+      axios.get("http://localhost:8000/api/getuser/",{ withCredentials: true ,headers: {
+        'X-CSRFToken': getCsrfToken(),
+    }}).then(res=>{
         console.log("token",res);
       }).catch(err=>{
         console.log("err",err);

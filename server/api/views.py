@@ -60,8 +60,8 @@ def login(request):
     value=token.key,
     path='/',
     httponly=True,         
-    secure=True,           
-    samesite='Lax'         
+    secure=False,         # Set to True in production
+    samesite='Lax'      # Change to 'Lax' or 'None' based on your requirements
 )
 
     
