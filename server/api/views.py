@@ -56,13 +56,14 @@ def login(request):
     
     
     response.set_cookie(
-        key='auth_token',
-        value=token.key,
-        path='/',
-        # httponly=True,         
-        # secure=True,           
-        # samesite='Lax'         
-    )
+    key='auth_token',
+    value=token.key,
+    path='/',
+    httponly=True,         
+    secure=True,           
+    samesite='Lax'         
+)
+
     
     return response
 @api_view(['GET'])
