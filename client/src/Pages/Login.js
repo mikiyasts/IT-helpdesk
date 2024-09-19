@@ -30,7 +30,15 @@ function Login() {
       axios.get("http://localhost:8000/api/getuser/",{ withCredentials: true ,headers: {
         'X-CSRFToken': getCsrfToken(),
     }}).then(res=>{
+      const role=res.data && res.data.role
         console.log("token",res);
+        console.log("token",role);
+        if(role==="employee"){
+          navigate("/dashboard")
+        }
+        if(role==="admin"){
+          navigate("/admin")
+        }
       }).catch(err=>{
         console.log("err",err);
         

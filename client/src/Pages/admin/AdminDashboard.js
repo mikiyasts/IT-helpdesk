@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Logo from "../../asset/Image/logo.png";
 import AdminHeader from "../../component/AdminHeader";
 import { Outlet } from "react-router-dom";
@@ -7,8 +7,38 @@ import FillChart from "../../component/FillChart"
 import LineChart from "../../component/LineChart"
 import BarChart from "../../component/BarChart"
 import PieChart from "../../component/PieChart"
-
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 function AdminDashboard() {
+const navigate
+  const getCsrfToken = () => {
+    const cookieValue = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('csrftoken='))
+        ?.split('=')[1];
+    return cookieValue || '';
+};
+
+  useEffect(()=>{
+    axios.get("http://localhost:8000/api/getuser/",{ withCredentials: true ,headers: {
+      'X-CSRFToken': getCsrfToken(),
+  }}).then(res=>{
+    const role=res.data && res.data.role
+      console.log("token",res);
+      console.log("token",role);
+      if(role==="employee"){
+        navigate("/dashboard")
+      }
+      if(role==="admin"){
+        navigate("/admin")
+      }
+    }).catch(err=>{
+      console.log("err",err);
+      
+    })
+  })
+
+
   return (
       <div className="admin-dashboard">
         <div className="cards">
