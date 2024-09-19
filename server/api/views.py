@@ -58,9 +58,10 @@ def login(request):
     response.set_cookie(
         key='auth_token',
         value=token.key,
-        httponly=True,         
-        secure=True,           
-        samesite='Lax'         
+        path='/',
+        # httponly=True,         
+        # secure=True,           
+        # samesite='Lax'         
     )
     
     return response
