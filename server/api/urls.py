@@ -24,5 +24,9 @@ urlpatterns = [
   path('create_ticket_category/', views.create_ticket_category),
   path('list_ticket_category_detail/<int:pk>/', views.list_ticket_category_detail),
   path('delete_ticket_category/<int:pk>/', views.delete_ticket_category),
+  
+  
+  
+    path('admin-dashboard/', views.admin_dashboard),
    
 ] 

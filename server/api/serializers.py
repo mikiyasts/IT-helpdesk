@@ -54,3 +54,20 @@ class TicketAttachmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Attachment
         fields = ['id', 'file', 'uploaded_at', 'ticket']
+class RecentTicketSerializer(serializers.ModelSerializer):
+    created_by = serializers.SerializerMethodField()
+    department = serializers.StringRelatedField(source='department.name')
+    category = serializers.StringRelatedField(source='category.name')
+
+    class Meta:
+        model = Ticket
+        fields = ['created_by', 'category', 'department', 'created_at']
+
+    def get_created_by(self, obj):
+        user = obj.created_by
+        return {
+            'username': user.username,
+            'department': user.department.name if user.department else None,
+            'branch': user.branch if user.branch else None,
+        }
+        

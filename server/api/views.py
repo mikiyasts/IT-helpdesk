@@ -7,7 +7,7 @@ from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.response import Response
 
 from tickets.models import Ticket,TicketCategory
-from .serializers import TicketCategorySerializer, TicketSerializer, UserGetSerializer, UserSerializer
+from .serializers import RecentTicketSerializer, TicketCategorySerializer, TicketSerializer, UserGetSerializer, UserSerializer
 from rest_framework.authtoken.models import Token
 from rest_framework import status
 from users.models import User
@@ -61,7 +61,7 @@ def login(request):
     path='/',
     httponly=True,         
     secure=False,         # Set to True in production
-    samesite='None'      # Change to 'Lax' or 'None' based on your requirements
+    samesite='Lax'      # Change to 'Lax' or 'None' based on your requirements
 )
 
     
@@ -175,3 +175,50 @@ def delete_ticket_category(request,pk):
     ticket_category = TicketCategory.objects.get(id=pk)
     ticket_category.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+
+
+## Admin API
+
+@api_view(['GET'])
+def admin_dashboard(request):
+    # Count ticket status
+    open_tickets = Ticket.objects.filter(status='Open').count()
+    in_progress_tickets = Ticket.objects.filter(status='In Progress').count()
+    closed_tickets = Ticket.objects.filter(status='Closed').count()
+
+    # Count requests from each branch
+    kaliti_requests = User.objects.filter(branch='kaliti').count()
+    lideta_requests = User.objects.filter(branch='lideta').count()
+    mekanissa_requests = User.objects.filter(branch='mekanissa').count()
+    farm_requests = User.objects.filter(branch='farm').count()
+
+    # Get category counts
+    categories = TicketCategory.objects.all()
+    category_counts = {}
+    for category in categories:
+        category_counts[category.name] = Ticket.objects.filter(category=category).count()
+
+    # Get recent 10 requests
+    recent_requests = Ticket.objects.all().order_by('-created_at')[:10]
+    recent_requests_serializer = RecentTicketSerializer(recent_requests, many=True)
+
+    # Create response data
+    data = {
+        'ticket_status': {
+            'open': open_tickets,
+            'in_progress': in_progress_tickets,
+            'closed': closed_tickets
+        },
+        'branch_requests': {
+            'Kaliti': kaliti_requests,
+            'Lideta': lideta_requests,
+            'Mekanissa': mekanissa_requests,
+            'Farm': farm_requests
+        },
+        'categories': category_counts,
+        'recent_requests': recent_requests_serializer.data
+    }
+
+    return Response(data)
