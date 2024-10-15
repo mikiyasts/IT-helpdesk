@@ -59,10 +59,10 @@ function App() {
     <div className="sidebar-main">
       <ul>
         <Link to="/admin" onClick={()=>setPage("dashboard")} className={page==="dashboard" && "active"}>Dashboard</Link>
-        <Link to="completed" onClick={()=>setPage("completed")} className={page==="completed"&&"active"}>Completed</Link>
-        <Link to="pending" onClick={()=>setPage("pending")} className={page==="pending"&&"active"}>Pending</Link>
-        <Link to="inprogress" onClick={()=>setPage("In Progress")} className={page==="In Progress"&&"active"}>In Progress</Link>
-        <Link to="manage" onClick={()=>setPage("manage")} className={page==="manage"&&"active"}>Manage</Link>
+        <Link to="completed" onClick={()=>setPage("completed")} className={page==="completed"&&"active"}>Tickets</Link>
+        <Link to="pending" onClick={()=>setPage("pending")} className={page==="pending"&&"active"}>Users</Link>
+        <Link to="inprogress" onClick={()=>setPage("In Progress")} className={page==="In Progress"&&"active"}>Chat</Link>
+        <Link to="manage" onClick={()=>setPage("manage")} className={page==="manage"&&"active"}>Report</Link>
       </ul>
     </div>
   </div>

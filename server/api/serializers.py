@@ -68,6 +68,6 @@ class RecentTicketSerializer(serializers.ModelSerializer):
         return {
             'username': user.username,
             'department': user.department.name if user.department else None,
-            'branch': user.branch if user.branch else None,
+            'branch': user.branch  if user.branch else None,
         }
         
