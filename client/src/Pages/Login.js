@@ -28,6 +28,11 @@ function Login() {
       document.cookie=`access_token=${res.data.access}`
       document.cookie=`refresh_token=${res.data.refresh}`
 
+      if(res.data.role==="admin"){
+        navigate("/admin")
+      }else if(res.data.role==="employee"){
+        navigate("/dashboard")
+      }
       // navigate("/dashboard")
     })
     .then(res => console.log(res))
