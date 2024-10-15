@@ -19,6 +19,15 @@ from rest_framework.permissions import IsAuthenticated
 import jwt, datetime
 from .models import APIKey
 from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework_simplejwt.views import TokenObtainPairView
+from .serializers import CustomTokenObtainPairSerializer
+from django.contrib.auth import get_user_model
+from rest_framework import serializers
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from .serializers import JWTUserSerializer
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
 @api_view(['GET'])
 def api_endpoints(request):
     endpoints = {
