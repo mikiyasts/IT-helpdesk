@@ -5,6 +5,7 @@ from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
 )
+from .views import CustomTokenObtainPairView
 urlpatterns = [
   path('',views.api_endpoints),
   path('signup/', views.signup),
@@ -14,7 +15,7 @@ urlpatterns = [
   path('generate-apikey/',views.GenerateAPIKeyView.as_view()),
    
   path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-  path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+  path('token/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
   
   
   

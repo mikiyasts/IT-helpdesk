@@ -1,8 +1,21 @@
 from rest_framework import serializers
-
 from django.contrib.auth import get_user_model
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from django.contrib.auth import get_user_model
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from users.models import User, Department
+from django.contrib.auth import get_user_model
+from rest_framework import serializers
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from django.contrib.auth import authenticate
+
+
 # from django.contrib.auth.models import User
-User = get_user_model()
+class DepartmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Department
+        fields = ['id', 'name']
 
 #user authentication
 class UserSerializer(serializers.ModelSerializer):
@@ -70,4 +83,38 @@ class RecentTicketSerializer(serializers.ModelSerializer):
             'department': user.department.name if user.department else None,
             'branch': user.branch  if user.branch else None,
         }
-        
+   
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    username = serializers.CharField(required=True)
+    password = serializers.CharField(required=True, write_only=True)
+
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+        token['username'] = user.username  # Optional: include username in the token
+        return token
+
+    def validate(self, attrs):
+        username = attrs.get('username')
+        password = attrs.get('password')
+
+        # Authenticate the user
+        user = authenticate(username=username, password=password)
+        if user is None:
+            raise serializers.ValidationError('Invalid username or password.')
+
+        # If we reach here, authentication was successful
+        data = super().validate(attrs)  # Call original validation for JWT token generation
+
+        # Serialize user details
+        user_serializer = JWTUserSerializer(user)
+        data.update(user_serializer.data)  # Add user details to the response
+
+        return data
+    
+class JWTUserSerializer(serializers.ModelSerializer):
+    department = DepartmentSerializer()  # Nested serializer for department details
+
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'department', 'role']
