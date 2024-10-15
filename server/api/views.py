@@ -5,7 +5,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.response import Response
-
+import secrets
+from .authentication import APIKeyAuthentication
 from tickets.models import Ticket,TicketCategory
 from .serializers import RecentTicketSerializer, TicketCategorySerializer, TicketSerializer, UserGetSerializer, UserSerializer
 from rest_framework.authtoken.models import Token
@@ -16,6 +17,8 @@ from rest_framework.decorators import authentication_classes, permission_classes
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 import jwt, datetime
+from .models import APIKey
+from rest_framework_simplejwt.authentication import JWTAuthentication
 @api_view(['GET'])
 def api_endpoints(request):
     endpoints = {
@@ -32,7 +35,19 @@ def api_endpoints(request):
         "delete_ticket_category": "/delete_ticket_category/<int:pk>/",
     }
     return Response(endpoints)
-
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+class GenerateAPIKeyView(APIView):
+    def post(self, request):
+        user = request.user
+        api_key, created = APIKey.objects.get_or_create(user=user)
+        if created:
+            api_key.key = secrets.token_urlsafe(32)
+            api_key.save()
+        elif not api_key.key:
+            api_key.key = secrets.token_urlsafe(32)
+            api_key.save()
+        return Response({'api_key': api_key.key})
 @api_view(['POST'])
 def signup(request):
     serializer = UserSerializer(data=request.data)
@@ -182,6 +197,8 @@ def delete_ticket_category(request,pk):
 ## Admin API
 
 @api_view(['GET'])
+@authentication_classes([APIKeyAuthentication])
+@permission_classes([IsAuthenticated])
 def admin_dashboard(request):
     # Count ticket status
     open_tickets = Ticket.objects.filter(status='Open').count()
