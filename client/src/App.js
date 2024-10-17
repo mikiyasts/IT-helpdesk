@@ -14,9 +14,11 @@ import { Link } from 'react-router-dom';
 import Manage from './Pages/admin/Manage';
 import Inprogress from './Pages/admin/Inprogress';
 import ProtectedRoutes from './Pages/ProtectedRoutes';
+import { AuthContext } from './Context/AuthContext';
 
 function App() {
 
+  const [isAuth, setIsAuth] = useState(false)
 
   const [page, setPage] = useState(sessionStorage.getItem("page") || "Dashboard")
 
@@ -81,22 +83,25 @@ function App() {
     </div>
   }
   return (
+
     <div className="App">
-      {/* <Header/> */}
-      <Routes>
-        <Route index element={<Login />}></Route>
-        <Route element={<ProtectedRoutes />}>
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/admin" element={<AdminLayout />}>
-            <Route index element={<AdminDashboard />} />
-            <Route path='completed' element={<Completed />} />
-            <Route path='pending' element={<Pending />} />
-            <Route path='inprogress' element={<Inprogress />} />
-            <Route path='manage' element={<Manage />} />
+      <AuthContext.Provider value={{ isAuth, setIsAuth }}>
+        {/* <Header/> */}
+        <Routes>
+          <Route index element={<Login />}></Route>
+          <Route element={<ProtectedRoutes />}>
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/admin" element={<AdminLayout />}>
+              <Route index element={<AdminDashboard />} />
+              <Route path='completed' element={<Completed />} />
+              <Route path='pending' element={<Pending />} />
+              <Route path='inprogress' element={<Inprogress />} />
+              <Route path='manage' element={<Manage />} />
+            </Route>
+            <Route path="*" element={<h1>ALU ALU</h1>}></Route>
           </Route>
-          <Route path="*" element={<h1>ALU ALU</h1>}></Route>
-        </Route>
-      </Routes>
+        </Routes>
+      </AuthContext.Provider>
     </div>
   );
 }

@@ -8,35 +8,9 @@ import LineChart from "../../component/LineChart"
 import BarChart from "../../component/BarChart"
 import PieChart from "../../component/PieChart"
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+
 
 function AdminDashboard() {
-  
-const navigate=useNavigate()
-  const getCsrfToken = () => {
-    const cookieValue = document.cookie
-        .split('; ')
-        .find(row => row.startsWith('csrftoken='))
-        ?.split('=')[1];
-    return cookieValue || '';
-};
-
-  useEffect(()=>{
-    axios.get("http://localhost:8000/api/getuser/",{ withCredentials: true ,headers: {
-      'X-CSRFToken': getCsrfToken(),
-  }}).then(res=>{
-    const role=res.data && res.data.role
-      console.log("token",res);
-      console.log("token",role);
-      if(role!=="admin"){
-        navigate("/")
-      }
-    }).catch(err=>{
-      console.log("err",err);
-      
-    })
-  })
-
 
   return (
       <div className="admin-dashboard">

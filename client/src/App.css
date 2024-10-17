@@ -522,20 +522,24 @@
 }
 .user{
   position: relative;
+  border-bottom: 1px solid var(--accent-secondary-alpha);
 }
 .logout{
+  padding: 2px 4px;
   position: absolute;
-  bottom:-2rem;
+  bottom:-2.2rem;
   left: 50%;
   width: 100%;
   text-align: center;
-  background-color: red;
+  background-color: var(--accent-tertiary);
   transform: translate3d(-50%,-50%,0) scaleY(0);
   opacity: 0;
   visibility: hidden;
+  transform-origin: top;
+  cursor: pointer;
 }
 .logout.active{
-  animation: 1s ease-in-out linear logouta;
+  animation: 1s ease-in-out forwards logouta;
 }
 @keyframes logouta {
   0%{

@@ -2,7 +2,10 @@ import React from "react";
 import Logo from "../asset/Image/logo.png";
 import QuestionAnswerRoundedIcon from "@mui/icons-material/QuestionAnswerRounded";
 import AccountCircleRoundedIcon from "@mui/icons-material/AccountCircleRounded";
+import { useNavigate } from "react-router-dom";
 function Header(props) {
+
+  const navigate=useNavigate()
   return (
     <div className="header">
       <div className="header-left">
@@ -18,7 +21,11 @@ function Header(props) {
         </div>
         <div className="user">
           <AccountCircleRoundedIcon /> <span>Wanofi</span>
-          <div className="logout active">
+          <div className="logout active" onClick={()=>{
+            document.cookie=`access_token=`
+            document.cookie=`refresh_token=`
+            navigate("/")
+          }}>
             Logout
           </div>
         </div>

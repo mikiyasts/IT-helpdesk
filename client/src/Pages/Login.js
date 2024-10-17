@@ -8,6 +8,8 @@ function Login() {
   const navigate=useNavigate()
   const [forgotPopup, setforgotPopup] = useState(false)
   const [loginform, Setloginform] = useState({ username: "", password: "" })
+
+  
   const getCsrfToken = () => {
     const cookieValue = document.cookie
         .split('; ')
@@ -29,15 +31,15 @@ function Login() {
       document.cookie=`refresh_token=${res.data.refresh}`
 
       if(res.data.role==="admin"){
+        console.log("ad");
+        
         navigate("/admin")
       }else if(res.data.role==="employee"){
+        console.log("emp");
         navigate("/dashboard")
       }
       // navigate("/dashboard")
-    })
-    .then(res => console.log(res))
-    .catch(err => console.log(err))
-    console.log(loginform);
+    }).catch(err => console.log(err))
   }
   const handleLoginchange = (e) => {
     Setloginform(prev => {
