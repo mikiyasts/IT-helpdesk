@@ -29,6 +29,8 @@ from .serializers import JWTUserSerializer
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
 @api_view(['GET'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
 def api_endpoints(request):
     endpoints = {
         "signup": "/signup/",
@@ -58,6 +60,8 @@ class GenerateAPIKeyView(APIView):
             api_key.save()
         return Response({'api_key': api_key.key})
 @api_view(['POST'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
 def signup(request):
     serializer = UserSerializer(data=request.data)
     if serializer.is_valid():
@@ -70,6 +74,8 @@ def signup(request):
     return Response(serializer.errors, status=status.HTTP_200_OK)
 
 @api_view(['POST'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
 def login(request):
     user = get_object_or_404(User, email=request.data['username'])
     if not user.check_password(request.data['password']):
@@ -91,6 +97,8 @@ def login(request):
     
     return response
 @api_view(['POST'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
 def logout(request):
     # Retrieve the token from cookies
     token_key = request.COOKIES.get('auth_token')
@@ -112,6 +120,8 @@ def logout(request):
 
 
 @api_view(['GET'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
 def GetUser(request):
     token = request.COOKIES.get('auth_token')
     print(f"Received token: {token}")  # Add debug logging
@@ -128,17 +138,12 @@ def GetUser(request):
         print("No token provided")  # Add debug logging
         return Response("Unauthorized", status=status.HTTP_401_UNAUTHORIZED)
 
-@api_view(['GET'])
-@authentication_classes([SessionAuthentication, TokenAuthentication])
-@permission_classes([IsAuthenticated])
-def test_token(request):
-    return Response("passed!")
-
-
 
 
 #views for ticket API
 @api_view(['POST'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
 def create_ticket(request):
     serializer = TicketSerializer(data=request.data)
     if serializer.is_valid():
@@ -147,6 +152,8 @@ def create_ticket(request):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
 def list_tickets(request):
     tickets = Ticket.objects.all()
     serializer = TicketSerializer(tickets, many=True)
@@ -154,6 +161,8 @@ def list_tickets(request):
 
 
 @api_view(['GET'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
 def ticket(request, pk):
     tickets = Ticket.objects.get(id=pk)
     serializer = TicketSerializer(tickets)
@@ -161,6 +170,8 @@ def ticket(request, pk):
     return Response(serializer.data)
 
 @api_view(['POST'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
 def edit_ticket(request, pk):
     ticket=Ticket.objects.get(id=pk)
     serializer = TicketSerializer(ticket, data=request.data, partial=True)  # `partial=True` for partial updates
@@ -173,12 +184,16 @@ def edit_ticket(request, pk):
 
 #views for ticket category
 @api_view(['GET'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
 def list_ticket_category(request):
     ticket_category = TicketCategory.objects.all()
     serializer = TicketCategorySerializer(ticket_category, many=True)
     return Response(serializer.data)
     
 @api_view(['POST'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
 def create_ticket_category(request):
     serializer = TicketCategorySerializer(data=request.data)
     if serializer.is_valid():
@@ -187,6 +202,8 @@ def create_ticket_category(request):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 @api_view(['GET'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
 def list_ticket_category_detail(request,pk):
     ticket_category = TicketCategory.objects.get(id=pk)
     serializer = TicketCategorySerializer(ticket_category)
@@ -195,6 +212,9 @@ def list_ticket_category_detail(request,pk):
 
 
 @api_view(['DELETE'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+
 def delete_ticket_category(request,pk):
     ticket_category = TicketCategory.objects.get(id=pk)
     ticket_category.delete()
@@ -206,7 +226,7 @@ def delete_ticket_category(request,pk):
 ## Admin API
 
 @api_view(['GET'])
-@authentication_classes([APIKeyAuthentication])
+@authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 def admin_dashboard(request):
     # Count ticket status
