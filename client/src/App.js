@@ -15,7 +15,12 @@ import Manage from './Pages/admin/Manage';
 import Inprogress from './Pages/admin/Inprogress';
 import ProtectedRoutes from './Pages/ProtectedRoutes';
 import { AuthContext } from './Context/AuthContext';
-
+import Tickets from './Pages/admin/Tickets';
+import DashboardIcon from '@mui/icons-material/Dashboard';
+import ConfirmationNumberIcon from '@mui/icons-material/ConfirmationNumber';
+import GroupIcon from '@mui/icons-material/Group';
+import ForumIcon from '@mui/icons-material/Forum';
+import AssessmentIcon from '@mui/icons-material/Assessment';
 function App() {
 
   const [isAuth, setIsAuth] = useState(false)
@@ -61,11 +66,11 @@ function App() {
         <div className="logo"><img src={Logo} alt="logo" width="45px" /></div>
         <div className="sidebar-main">
           <ul>
-            <Link to="/admin" onClick={() => setPage("dashboard")} className={page === "dashboard" && "active"}>Dashboard</Link>
-            <Link to="completed" onClick={() => setPage("completed")} className={page === "completed" && "active"}>Tickets</Link>
-            <Link to="pending" onClick={() => setPage("pending")} className={page === "pending" && "active"}>Users</Link>
-            <Link to="inprogress" onClick={() => setPage("In Progress")} className={page === "In Progress" && "active"}>Chat</Link>
-            <Link to="manage" onClick={() => setPage("manage")} className={page === "manage" && "active"}>Report</Link>
+            <Link to="/admin" onClick={() => setPage("dashboard")} className={page === "dashboard" && "active"}><DashboardIcon/> Dashboard</Link>
+            <Link to="tickets" onClick={() => setPage("tickets")} className={page === "tickets" && "active"}><ConfirmationNumberIcon/> Tickets</Link>
+            <Link to="pending" onClick={() => setPage("pending")} className={page === "pending" && "active"}><GroupIcon/>Users</Link>
+            <Link to="inprogress" onClick={() => setPage("In Progress")} className={page === "In Progress" && "active"}><ForumIcon/>Chat</Link>
+            <Link to="manage" onClick={() => setPage("manage")} className={page === "manage" && "active"}><AssessmentIcon/>Report</Link>
           </ul>
         </div>
       </div>
@@ -94,6 +99,7 @@ function App() {
             <Route path="/admin" element={<AdminLayout />}>
               <Route index element={<AdminDashboard />} />
               <Route path='completed' element={<Completed />} />
+              <Route path='tickets' element={<Tickets />} />
               <Route path='pending' element={<Pending />} />
               <Route path='inprogress' element={<Inprogress />} />
               <Route path='manage' element={<Manage />} />

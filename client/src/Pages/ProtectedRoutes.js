@@ -46,11 +46,8 @@ function ProtectedRoutes() {
         // setisLoading(false)
         console.log("hellow ac",res.data.access);
         return console.log("hellow ref",res.data.refresh);
-        
-        
       }).catch(err=>{
         setisLoading(false)
-
         setIsAuth(false)
         return console.log("hellow?");
 
