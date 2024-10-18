@@ -8,6 +8,8 @@ function Login() {
   const navigate=useNavigate()
   const [forgotPopup, setforgotPopup] = useState(false)
   const [loginform, Setloginform] = useState({ username: "", password: "" })
+
+  
   const getCsrfToken = () => {
     const cookieValue = document.cookie
         .split('; ')
@@ -20,33 +22,24 @@ function Login() {
 
   const submitLogin = (e) => {
     e.preventDefault()
-    axios.post("http://localhost:8000/api/login/",loginform,{ withCredentials: true ,headers: {
+    axios.post("http://localhost:8000/api/token/",loginform,{ withCredentials: true ,headers: {
       'X-CSRFToken': getCsrfToken(),
   }})
     .then(res => {
-      // document.cookie=`auth_token=${res.data && res.data.token && res.data.token}`
-      console.log("loged in",res);
-      // console.log(document.cookie);
-      axios.get("http://localhost:8000/api/getuser/",{ withCredentials: true ,headers: {
-        'X-CSRFToken': getCsrfToken(),
-    }}).then(res=>{
-      const role=res.data && res.data.role
-        console.log("token",res);
-        console.log("token",role);
-        if(role==="employee"){
-          navigate("/dashboard")
-        }
-        if(role==="admin"){
-          navigate("/admin")
-        }
-      }).catch(err=>{
-        console.log("err",err);
+      console.log(res);
+      document.cookie=`access_token=${res.data.access}`
+      document.cookie=`refresh_token=${res.data.refresh}`
+
+      if(res.data.role==="admin"){
+        console.log("ad");
         
-      })
-    })
-    .then(res => console.log(res))
-    .catch(err => console.log(err))
-    console.log(loginform);
+        navigate("/admin")
+      }else if(res.data.role==="employee"){
+        console.log("emp");
+        navigate("/dashboard")
+      }
+      // navigate("/dashboard")
+    }).catch(err => console.log(err))
   }
   const handleLoginchange = (e) => {
     Setloginform(prev => {
