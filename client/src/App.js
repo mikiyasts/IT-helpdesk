@@ -94,7 +94,7 @@ function App() {
         {/* <Header/> */}
         <Routes>
           <Route index element={<Login />}></Route>
-          <Route element={<ProtectedRoutes />}>
+          <Route element={<ProtectedRoutes/>}>
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/admin" element={<AdminLayout />}>
               <Route index element={<AdminDashboard />} />
