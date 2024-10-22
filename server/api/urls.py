@@ -10,7 +10,7 @@ urlpatterns = [
   path('',views.api_endpoints),
   path('signup/', views.signup),
   path('login/', views.login),
-  path('getuser/', views.GetUser),
+  path('getuser/', views.GetUserView.as_view()),
   path('logout/',views.logout),
   path('generate-apikey/',views.GenerateAPIKeyView.as_view()),
    

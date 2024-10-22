@@ -35,7 +35,9 @@ def api_endpoints(request):
     endpoints = {
         "signup": "/signup/",
         "login": "/login/",
-        "test_token": "/test_token/",
+        "to get token":"/token/",
+        "to refresh token":"/token/refresh/",
+        "to get authenticated user":"/getuser/",
         "list_ticket": "/list_ticket/",
         "create_ticket": "/create_ticket/",
         "ticket": "/list_ticket/<int:pk>/",
@@ -72,7 +74,15 @@ def signup(request):
         token = Token.objects.create(user=user)
         return Response({'token': token.key, 'user': serializer.data})
     return Response(serializer.errors, status=status.HTTP_200_OK)
+class GetUserView(APIView):
+    permission_classes = [IsAuthenticated]
 
+    def get(self, request):
+        user = request.user
+        # Assuming you have a custom User model with a 'role' field
+        # or a separate Role model with a foreign key to User
+        role = user.role  # or user.userprofile.role, etc.
+        return Response({'username': user.username, 'role': role})
 @api_view(['POST'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
@@ -90,7 +100,6 @@ def login(request):
     value=token.key,
     path='/',
     httponly=True,         
-    secure=False,         # Set to True in production
     samesite='Lax'      # Change to 'Lax' or 'None' based on your requirements
 )
 
