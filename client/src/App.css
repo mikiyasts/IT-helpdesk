@@ -500,6 +500,10 @@
   cursor: pointer;
   min-width: fit-content;
   text-wrap: nowrap;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .3rem;
 }
 
 

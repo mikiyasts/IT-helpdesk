@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import Logo from "../asset/Image/logo.png"
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import axios from "axios"
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../Context/AuthContext";
 function Login() {
+  const {isAuth,setIsAuth}=useContext(AuthContext)
   const [tab, setTab] = useState("signin");
   const navigate=useNavigate()
   const [forgotPopup, setforgotPopup] = useState(false)
@@ -26,11 +28,10 @@ function Login() {
       'X-CSRFToken': getCsrfToken(),
   }})
     .then(res => {
-      console.log(res);
       document.cookie=`access_token=${res.data.access}`
       document.cookie=`refresh_token=${res.data.refresh}`
-
       if(res.data.role==="admin"){
+        setIsAuth(true)
         console.log("ad");
         
         navigate("/admin")

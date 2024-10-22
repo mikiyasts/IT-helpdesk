@@ -1,10 +1,12 @@
-import React, { useState,useEffect } from 'react'
+import React, { useState,useEffect, useContext } from 'react'
 import Header from '../../component/Header'
 import Table from '../../component/DataTable'
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from '../../Context/AuthContext';
 function Dashboard() {
 
+  const {isAuth,setIsAuth}=useContext(AuthContext)
   
   const [popup,setPopup]=useState(false);
 
@@ -30,6 +32,9 @@ function Dashboard() {
 
  
   console.log(request);
+  console.log("cont",isAuth);
+
+
   return (
     <div className='user-dashboard_page'>
         <Header/>

@@ -6,7 +6,7 @@ import { AuthContext } from '../Context/AuthContext'
 function ProtectedRoutes() {
 
   const {isAuth,setIsAuth}=useContext(AuthContext)
-
+  const [isLoading,setisLoading]=useState(true)
   
     
   const getCsrfToken = () => {
@@ -37,30 +37,33 @@ function ProtectedRoutes() {
         'X-CSRFToken': getCsrfToken(),
         "Authorization":`Bearer ${acstoken}`
       }}).then(res=>{
+
+        setisLoading(false)
+
         setIsAuth(true)
         document.cookie=`access_token=${res.data.access}`
         document.cookie=`refresh_token=${res.data.refresh}`
         // setisLoading(false)
         console.log("hellow ac",res.data.access);
-        console.log("hellow ref",res.data.refresh);
-        
-        return
+        return console.log("hellow ref",res.data.refresh);
       }).catch(err=>{
+        setisLoading(false)
         setIsAuth(false)
-        console.log("hellow?");
+        return console.log("hellow?");
 
         // setisLoading(false)
-        return
+        
       })
     }
 
     authUser()
   },[])
+  if(isLoading){
+    return <h1>Loading</h1>
+}else{
 
-
-  console.log("assssdad",isAuth);
-
-  return  isAuth?<Outlet/>:<Navigate to="/"/>
+  return isAuth && isAuth? <Outlet/> : <Navigate to="/"/>
+}
 }
 
 export default ProtectedRoutes

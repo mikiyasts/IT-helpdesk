@@ -16,95 +16,23 @@ const chartSetting = {
 
 const valueFormatter = (value) => `${value}req`;
 
-export default function BarsDataset() {
+export default function BarsDataset(props) {
 
 
-const dataset = [
-        {
-          Lideta: 59,
-          Kality: 57,
-          Mekanissa: 86,
-          Farm: 21,
-          month: 'Jan',
-        },
-        {
-          Lideta: 50,
-          Kality: 52,
-          Mekanissa: 78,
-          Farm: 28,
-          month: 'Feb',
-        },
-        {
-          Lideta: 47,
-          Kality: 53,
-          Mekanissa: 106,
-          Farm: 41,
-          month: 'Mar',
-        },
-        {
-          Lideta: 54,
-          Kality: 56,
-          Mekanissa: 92,
-          Farm: 73,
-          month: 'Apr',
-        },
-        {
-          Lideta: 57,
-          Kality: 69,
-          Mekanissa: 92,
-          Farm: 99,
-          month: 'May',
-        },
-        {
-          Lideta: 60,
-          Kality: 63,
-          Mekanissa: 103,
-          Farm: 144,
-          month: 'June',
-        },
-        {
-          Lideta: 59,
-          Kality: 60,
-          Mekanissa: 105,
-          Farm: 319,
-          month: 'July',
-        },
-        {
-          Lideta: 65,
-          Kality: 60,
-          Mekanissa: 106,
-          Farm: 249,
-          month: 'Aug',
-        },
-        {
-          Lideta: 51,
-          Kality: 51,
-          Mekanissa: 95,
-          Farm: 131,
-          month: 'Sept',
-        },
-        {
-          Lideta: 60,
-          Kality: 65,
-          Mekanissa: 97,
-          Farm: 55,
-          month: 'Oct',
-        },
-        {
-          Lideta: 67,
-          Kality: 64,
-          Mekanissa: 76,
-          Farm: 48,
-          month: 'Nov',
-        },
-        {
-          Lideta: 61,
-          Kality: 70,
-          Mekanissa: 103,
-          Farm: 25,
-          month: 'Dec',
-        },
-      ];
+  
+  const dataset = Array()
+  if(props.dataset){
+    console.log("from bar",typeof(props.dataset));
+    console.log("from bar",Object.keys(props.dataset));
+    Object.keys(props.dataset).map((el,index)=>{
+      dataset[index]={
+        [el]:props.dataset[el],
+        "month":el
+      }
+    })
+  }
+  console.log("from bar",dataset);
+  
       
   return (
     <BarChart
