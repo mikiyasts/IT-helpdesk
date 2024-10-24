@@ -2,6 +2,7 @@ import React from 'react'
 import Logo from "../asset/Image/logo.png"
 import AccountCircleRoundedIcon from "@mui/icons-material/AccountCircleRounded";
 import { useNavigate } from "react-router-dom";
+import Cookies from 'js-cookie'
 function Header() {
   const navigate=useNavigate()
   return (
@@ -15,8 +16,8 @@ function Header() {
         <div className="user">
         <AccountCircleRoundedIcon /> <span>Wanofi</span>
           <div className="logout active" onClick={()=>{
-            document.cookie=`access_token=`
-            document.cookie=`refresh_token=`
+            Cookies.remove('access_token')
+            Cookies.remove('refresh_token')
             navigate("/")
           }}>
             Logout

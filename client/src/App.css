@@ -916,8 +916,7 @@ svg .css-1qkz8p7{
   min-height: 80px;
   display: flex;
   flex-direction: column;
-  padding: .5rem 1.2rem;
-  gap: .5rem;
+  padding: .2rem 1.2rem;
   overflow: hidden;
 }
 .tickets-list ul li .list-requestor-name{
@@ -930,14 +929,14 @@ svg .css-1qkz8p7{
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  padding-block: .5rem;
+  padding-block:0;
 }
 .tickets-list ul .ticketid-status{
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
-.tickets-list ul li:nth-child(1){
+.tickets-list ul li.active{
   background-color:var(--accent-secondary-alpha);
 }
 
@@ -951,9 +950,10 @@ svg .css-1qkz8p7{
   flex-direction: column;
   gap:.3rem;
 }
-.ticket-description>p , .ticket-note>p{
+.ticket-description>p , .ticket-note>p,.highlight-lable,.ticket-highligh-status p{
   opacity: .9;
   font-weight: lighter;
+  font-size: smaller;
 }
 .ticket-solution form{
   display: flex;
@@ -1014,15 +1014,52 @@ svg .css-1qkz8p7{
 .ticket-highlight-datail .detail-header{
   background-color: var(--body-bg-primary);
   padding: .5rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  cursor: pointer;
+  border: none;
+
 }
-.ticket-highlight-datail>ul{
+.ticket-highlight-datail .detail-header>ul{
+  width: 100%;
   display: flex;
   flex-direction: column;
   list-style: none;
+  position: absolute;
+  left: 0;
+  top:100%;
+  transform-origin: top;
+  opacity: 0;
+  visibility: hidden;
+  transition: all .1s;
+  z-index: 2000;
+  border-bottom:1px solid var(--body-bg-primary);
 }
-.ticket-highlight-datail>ul li{
+.ticket-highlight-datail .detail-header>ul.active{
+  opacity: 1;
+  visibility: visible;
+} 
+
+.ticket-highlight-datail .detail-header>ul li{
   padding: .5rem 1rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 2rem;
+}
+.ticket-highlight-datail .detail-header>ul li>div{
+  flex: 1;
+  text-align: left;
+}
+@keyframes collapsdetail {
+  0%{
+    opacity: 0;
+    visibility: hidden;
+  }
+  100%{
+    opacity: 1;
+    visibility: visible;
+  }
 }

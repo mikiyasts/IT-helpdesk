@@ -2,7 +2,7 @@ import axios from 'axios'
 import React, { useContext, useEffect, useState } from 'react'
 import { Navigate, Outlet, useNavigate } from 'react-router-dom'
 import { AuthContext } from '../Context/AuthContext'
-
+import Cookies from 'js-cookie'
 function ProtectedRoutes() {
 
   const {isAuth,setIsAuth}=useContext(AuthContext)
@@ -49,6 +49,8 @@ function ProtectedRoutes() {
       }).catch(err=>{
         setisLoading(false)
         setIsAuth(false)
+        Cookies.remove('access_token')
+        Cookies.remove('refresh_token')
         navigate("/")
         return console.log("hellow?");
 
