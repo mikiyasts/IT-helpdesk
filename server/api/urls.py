@@ -36,5 +36,7 @@ urlpatterns = [
   
   
   path('admin-dashboard/', views.admin_dashboard),
+  path('systemusers/', views.get_all_users),
+  path('edituser/<str:pk>/', views.edit_user),
    
 ] 

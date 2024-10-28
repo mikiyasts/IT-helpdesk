@@ -25,7 +25,7 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from .serializers import JWTUserSerializer
-
+from users.models import User
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
 @api_view(['GET'])
@@ -277,3 +277,46 @@ def admin_dashboard(request):
     }
 
     return Response(data)
+
+
+
+#users
+@api_view(['GET'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+def get_all_users(request):
+    users = User.objects.all()  
+    user_data = []
+    
+    for user in users:
+        user_data.append({
+            'id': user.id,
+            'username': user.username,
+            'email': user.email,
+            'phone_number': user.phone_number,
+            'profile_picture': user.profile_picture.url if user.profile_picture else None,
+            'branch': user.branch,
+            'department': user.department.name if user.department else None, 
+            'role': user.role,
+        })
+    
+    return Response(user_data, status=status.HTTP_200_OK)
+
+#edit user
+@api_view(['PATCH'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+def edit_user(request, pk):
+    try:
+        user = User.objects.get(id=pk)  # Get the user by primary key
+    except User.DoesNotExist:
+        return Response({'detail': 'User  not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+    # Use a serializer to validate and update the user
+    serializer = UserSerializer(user, data=request.data, partial=True)  # partial=True allows for partial updates
+    if serializer.is_valid():
+        serializer.save()  # Save the updated user
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    # Return validation errors if the serializer is not valid
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
