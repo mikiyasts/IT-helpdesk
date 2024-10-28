@@ -1,6 +1,10 @@
 import React from 'react'
 import Logo from "../asset/Image/logo.png"
+import AccountCircleRoundedIcon from "@mui/icons-material/AccountCircleRounded";
+import { useNavigate } from "react-router-dom";
+import Cookies from 'js-cookie'
 function Header() {
+  const navigate=useNavigate()
   return (
     <div className='header'>
       <div className="header-left">
@@ -9,7 +13,16 @@ function Header() {
       </div>
       <div className="header-right">
         <div className="notification">✉️</div> 
-        <div className="user">👤 wanofi</div> 
+        <div className="user">
+        <AccountCircleRoundedIcon /> <span>Wanofi</span>
+          <div className="logout active" onClick={()=>{
+            Cookies.remove('access_token')
+            Cookies.remove('refresh_token')
+            navigate("/")
+          }}>
+            Logout
+          </div>
+          </div> 
       </div>
     </div>
   )

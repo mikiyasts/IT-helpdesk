@@ -20,15 +20,16 @@ export default function BarsDataset(props) {
 
 
   
-  const dataset = Array()
+  const dataset = []
   if(props.dataset){
     console.log("from bar",typeof(props.dataset));
     console.log("from bar",Object.keys(props.dataset));
     Object.keys(props.dataset).map((el,index)=>{
       dataset[index]={
-        [el]:props.dataset[el],
+        [el]:Number(props.dataset[el]),
         "month":el
       }
+      return 1
     })
   }
   console.log("from bar",dataset);

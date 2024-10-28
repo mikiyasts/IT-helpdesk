@@ -66,11 +66,11 @@ function App() {
         <div className="logo"><img src={Logo} alt="logo" width="45px" /></div>
         <div className="sidebar-main">
           <ul>
-            <Link to="/admin" onClick={() => setPage("dashboard")} className={page === "dashboard" && "active"}><DashboardIcon/> Dashboard</Link>
-            <Link to="tickets" onClick={() => setPage("tickets")} className={page === "tickets" && "active"}><ConfirmationNumberIcon/> Tickets</Link>
-            <Link to="pending" onClick={() => setPage("pending")} className={page === "pending" && "active"}><GroupIcon/>Users</Link>
-            <Link to="inprogress" onClick={() => setPage("In Progress")} className={page === "In Progress" && "active"}><ForumIcon/>Chat</Link>
-            <Link to="manage" onClick={() => setPage("manage")} className={page === "manage" && "active"}><AssessmentIcon/>Report</Link>
+            <Link to="/admin" onClick={() => setPage("dashboard")} className={page === "dashboard" ? "active":""}><DashboardIcon/> Dashboard</Link>
+            <Link to="tickets" onClick={() => setPage("tickets")} className={page === "tickets" ? "active":""}><ConfirmationNumberIcon/> Tickets</Link>
+            <Link to="pending" onClick={() => setPage("pending")} className={page === "pending" ? "active":""}><GroupIcon/>Users</Link>
+            <Link to="inprogress" onClick={() => setPage("In Progress")} className={page === "In Progress" ? "active":""}><ForumIcon/>Chat</Link>
+            <Link to="manage" onClick={() => setPage("manage")} className={page === "manage" ? "active":""}><AssessmentIcon/>Report</Link>
           </ul>
         </div>
       </div>
@@ -94,7 +94,7 @@ function App() {
         {/* <Header/> */}
         <Routes>
           <Route index element={<Login />}></Route>
-          <Route element={<ProtectedRoutes />}>
+          <Route element={<ProtectedRoutes/>}>
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/admin" element={<AdminLayout />}>
               <Route index element={<AdminDashboard />} />

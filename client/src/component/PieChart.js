@@ -11,7 +11,7 @@ const data = [
 ];
 
 const size = {
-  width: "400",
+  width: 400,
   height: 200,
 };
 

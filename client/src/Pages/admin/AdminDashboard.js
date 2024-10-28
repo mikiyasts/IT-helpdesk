@@ -8,17 +8,16 @@ import LineChart from "../../component/LineChart"
 import BarChart from "../../component/BarChart"
 import PieChart from "../../component/PieChart"
 import axios from "axios";
+import Cookies from 'js-cookie'
 
 
 function AdminDashboard() {
 
-  const [chartdata,setChartset]=useState([])
+  // const [chartdata,setChartset]=useState([])
   const [dashdata,setDashdata]=useState({})
+
+
   useEffect( ()=>{
-    // const reftoken = document.cookie
-    //     .split('; ')
-    //     .find(row => row.startsWith('refresh_token='))
-    //     ?.split('=')[1];
     const acstoken = document.cookie
         .split('; ')
         .find(row => row.startsWith('access_token='))
@@ -32,8 +31,11 @@ function AdminDashboard() {
       setDashdata(res.data)
       console.log("brr",res.data && res.data.branch_request);
       
-    }).catch(err=>console.log("errdash",err)
-    )
+    }).catch(err=>{
+      Cookies.remove('access_token')
+        Cookies.remove('refresh_token')
+      console.log("errdash",err)
+    })
         }
     getdashData()
 

@@ -1,13 +1,13 @@
 import axios from 'axios'
 import React, { useContext, useEffect, useState } from 'react'
-import { Navigate, Outlet } from 'react-router-dom'
+import { Navigate, Outlet, useNavigate } from 'react-router-dom'
 import { AuthContext } from '../Context/AuthContext'
-
+import Cookies from 'js-cookie'
 function ProtectedRoutes() {
 
   const {isAuth,setIsAuth}=useContext(AuthContext)
   const [isLoading,setisLoading]=useState(true)
-  
+  const navigate=useNavigate()
     
   const getCsrfToken = () => {
     const cookieValue = document.cookie
@@ -49,6 +49,9 @@ function ProtectedRoutes() {
       }).catch(err=>{
         setisLoading(false)
         setIsAuth(false)
+        Cookies.remove('access_token')
+        Cookies.remove('refresh_token')
+        navigate("/")
         return console.log("hellow?");
 
         // setisLoading(false)
