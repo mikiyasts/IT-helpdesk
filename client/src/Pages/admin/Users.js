@@ -1,6 +1,15 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
+import axios from "axios"
+function Users() {
 
-function Pending() {
+const [users,setUsers]=useState([])
+
+
+  useEffect(()=>{
+    axios.get(`${process.env.REACT_APP_API_KEY}/api/systemusers/`,{headers:{
+      "Authorization":`Bearer ${}`
+    }}).then(res=>setUsers)
+  },[])
   return (
     <div className='admin-dashboard'>
       <div className="table-wrapper">
@@ -92,4 +101,4 @@ function Pending() {
   )
 }
 
-export default Pending
+export default Users
