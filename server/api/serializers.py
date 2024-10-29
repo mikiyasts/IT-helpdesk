@@ -22,7 +22,7 @@ class DepartmentSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta(object):
         model = User 
-        fields = ['id', 'username', 'password', 'email',"department","branch","phone_number"]
+        fields = ['id', 'username', 'password', 'email',"department","branch","phone_number","role"]
         
 class UserGetSerializer(serializers.ModelSerializer):
     class Meta(object):
