@@ -4,6 +4,7 @@ function Users() {
   const [users, setUsers] = useState([]);
   const [popup,setPopup]=useState(false)
   const [form,setForm]=useState({})
+  const [edited,setEdited]=useState({})
   useEffect(() => {
     const acstoken = document.cookie
       .split("; ")
@@ -13,7 +14,7 @@ function Users() {
     axios
       .get(`${process.env.REACT_APP_URL}/api/systemusers/`, {
         headers: {
-          Authorization: `Bearer ${acstoken}`,
+          Authorization: `API_KEY ${process.env.REACT_APP_API_KEY}`,
         },
       })
       .then((res) => setUsers(res.data))
@@ -46,22 +47,40 @@ function Users() {
         [e.target.name]:e.target.value
       }
     })
+
+    setEdited(prev=>{
+      return {
+        ...prev,
+        [e.target.name]:e.target.value
+      }
+    })
     console.log(form);
     
   }
 console.log("inin",form);
+console.log("ed",edited);
 
 const submitEdit=(e)=>{
   e.preventDefault()
-  const acstoken = document.cookie
-      .split("; ")
-      .find((row) => row.startsWith("access_token="))
-      ?.split("=")[1];
-  axios.patch(`${process.env.REACT_APP_URL}/api/edituser/${form.id}/`, {
+  const getCsrfToken = () => {
+    const cookieValue = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('csrftoken='))
+        ?.split('=')[1];
+    return cookieValue || '';
+};
+
+  axios.patch(`${process.env.REACT_APP_URL}/api/edituser/${form.id}/`,
+    edited ,{
     headers: {
-      Authorization: `Bearer ${acstoken}`,
+      'X-CSRFToken': getCsrfToken(),
+      Authorization: `API_KEY ${process.env.REACT_APP_API_KEY}`,
     },
-  }).then(res=>{
+  }
+  ).then(res=>{
+    setPopup(false)
+    setEdited({})
+    setForm({})
     console.log("succes",res);
     
   }).catch(err=>{
@@ -109,7 +128,7 @@ const submitEdit=(e)=>{
         <form className="request-form" onSubmit={submitEdit}>
           <div className="form-ctrl">
             <label htmlFor="username">User Name</label>
-            <input type="text" name="username" id="username" value={form && form.username}/>
+            <input type="text" name="username" id="username" value={form && form.username} onChange={setInput}/>
           </div>
           <div className="form-ctrl">
             <label htmlFor="role">Role</label>
@@ -133,7 +152,7 @@ const submitEdit=(e)=>{
             <label htmlFor="dept">Department</label>
             <select name="department" id="dept" onChange={setInput} value={form && form.department===null?"":form.department}>
               <option value="">Select Department</option>
-              <option value="IT">IT</option>
+              <option value="1">IT</option>
               <option value="Finance">Finanace</option>
               <option value="Procurment">Procurement</option>
               <option value="Marketing">Marketing</option>
@@ -145,7 +164,7 @@ const submitEdit=(e)=>{
           </div>
           <div className="form-ctrl">
             <label htmlFor="phon_num">Phone number</label>
-            <input type="text" name="phone_number" id="phon_num"  onChange={setInput} value={form && form.phone_number}/>
+            <input type="text" name="phone_number" id="phon_num"  onChange={setInput} value={form.phone_number}/>
           </div>
           <div className="forgot-signin sigup-btn-conatiner">
                 <button className="btn-login">Submit</button>
