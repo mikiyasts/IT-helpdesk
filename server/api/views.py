@@ -26,6 +26,8 @@ from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from .serializers import JWTUserSerializer
 from users.models import User
+from .serializers import NotificationSerializer
+from notifications.models import Notification
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
 @api_view(['GET'])
@@ -320,3 +322,25 @@ def edit_user(request, pk):
 
     # Return validation errors if the serializer is not valid
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class ListNotificationsView(APIView):
+    permission_classes = [IsAuthenticated]
+    @authentication_classes([APIKeyAuthentication])
+
+    def get(self, request):
+        notifications = Notification.objects.filter(user=request.user,read=False).order_by('-created_at')
+        serializer = NotificationSerializer(notifications, many=True)
+        return Response(serializer.data)
+
+class MarkNotificationAsReadView(APIView):
+    permission_classes = [IsAuthenticated]
+    @authentication_classes([APIKeyAuthentication])
+
+    def post(self, request, pk):
+        try:
+            notification = Notification.objects.get(pk=pk, user=request.user)
+            notification.read = True
+            notification.save()
+            return Response({'status': 'notification marked as read'}, status=status.HTTP_200_OK)
+        except Notification.DoesNotExist:
+            return Response({'error': 'Notification not found or does not belong to the user'}, status=status.HTTP_404_NOT_FOUND)

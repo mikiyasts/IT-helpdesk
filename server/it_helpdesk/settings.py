@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'corsheaders',
+    'channels'
     
 ]
 
@@ -104,7 +105,13 @@ SIMPLE_JWT = {
 }
 
 WSGI_APPLICATION = 'it_helpdesk.wsgi.application'
-
+ASGI_APPLICATION = 'it_helpdesk.asgi.application'
+# settings.py
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+    },
+}
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases

@@ -6,6 +6,7 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
 )
 from .views import CustomTokenObtainPairView
+from it_helpdesk.consumers import NotificationConsumer
 urlpatterns = [
   path('',views.api_endpoints),
   path('signup/', views.signup),
@@ -38,5 +39,9 @@ urlpatterns = [
   path('admin-dashboard/', views.admin_dashboard),
   path('systemusers/', views.get_all_users),
   path('edituser/<str:pk>/', views.edit_user),
-   
+  
+  
+  path('notifications/', views.ListNotificationsView.as_view()),
+  path('notifications/<int:pk>/mark-as-read/', views.MarkNotificationAsReadView.as_view()),
+
 ] 
