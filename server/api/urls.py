@@ -6,7 +6,7 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
 )
 from .views import CustomTokenObtainPairView
-from it_helpdesk.consumers import NotificationConsumer
+
 urlpatterns = [
   path('',views.api_endpoints),
   path('signup/', views.signup),
