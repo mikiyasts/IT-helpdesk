@@ -8,7 +8,7 @@ import { useEffect, useState } from 'react';
 import AdminHeader from "./component/AdminHeader"
 import AdminDashboard from './Pages/admin/AdminDashboard';
 import Completed from './Pages/admin/Completed';
-import Pending from './Pages/admin/Pending';
+import Users from './Pages/admin/Users';
 import { Outlet } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import Manage from './Pages/admin/Manage';
@@ -68,7 +68,7 @@ function App() {
           <ul>
             <Link to="/admin" onClick={() => setPage("dashboard")} className={page === "dashboard" ? "active":""}><DashboardIcon/> Dashboard</Link>
             <Link to="tickets" onClick={() => setPage("tickets")} className={page === "tickets" ? "active":""}><ConfirmationNumberIcon/> Tickets</Link>
-            <Link to="pending" onClick={() => setPage("pending")} className={page === "pending" ? "active":""}><GroupIcon/>Users</Link>
+            <Link to="users" onClick={() => setPage("users")} className={page === "users" ? "active":""}><GroupIcon/>Users</Link>
             <Link to="inprogress" onClick={() => setPage("In Progress")} className={page === "In Progress" ? "active":""}><ForumIcon/>Chat</Link>
             <Link to="manage" onClick={() => setPage("manage")} className={page === "manage" ? "active":""}><AssessmentIcon/>Report</Link>
           </ul>
@@ -100,7 +100,7 @@ function App() {
               <Route index element={<AdminDashboard />} />
               <Route path='completed' element={<Completed />} />
               <Route path='tickets' element={<Tickets />} />
-              <Route path='pending' element={<Pending />} />
+              <Route path='users' element={<Users />} />
               <Route path='inprogress' element={<Inprogress />} />
               <Route path='manage' element={<Manage />} />
             </Route>
