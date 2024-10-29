@@ -9,6 +9,7 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.contrib.auth import authenticate
+from notifications.models import Notification
 
 
 # from django.contrib.auth.models import User
@@ -21,7 +22,7 @@ class DepartmentSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta(object):
         model = User 
-        fields = ['id', 'username', 'password', 'email',"department","branch"]
+        fields = ['id', 'username', 'password', 'email',"department","branch","phone_number"]
         
 class UserGetSerializer(serializers.ModelSerializer):
     class Meta(object):
@@ -39,10 +40,12 @@ class TicketCategorySerializer(serializers.ModelSerializer):
         model = TicketCategory
         fields = ['id', 'name', 'description', 'image']
 
+
 class TicketSerializer(serializers.ModelSerializer):
     created_by = UserSerializer(read_only=True)
     assigned_to = UserSerializer(read_only=True)
-    category = TicketCategorySerializer()
+    category = serializers.PrimaryKeyRelatedField(queryset=TicketCategory.objects.all())
+
 
     class Meta:
         model = Ticket
@@ -118,3 +121,7 @@ class JWTUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['username', 'email', 'department', 'role']
+class NotificationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Notification
+        fields = ['id', 'user', 'message', 'read', 'created_at', 'notification_type']
