@@ -26,8 +26,6 @@ from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from .serializers import JWTUserSerializer
 from users.models import User
-from django.utils import timezone
-from datetime import timedelta
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
 @api_view(['GET'])
@@ -246,19 +244,10 @@ def admin_dashboard(request):
     closed_tickets = Ticket.objects.filter(status='Closed').count()
 
     # Count requests from each branch
-    now = timezone.now()
-
-# Calculate the start of the week (Monday)
-    start_of_week = now - timedelta(days=now.weekday())
-
-# Calculate the end of the week (Sunday)
-    end_of_week = start_of_week + timedelta(days=7)
-
-# Count requests for each branch created in the current week
-    kaliti_requests = User.objects.filter(branch='kaliti', created_at__gte=start_of_week, created_at__lt=end_of_week).count()
-    lideta_requests = User.objects.filter(branch='lideta', created_at__gte=start_of_week, created_at__lt=end_of_week).count()
-    mekanissa_requests = User.objects.filter(branch='mekanissa', created_at__gte=start_of_week, created_at__lt=end_of_week).count()
-    farm_requests = User.objects.filter(branch='farm', created_at__gte=start_of_week, created_at__lt=end_of_week).count()
+    kaliti_requests = User.objects.filter(branch='kaliti').count()
+    lideta_requests = User.objects.filter(branch='lideta').count()
+    mekanissa_requests = User.objects.filter(branch='mekanissa').count()
+    farm_requests = User.objects.filter(branch='farm').count()
 
     # Get category counts
     categories = TicketCategory.objects.all()
