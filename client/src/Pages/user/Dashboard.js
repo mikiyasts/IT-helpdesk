@@ -79,7 +79,7 @@ function Dashboard() {
           </div>
           <div className="form-ctrl">
             <label htmlFor="location">Location <span>*</span></label>
-            <select name="location" id="lo0cation" onChange={setInput}>
+            <select name="location" id="location" onChange={setInput}>
               <option value="">Select Your Location</option>
               <option value="Farm">Farm</option>
               <option value="Kality">Kality</option>
@@ -90,7 +90,7 @@ function Dashboard() {
           <div className="form-ctrl">
             <label htmlFor="dept">Department <span>*</span></label>
             <select name="dept" id="dept" onChange={setInput}>
-              <option value="">Select Your Location</option>
+              <option value="">Select Your Department</option>
               <option value="HR">HR</option>
               <option value="Finance">Finanace</option>
               <option value="Procurment">Procurement</option>
