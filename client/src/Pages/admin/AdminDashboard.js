@@ -32,9 +32,8 @@ function AdminDashboard() {
       console.log("brr",res.data && res.data.branch_request);
       
     }).catch(err=>{
-      Cookies.remove('access_token')
-        Cookies.remove('refresh_token')
-      console.log("errdash",err)
+      console.log("You are Not Authorized !!");
+      
     })
         }
     getdashData()
