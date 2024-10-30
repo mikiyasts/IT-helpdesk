@@ -39,8 +39,10 @@ urlpatterns = [
   path('admin-dashboard/', views.admin_dashboard),
   path('systemusers/', views.get_all_users),
   path('edituser/<str:pk>/', views.edit_user),
-  path('departments/',views.departments),
   
+  path('departments/',views.departments),
+  path('create_department/',views.create_department),
+  path('edit_department/<int:pk>/', views.edit_department),
   
   path('notifications/', views.ListNotificationsView.as_view()),
   path('notifications/<int:pk>/mark-as-read/', views.MarkNotificationAsReadView.as_view()),

@@ -228,6 +228,29 @@ def departments(request):
     serializer = DepartmentSerializer(departments, many=True)
     return Response(serializer.data)
 
+
+@api_view(['POST'])
+@authentication_classes([APIKeyAuthentication])
+@permission_classes([IsAuthenticated])
+def create_department(request):
+    serializer = DepartmentSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+@authentication_classes([APIKeyAuthentication])
+@permission_classes([IsAuthenticated])
+def edit_department(request, pk):
+    department=Department.objects.get(id=pk)
+    serializer = DepartmentSerializer(department, data=request.data, partial=True)  # `partial=True` for partial updates
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 @api_view(['DELETE'])
 @authentication_classes([APIKeyAuthentication])
 @permission_classes([IsAuthenticated])
