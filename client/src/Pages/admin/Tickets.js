@@ -28,7 +28,7 @@ function Tickets() {
         const getdashData=async ()=>{
           await axios.get(`${process.env.REACT_APP_URL}/api/list_ticket/`,{
       headers:{
-        "Authorization":`Bearer ${acstoken}`
+        Authorization: `API_KEY ${process.env.REACT_APP_API_KEY}`,
       }
     }).then(res=>{
       setTicketList(res.data)
