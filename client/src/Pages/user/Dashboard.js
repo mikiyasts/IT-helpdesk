@@ -33,7 +33,8 @@ function Dashboard() {
     })
   }
 
-const newRequest=()=>{
+const newRequest=(e)=>{
+  e.preventDefault()
   axios.post(`${process.env.REACT_APP_URL}/api/create_ticket/`,request,{headers:{
     Authorization: `API_KEY ${process.env.REACT_APP_API_KEY}`,
   }}).then(res=>console.log(res)).catch(err=>console.log(err))

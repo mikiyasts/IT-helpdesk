@@ -96,7 +96,9 @@ function App() {
           <Route index element={<Login />}></Route>
           <Route element={<ProtectedRoutes/>}>
             <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/admin" element={<AdminLayout />}>
+            
+          </Route>
+          <Route path="/admin" element={<AdminLayout />}>
               <Route index element={<AdminDashboard />} />
               <Route path='completed' element={<Completed />} />
               <Route path='tickets' element={<Tickets />} />
@@ -105,7 +107,6 @@ function App() {
               <Route path='manage' element={<Manage />} />
             </Route>
             <Route path="*" element={<h1>ALU ALU</h1>}></Route>
-          </Route>
         </Routes>
       </AuthContext.Provider>
     </div>
