@@ -23,7 +23,11 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta(object):
         model = User 
         fields = ['id', 'username', 'password', 'email',"department","branch","phone_number","role"]
-        
+     
+class CreateTicketUserSerializer(serializers.ModelSerializer):
+    class Meta(object):
+        model=User
+        fields=['id','username']   
 class UserGetSerializer(serializers.ModelSerializer):
     class Meta(object):
         model = User 
@@ -42,7 +46,7 @@ class TicketCategorySerializer(serializers.ModelSerializer):
 
 
 class TicketSerializer(serializers.ModelSerializer):
-    created_by = UserSerializer(read_only=True)
+    created_by = CreateTicketUserSerializer(read_only=True)
     assigned_to = UserSerializer(read_only=True)
     category = serializers.PrimaryKeyRelatedField(queryset=TicketCategory.objects.all())
 

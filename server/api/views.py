@@ -159,7 +159,7 @@ def create_ticket(request):
     serializer = TicketSerializer(data=request.data)
     if serializer.is_valid():
         serializer.save(created_by=request.user)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response('ticket created successfully', status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
