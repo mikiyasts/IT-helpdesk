@@ -73,7 +73,7 @@ const newRequest=(e)=>{
        
         <div className="popup_header"><h2>Add New Request</h2></div>
 
-        <form className="request-form" onSubmit={newRequest}>
+        <form className="request-form" enctype="multipart/form-data" onSubmit={newRequest}>
           <div className="form-ctrl">
             <label htmlFor="req_name">Request Name <span>*</span></label>
             <input type="text" name="req_name" id="req-name" value={request.title} readOnly/>
