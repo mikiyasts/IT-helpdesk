@@ -5,6 +5,7 @@ function Users() {
   const [popup,setPopup]=useState(false)
   const [form,setForm]=useState({})
   const [edited,setEdited]=useState({})
+  const [dept,setDept]=useState([])
   useEffect(() => {
 
     axios
@@ -15,6 +16,19 @@ function Users() {
       })
       .then((res) => setUsers(res.data))
       .catch((err) => console.log(err));
+
+
+      axios.get(`${process.env.REACT_APP_URL}/api/departments`,{
+        headers:{
+          Authorization: `API_KEY ${process.env.REACT_APP_API_KEY}`,
+        }
+      }).then(res=>{
+        setDept(res.data)
+        
+      }).catch(err=>{
+        console.log("You are Not Authorized !!");
+        
+      })
   }, []);
 
   const refreshData=()=>{
@@ -44,13 +58,14 @@ function Users() {
     </tr>
   ));
 
+  const deptOption=dept.map(el=><option value={Number(el.id)}>{el.name}</option>)
   const setInput=(e)=>{
     console.log(e.target.value);
     
     setForm(prev=>{
       return {
         ...prev,
-        [e.target.name]:e.target.value
+        [e.target.name]:e.target.name==="department"? Number(e.target.value):e.target.value
       }
     })
 
@@ -159,10 +174,7 @@ const submitEdit=(e)=>{
             <label htmlFor="dept">Department</label>
             <select name="department" id="dept" onChange={setInput} value={form && form.department===null?"":form.department}>
               <option value="">Select Department</option>
-              <option value="1">IT</option>
-              <option value="Finance">Finanace</option>
-              <option value="Procurment">Procurement</option>
-              <option value="Marketing">Marketing</option>
+              {deptOption}
             </select>
           </div>
           <div className="form-ctrl">
