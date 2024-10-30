@@ -28,6 +28,7 @@ from .serializers import JWTUserSerializer
 from users.models import User
 from .serializers import NotificationSerializer
 from notifications.models import Notification
+
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
 @api_view(['GET'])
@@ -153,11 +154,12 @@ def GetUser(request):
 
 #views for ticket API
 @api_view(['POST'])
-@authentication_classes([APIKeyAuthentication])
+@authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 def create_ticket(request):
     serializer = TicketSerializer(data=request.data)
     if serializer.is_valid():
+        
         ticket = serializer.save(created_by=request.user)
         
         # Handle file attachments
