@@ -25,19 +25,19 @@ function Tickets() {
         .split('; ')
         .find(row => row.startsWith('access_token='))
         ?.split('=')[1];
-        const getdashData=async ()=>{
+        const getTickets=async ()=>{
           await axios.get(`${process.env.REACT_APP_URL}/api/list_ticket/`,{
       headers:{
-        Authorization: `API_KEY ${process.env.REACT_APP_API_KEY}`,
+        Authorization: `bearer  ${acstoken}`,
       }
     }).then(res=>{
-      setTicketList(res.data)
+      setTicketList(res.data.reverse())
       console.log("brr",res.data && res.data.branch_request);
       
     }).catch(err=>console.log("errdash",err)
     )
         }
-    getdashData()
+    getTickets()
 
   },[])
   // useEffect(()=>{
@@ -46,6 +46,20 @@ function Tickets() {
   //     setActivePreview(preview)
   //   }
   // },[])
+
+  const refreshTicket= async ()=>{
+    
+    await axios.get(`${process.env.REACT_APP_URL}/api/list_ticket/`,{
+      headers:{
+        Authorization: `API_KEY ${process.env.REACT_APP_API_KEY}`,
+      }
+    }).then(res=>{
+      setTicketList(res.data.reverse())
+      console.log("brr",res.data && res.data.branch_request);
+      
+    }).catch(err=>console.log("errdash",err)
+    )
+  }
 console.log("act",activeTicket)
 console.log(ticketList[0]);
 
@@ -76,7 +90,7 @@ console.log(ticketList[0]);
         filter and number of tickets
       </div> */}
       <div className="tickets-list">
-        <div className="sort-refresh"><p>Sort <ExpandMoreIcon sx={{ fontSize: 20 }} /></p> <div><CachedIcon sx={{ fontSize: 20 }} /></div></div>
+        <div className="sort-refresh"><p>Sort <ExpandMoreIcon sx={{ fontSize: 20 }} /></p> <div onClick={refreshTicket}><CachedIcon sx={{ fontSize: 20 }} className='refresh-icon' id="refresh-icon" /></div></div>
         <ul>
          {list ? list :<h2>Nothing to show</h2>}
         </ul>
