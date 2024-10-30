@@ -8,10 +8,10 @@ from rest_framework.response import Response
 import secrets
 from .authentication import APIKeyAuthentication
 from tickets.models import Ticket,TicketCategory
-from .serializers import RecentTicketSerializer, TicketCategorySerializer, TicketSerializer, UserGetSerializer, UserSerializer
+from .serializers import DepartmentSerializer, RecentTicketSerializer, TicketCategorySerializer, TicketSerializer, UserGetSerializer, UserSerializer
 from rest_framework.authtoken.models import Token
 from rest_framework import status
-from users.models import User
+from users.models import Department, User
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import authentication_classes, permission_classes
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
@@ -220,7 +220,13 @@ def list_ticket_category_detail(request,pk):
     serializer = TicketCategorySerializer(ticket_category)
     return Response(serializer.data)
 
-
+@api_view(['GET'])
+@authentication_classes([APIKeyAuthentication])
+@permission_classes([IsAuthenticated])
+def departments(request):
+    departments = Department.objects.all()
+    serializer = DepartmentSerializer(departments, many=True)
+    return Response(serializer.data)
 
 @api_view(['DELETE'])
 @authentication_classes([APIKeyAuthentication])
