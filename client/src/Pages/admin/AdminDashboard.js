@@ -25,7 +25,7 @@ function AdminDashboard() {
         const getdashData=async ()=>{
           await axios.get(`${process.env.REACT_APP_URL}/api/admin-dashboard/`,{
       headers:{
-        "Authorization":`Bearer ${acstoken}`
+        Authorization: `API_KEY ${process.env.REACT_APP_API_KEY}`,
       }
     }).then(res=>{
       setDashdata(res.data)

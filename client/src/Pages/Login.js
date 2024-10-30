@@ -26,6 +26,7 @@ function Login() {
     e.preventDefault()
     axios.post("http://localhost:8000/api/token/",loginform,{ withCredentials: true ,headers: {
       'X-CSRFToken': getCsrfToken(),
+      Authorization: `API_KEY ${process.env.REACT_APP_API_KEY}`,
   }})
     .then(res => {
       document.cookie=`access_token=${res.data.access}`

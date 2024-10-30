@@ -6,10 +6,6 @@ function Users() {
   const [form,setForm]=useState({})
   const [edited,setEdited]=useState({})
   useEffect(() => {
-    const acstoken = document.cookie
-      .split("; ")
-      .find((row) => row.startsWith("access_token="))
-      ?.split("=")[1];
 
     axios
       .get(`${process.env.REACT_APP_URL}/api/systemusers/`, {
@@ -21,6 +17,16 @@ function Users() {
       .catch((err) => console.log(err));
   }, []);
 
+  const refreshData=()=>{
+    axios
+      .get(`${process.env.REACT_APP_URL}/api/systemusers/`, {
+        headers: {
+          Authorization: `API_KEY ${process.env.REACT_APP_API_KEY}`,
+        },
+      })
+      .then((res) => setUsers(res.data))
+      .catch((err) => console.log(err));
+  }
   console.log(users);
   const tableRw = users.map((el) => (
     <tr>
@@ -81,6 +87,7 @@ const submitEdit=(e)=>{
     setPopup(false)
     setEdited({})
     setForm({})
+    refreshData()
     console.log("succes",res);
     
   }).catch(err=>{
@@ -97,7 +104,7 @@ const submitEdit=(e)=>{
             className="card-header"
             style={{ padding: "1.5rem", borderBottom: ".5px solid #f2f2f225" }}
           >
-            <h3>All Users</h3>
+            <h3>All Users <sub style={{color:"#f2f2f2",fontWeight:"lighter",fontSize:"small"}}>{users.length}</sub></h3>
           </div>
           <div className="table">
             <table>
