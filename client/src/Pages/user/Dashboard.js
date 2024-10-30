@@ -36,9 +36,14 @@ function Dashboard() {
 
 const newRequest=(e)=>{
   e.preventDefault()
+  const acstoken = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('access_token='))
+        ?.split('=')[1];
+
   axios.post(`${process.env.REACT_APP_URL}/api/create_ticket/`,request,{headers:{
     "Content-Type": 'multipart/form-data',
-   "Authorization": `API_KEY ${process.env.REACT_APP_API_KEY}`,
+    Authorization: `Bearer ${acstoken}`,
   }}).then(res=>console.log(res)).catch(err=>console.log(err))
 }
  
