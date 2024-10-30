@@ -7,7 +7,7 @@ from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.response import Response
 import secrets
 from .authentication import APIKeyAuthentication
-from tickets.models import Ticket,TicketCategory
+from tickets.models import Attachment, Ticket,TicketCategory
 from .serializers import DepartmentSerializer, RecentTicketSerializer, TicketCategorySerializer, TicketSerializer, UserGetSerializer, UserSerializer
 from rest_framework.authtoken.models import Token
 from rest_framework import status
@@ -158,8 +158,14 @@ def GetUser(request):
 def create_ticket(request):
     serializer = TicketSerializer(data=request.data)
     if serializer.is_valid():
-        serializer.save(created_by=request.user)
-        return Response('ticket created successfully', status=status.HTTP_201_CREATED)
+        ticket = serializer.save(created_by=request.user)
+        
+        # Handle file attachments
+        files = request.FILES.getlist('attachments')
+        for file in files:
+            Attachment.objects.create(ticket=ticket, file=file)
+        
+        return Response('Ticket created successfully', status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
