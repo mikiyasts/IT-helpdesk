@@ -43,17 +43,12 @@ class TicketCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = TicketCategory
         fields = ['id', 'name', 'description', 'image']
-
-
-class TicketSerializer(serializers.ModelSerializer):
-    created_by = CreateTicketUserSerializer(read_only=True)
-    assigned_to = UserSerializer(read_only=True)
-    category = serializers.PrimaryKeyRelatedField(queryset=TicketCategory.objects.all())
-
-
+class AttachmentSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Ticket
-        fields = ['id', 'title', 'description', 'status', 'created_at', 'updated_at', 'category', 'assigned_to', 'created_by']
+        model = Attachment
+        fields = ['file', 'uploaded_at',]
+
+
 
 class TicketCommentSerializer(serializers.ModelSerializer):
     author = serializers.PrimaryKeyRelatedField(read_only=True)
@@ -74,6 +69,17 @@ class TicketAttachmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Attachment
         fields = ['id', 'file', 'uploaded_at', 'ticket']
+
+class TicketSerializer(serializers.ModelSerializer):
+    attachments=TicketAttachmentSerializer(many=True,read_only=True)
+    created_by = CreateTicketUserSerializer(read_only=True)
+    assigned_to = UserSerializer(read_only=True)
+    category = serializers.PrimaryKeyRelatedField(queryset=TicketCategory.objects.all())
+
+
+    class Meta:
+        model = Ticket
+        fields = ['id', 'title', 'description', 'status', 'created_at', 'updated_at', 'category', 'assigned_to', 'created_by','attachments']
 class RecentTicketSerializer(serializers.ModelSerializer):
     created_by = serializers.SerializerMethodField()
     department = serializers.StringRelatedField(source='department.name')
