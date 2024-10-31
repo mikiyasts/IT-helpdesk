@@ -381,3 +381,13 @@ class MarkNotificationAsReadView(APIView):
             return Response({'status': 'notification marked as read'}, status=status.HTTP_200_OK)
         except Notification.DoesNotExist:
             return Response({'error': 'Notification not found or does not belong to the user'}, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['GET'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+def my_ticket(request):
+    tickets = Ticket.objects.filter(created_by=request.user)
+    serializer = TicketSerializer(tickets, many=True)
+
+    return Response(serializer.data)
