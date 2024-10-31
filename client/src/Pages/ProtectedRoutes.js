@@ -20,41 +20,6 @@ function ProtectedRoutes() {
 
 
 
-
-  setInterval( async ()=>{
-    const reftoken = document.cookie
-        .split('; ')
-        .find(row => row.startsWith('refresh_token='))
-        ?.split('=')[1];
-    const acstoken = document.cookie
-        .split('; ')
-        .find(row => row.startsWith('access_token='))
-        ?.split('=')[1];
-
-    await axios.post(`${process.env.REACT_APP_URL}/api/token/refresh/`,{refresh:reftoken},{headers:{
-      'X-CSRFToken': getCsrfToken(),
-    }}).then(res=>{
-
-      document.cookie=`access_token=${res.data.access}`
-      document.cookie=`refresh_token=${res.data.refresh}`
-      // setisLoading(false)
-      console.log("hellow ac",res.data.access);
-      return console.log("hellow ref",res.data.refresh);
-    }).catch(err=>{
-      document.cookie=`access_token=""`
-      document.cookie=`refresh_token=""`
-      navigate("/")
-      console.log(err,"int");
-      
-    })
-    console.log("interval");
-    
-  },300000)
-
-
-
-
-
   useEffect(()=>{
 
     const reftoken = document.cookie
