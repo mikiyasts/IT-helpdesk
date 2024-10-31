@@ -33,6 +33,7 @@ urlpatterns = [
   path('create_ticket_category/', views.create_ticket_category),
   path('list_ticket_category_detail/<int:pk>/', views.list_ticket_category_detail),
   path('delete_ticket_category/<int:pk>/', views.delete_ticket_category),
+  path('my_ticket/', views.my_ticket),
   
   
   

@@ -130,8 +130,18 @@ class JWTUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['username', 'email', 'department', 'role']
+        fields = ['id','username', 'email', 'department', 'role']
 class NotificationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Notification
         fields = ['id', 'user', 'message', 'read', 'created_at', 'notification_type']
+class MyTicketSerializer(serializers.ModelSerializer):
+    attachments=TicketAttachmentSerializer(many=True,read_only=True)
+    created_by = CreateTicketUserSerializer(read_only=True)
+    assigned_to = UserSerializer(read_only=True)
+    category = serializers.PrimaryKeyRelatedField(queryset=TicketCategory.objects.all())
+
+
+    class Meta:
+        model = Ticket
+        fields = ['id', 'title', 'description', 'status', 'created_at', 'updated_at', 'category', 'assigned_to', 'created_by','attachments']
