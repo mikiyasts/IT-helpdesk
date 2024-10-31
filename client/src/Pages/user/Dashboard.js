@@ -34,6 +34,8 @@ function Dashboard() {
     })
   }
 
+  
+
 const newRequest=(e)=>{
   e.preventDefault()
   const acstoken = document.cookie
@@ -68,8 +70,36 @@ const newRequest=(e)=>{
             
             {reqCard}
           </div>
+
+
           <div className="dashboard-table">
-            {/* <Table/> */}
+          <div className="table-wrapper">
+        <div className="card-table">
+          <div
+            className="card-header"
+            style={{ padding: "1.5rem", borderBottom: ".5px solid #f2f2f225" }}
+          >
+            <h3>Recent Requests<sub style={{color:"#f2f2f2",fontWeight:"lighter",fontSize:"small"}}>{/*users.length*/}</sub></h3>
+          </div>
+          <div className="table">
+            <table>
+              <thead>
+                <tr>
+                  <td>ID</td>
+                  <td>User name</td>
+                  <td>Role</td>
+                  <td>Branch</td>
+                  <td>Department</td>
+                  <td></td>
+                </tr>
+              </thead>
+              <tbody>
+                {/* {tableRw} */}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
           </div>
         </div>
         {/* popup*/}
