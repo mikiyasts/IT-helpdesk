@@ -1079,3 +1079,7 @@ svg .css-1qkz8p7{
   background-color: var(--accent-secondary);
   color: #f2f2f2;
 }
+
+.test{
+  transform: rotateZ('360deg');
+}

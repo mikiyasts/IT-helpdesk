@@ -13,7 +13,8 @@ function Dashboard() {
   const [request,setRequest]=useState({
     title:"",
     description:"",
-    category:0
+    category:0,
+    attachments:""
   })
 
   useEffect(()=>{
@@ -35,8 +36,14 @@ function Dashboard() {
 
 const newRequest=(e)=>{
   e.preventDefault()
+  const acstoken = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('access_token='))
+        ?.split('=')[1];
+
   axios.post(`${process.env.REACT_APP_URL}/api/create_ticket/`,request,{headers:{
-    Authorization: `API_KEY ${process.env.REACT_APP_API_KEY}`,
+    "Content-Type": 'multipart/form-data',
+    Authorization: `Bearer ${acstoken}`,
   }}).then(res=>console.log(res)).catch(err=>console.log(err))
 }
  
@@ -73,7 +80,7 @@ const newRequest=(e)=>{
        
         <div className="popup_header"><h2>Add New Request</h2></div>
 
-        <form className="request-form" enctype="multipart/form-data" onSubmit={newRequest}>
+        <form className="request-form" onSubmit={newRequest}>
           <div className="form-ctrl">
             <label htmlFor="req_name">Request Name <span>*</span></label>
             <input type="text" name="req_name" id="req-name" value={request.title} readOnly/>
@@ -108,7 +115,7 @@ const newRequest=(e)=>{
           </div>
           <div className="form-ctrl">
             <label htmlFor="atch">Attachment <span>*</span></label>
-            <input type="file" name="attachment" id="atch" style={{width:"100%",display:"flex",alignItems:"center",paddingBlock:".3rem"}} onChange={setInput}/>
+            <input type="file" name="attachments" id="atch" style={{width:"100%",display:"flex",alignItems:"center",paddingBlock:".3rem"}} onChange={setInput}/>
           </div>
           <div className="forgot-signin sigup-btn-conatiner">
                 <button className="btn-login">Submit</button>
