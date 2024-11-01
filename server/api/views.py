@@ -1,5 +1,6 @@
 from django.http import JsonResponse
 from django.shortcuts import render
+import requests
 from rest_framework.decorators import api_view
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -29,6 +30,32 @@ from users.models import User
 from .serializers import NotificationSerializer
 from notifications.models import Notification
 
+
+def send_message(host, port, username, password, number, message):
+    
+    message = message.encode('utf-8')
+
+    
+    url = f"http://{host}:{port}/http/send-message/"
+    params = {
+        'username': username,
+        'password': password,
+        'to': number,
+        'message': message,
+    }
+
+    try:
+        
+        response = requests.get(url, params=params)
+
+       
+        response.raise_for_status()
+
+        
+        return response.text
+    except requests.RequestException as e:
+        return f"Error: {e}"
+#send_message('192.168.110.3', 9710, 'admin', 'admin123', phone_number, message)
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
 @api_view(['GET'])
@@ -391,3 +418,16 @@ def my_ticket(request):
     serializer = TicketSerializer(tickets, many=True)
 
     return Response(serializer.data)
+@api_view(['POST'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+def send_message_view(request):
+    phone_number = request.data.get('phone_no')
+    message = request.data.get('message')
+
+    if not phone_number or not message:
+        return Response({'error': 'Missing phone number or message'}, status=status.HTTP_400_BAD_REQUEST)
+
+    send_message('192.168.110.11', 9710, 'admin', '@dIff%nSms0', phone_number, message)
+    return Response({'status': 'Message sent successfully'}, status=status.HTTP_200_OK)
+    
