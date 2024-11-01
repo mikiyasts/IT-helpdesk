@@ -37,6 +37,7 @@ function Dashboard() {
   
 
 const newRequest=(e)=>{
+  
   e.preventDefault()
   const acstoken = document.cookie
         .split('; ')
@@ -58,7 +59,7 @@ const newRequest=(e)=>{
       title:el.name,
       category:el.id
     })
-  }}><div className="card-name">{el.name}</div></div>)
+  }}><div className="card-name" key={el.id}>{el.name}</div></div>)
 
 
   return (

@@ -3,9 +3,9 @@ import React, { useContext, useEffect, useState } from 'react'
 import { Navigate, Outlet, useNavigate } from 'react-router-dom'
 import { AuthContext } from '../Context/AuthContext'
 import Cookies from 'js-cookie'
-function ProtectedRoutes() {
+function AdminRoutes() {
 
-  const {isAuth,setIsAuth}=useContext(AuthContext)
+  const {isAdmin,setIsAdmin}=useContext(AuthContext)
   const [isLoading,setisLoading]=useState(true)
   const navigate=useNavigate()
     
@@ -18,24 +18,24 @@ function ProtectedRoutes() {
   };
 
 
- 
+
   
 
 
   const authUser=async ()=>{
-    if(isAuth){
-      const reftoken = document.cookie
+    if(isAdmin){
+        const reftoken = document.cookie
     .split('; ')
     .find(row => row.startsWith('refresh_token='))
     ?.split('=')[1];
-
+    
     await axios.post(`${process.env.REACT_APP_URL}/api/token/refresh/`,{refresh:reftoken},{headers:{
       'X-CSRFToken': getCsrfToken(),
     }}).then(res=>{
 
       setisLoading(false)
 
-      setIsAuth(true)
+      setIsAdmin(true)
       document.cookie=`access_token=${res.data.access}`
       document.cookie=`refresh_token=${res.data.refresh}`
       // setisLoading(false)
@@ -43,7 +43,7 @@ function ProtectedRoutes() {
       return console.log("hellow ref",res.data.refresh);
     }).catch(err=>{
       setisLoading(false)
-      setIsAuth(false)
+      setIsAdmin(false)
       Cookies.remove('access_token')
       Cookies.remove('refresh_token')
       navigate("/")
@@ -53,7 +53,7 @@ function ProtectedRoutes() {
       
     })
     }else{
-      navigate(-1)
+        navigate(-1)
     }
     
   }
@@ -63,8 +63,7 @@ function ProtectedRoutes() {
 
     
 
-    
-    authUser()
+        authUser()
 
     const delay= 1000 * 60 * 4 
     const interval=setInterval(()=>{
@@ -72,14 +71,14 @@ function ProtectedRoutes() {
     },delay)
 
     return ()=>clearInterval(interval)
-  },[isLoading,isAuth])
+  },[isLoading,isAdmin])
 
   if(isLoading){
     return <h1>Loading</h1>
 }else{
 
-  return isAuth && isAuth? <Outlet/> : <Navigate to="/"/>
+  return isAdmin && isAdmin? <Outlet/> : <Navigate to="/"/>
 }
 }
 
-export default ProtectedRoutes
+export default AdminRoutes

@@ -21,9 +21,11 @@ import ConfirmationNumberIcon from '@mui/icons-material/ConfirmationNumber';
 import GroupIcon from '@mui/icons-material/Group';
 import ForumIcon from '@mui/icons-material/Forum';
 import AssessmentIcon from '@mui/icons-material/Assessment';
+import AdminRoutes from './Pages/AdminRoutes';
 function App() {
 
-  const [isAuth, setIsAuth] = useState(false)
+  const [isAuth, setIsAuth] = useState(sessionStorage.getItem("isAuth") || false)
+  const [isAdmin, setIsAdmin] = useState(sessionStorage.getItem("isAdmin") || false)
 
   const [page, setPage] = useState(sessionStorage.getItem("page") || "Dashboard")
 
@@ -90,13 +92,17 @@ function App() {
   return (
 
     <div className="App">
-      <AuthContext.Provider value={{ isAuth, setIsAuth }}>
+      <AuthContext.Provider value={{ isAuth, setIsAuth,isAdmin, setIsAdmin }}>
         {/* <Header/> */}
         <Routes>
           <Route index element={<Login />}></Route>
           <Route element={<ProtectedRoutes/>}>
             <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/admin" element={<AdminLayout />}>
+            
+          </Route>
+          <Route element={<AdminRoutes/>}>
+
+          <Route path="/admin" element={<AdminLayout />}>
               <Route index element={<AdminDashboard />} />
               <Route path='completed' element={<Completed />} />
               <Route path='tickets' element={<Tickets />} />
@@ -105,7 +111,7 @@ function App() {
               <Route path='manage' element={<Manage />} />
             </Route>
           </Route>
-          
+
             <Route path="*" element={<h1>ALU ALU</h1>}></Route>
         </Routes>
       </AuthContext.Provider>
