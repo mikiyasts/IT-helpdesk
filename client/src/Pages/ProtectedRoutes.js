@@ -32,12 +32,12 @@ function ProtectedRoutes() {
     await axios.post(`${process.env.REACT_APP_URL}/api/token/refresh/`,{refresh:reftoken},{headers:{
       'X-CSRFToken': getCsrfToken(),
     }}).then(res=>{
-
+      document.cookie=`access_token=${res.data.access}`
+      document.cookie=`refresh_token=${res.data.refresh}`
       setisLoading(false)
 
       setIsAuth(true)
-      document.cookie=`access_token=${res.data.access}`
-      document.cookie=`refresh_token=${res.data.refresh}`
+      
       // setisLoading(false)
       console.log("hellow ac",res.data.access);
       return console.log("hellow ref",res.data.refresh);
