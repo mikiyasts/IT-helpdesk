@@ -19,83 +19,56 @@ function ProtectedRoutes() {
 
 
 
+  
 
 
-  setInterval( async ()=>{
+  const authUser=async ()=>{
     const reftoken = document.cookie
-        .split('; ')
-        .find(row => row.startsWith('refresh_token='))
-        ?.split('=')[1];
-    const acstoken = document.cookie
-        .split('; ')
-        .find(row => row.startsWith('access_token='))
-        ?.split('=')[1];
-
+    .split('; ')
+    .find(row => row.startsWith('refresh_token='))
+    ?.split('=')[1];
+    
     await axios.post(`${process.env.REACT_APP_URL}/api/token/refresh/`,{refresh:reftoken},{headers:{
       'X-CSRFToken': getCsrfToken(),
     }}).then(res=>{
 
+      setisLoading(false)
+
+      setIsAuth(true)
       document.cookie=`access_token=${res.data.access}`
       document.cookie=`refresh_token=${res.data.refresh}`
       // setisLoading(false)
       console.log("hellow ac",res.data.access);
       return console.log("hellow ref",res.data.refresh);
     }).catch(err=>{
-      document.cookie=`access_token=""`
-      document.cookie=`refresh_token=""`
+      setisLoading(false)
+      setIsAuth(false)
+      Cookies.remove('access_token')
+      Cookies.remove('refresh_token')
       navigate("/")
-      console.log(err,"int");
+      return console.log("hellow?");
+
+      // setisLoading(false)
       
     })
-    console.log("interval");
-    
-  },300000)
-
-
-
+  }
 
 
   useEffect(()=>{
 
-    const reftoken = document.cookie
-        .split('; ')
-        .find(row => row.startsWith('refresh_token='))
-        ?.split('=')[1];
-    const acstoken = document.cookie
-        .split('; ')
-        .find(row => row.startsWith('access_token='))
-        ?.split('=')[1];
+    
 
-    const authUser=async ()=>{
-
-      await axios.post(`${process.env.REACT_APP_URL}/api/token/refresh/`,{refresh:reftoken},{headers:{
-        'X-CSRFToken': getCsrfToken(),
-        "Authorization":`Bearer ${acstoken}`
-      }}).then(res=>{
-
-        setisLoading(false)
-
-        setIsAuth(true)
-        document.cookie=`access_token=${res.data.access}`
-        document.cookie=`refresh_token=${res.data.refresh}`
-        // setisLoading(false)
-        console.log("hellow ac",res.data.access);
-        return console.log("hellow ref",res.data.refresh);
-      }).catch(err=>{
-        setisLoading(false)
-        setIsAuth(false)
-        Cookies.remove('access_token')
-        Cookies.remove('refresh_token')
-        navigate("/")
-        return console.log("hellow?");
-
-        // setisLoading(false)
-        
-      })
-    }
-
+    
     authUser()
-  },[])
+
+    const delay= 1000 * 60 * 4 
+    const interval=setInterval(()=>{
+      authUser()
+    },delay)
+
+    return ()=>clearInterval(interval)
+  },[isLoading,isAuth])
+
   if(isLoading){
     return <h1>Loading</h1>
 }else{
