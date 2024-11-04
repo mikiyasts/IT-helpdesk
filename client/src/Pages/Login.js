@@ -1,11 +1,13 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Logo from "../asset/Image/logo.png"
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import axios from "axios"
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../Context/AuthContext";
+
 function Login() {
   const {isAuth,setIsAuth}=useContext(AuthContext)
+  const {isAdmin,setIsAdmin}=useContext(AuthContext)
   const [tab, setTab] = useState("signin");
   const navigate=useNavigate()
   const [forgotPopup, setforgotPopup] = useState(false)
@@ -21,6 +23,12 @@ function Login() {
 };
 
 
+useEffect(()=>{
+   document.cookie=`access_token=`
+      document.cookie=`refresh_token=`
+      sessionStorage.clear("isAuth")
+      sessionStorage.clear("isAdmin")
+},[])
 
   const submitLogin = (e) => {
     e.preventDefault()
@@ -32,11 +40,14 @@ function Login() {
       document.cookie=`access_token=${res.data.access}`
       document.cookie=`refresh_token=${res.data.refresh}`
       if(res.data.role==="admin"){
-        setIsAuth(true)
+        setIsAdmin(true)
+        sessionStorage.setItem("isAdmin",true) 
         console.log("ad");
         
         navigate("/admin")
       }else if(res.data.role==="employee"){
+        setIsAuth(true)
+        sessionStorage.setItem("isAuth",true) 
         console.log("emp");
         navigate("/dashboard")
       }

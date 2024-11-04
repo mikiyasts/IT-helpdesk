@@ -16,14 +16,40 @@ function Dashboard() {
     category:0,
     attachments:""
   })
+  const [mytickets,setMytickets]=useState([])
 
-  useEffect(()=>{
-    axios.get(`${process.env.REACT_APP_URL}/api/list_ticket_category/`,{
+  const getDashdata=async ()=>{
+    const acstoken = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('access_token='))
+        ?.split('=')[1];
+
+     await axios.get(`${process.env.REACT_APP_URL}/api/list_ticket_category/`,{
       headers:{
         Authorization: `API_KEY ${process.env.REACT_APP_API_KEY}`,
       }
     }).then(res=>setCategory(res.data)).catch(err=>console.log(err))
+
+
+
+    await axios.get(`${process.env.REACT_APP_URL}/api/my_ticket/`,{
+      headers:{
+    Authorization: `Bearer ${acstoken}`,
+      }
+      }).then(res=>{
+        console.log("mytickets",res.data);
+        setMytickets(res.data)
+        
+      }).catch(err=>{
+        console.log(err);
+        
+      })
+  }
+  useEffect( ()=>{
+    getDashdata()
   },[])
+
+
   const setInput=(e)=>{
     setRequest(prev=>{
       return{
@@ -37,6 +63,7 @@ function Dashboard() {
   
 
 const newRequest=(e)=>{
+
   e.preventDefault()
   const acstoken = document.cookie
         .split('; ')
@@ -58,8 +85,20 @@ const newRequest=(e)=>{
       title:el.name,
       category:el.id
     })
-  }}><div className="card-name">{el.name}</div></div>)
+  }}><div className="card-name" key={el.id}>{el.name}</div></div>)
 
+  const tableRw=mytickets && mytickets.map(el=><tr>
+    <td data-cell="ID">{el.id}</td>
+    <td data-cell="Title">{el.title}</td>
+    <td data-cell="Description">{el.description}</td>
+    <td className="opt-dots" data-cell="Attachment">
+    {el?.attachments.length<1?null:
+    <a href={`${process.env.REACT_APP_URL}${el?.attachments[0]?.file}`} download><button className="btn-solved">Download</button></a>
+    
+    }
+    </td>
+    <td data-cell="Comment">Comment</td>
+  </tr>)
 
   return (
     <div className='user-dashboard_page'>
@@ -86,15 +125,15 @@ const newRequest=(e)=>{
               <thead>
                 <tr>
                   <td>ID</td>
-                  <td>User name</td>
-                  <td>Role</td>
-                  <td>Branch</td>
-                  <td>Department</td>
+                  <td>Title</td>
+                  <td>Description</td>
+                  <td>Attachment</td>
+                  <td>Comment</td>
                   <td></td>
                 </tr>
               </thead>
               <tbody>
-                {/* {tableRw} */}
+                {tableRw}
               </tbody>
             </table>
           </div>
@@ -115,30 +154,7 @@ const newRequest=(e)=>{
             <label htmlFor="req_name">Request Name <span>*</span></label>
             <input type="text" name="req_name" id="req-name" value={request.title} readOnly/>
           </div>
-          {/* <div className="form-ctrl">
-            <label htmlFor="location">Location <span>*</span></label>
-            <select name="location" id="location" onChange={setInput}>
-              <option value="">Select Your Location</option>
-              <option value="Farm">Farm</option>
-              <option value="Kality">Kality</option>
-              <option value="Lideta">Lideta</option>
-              <option value="Mekanissa">Mekanissa</option>
-            </select>
-          </div>
-          <div className="form-ctrl">
-            <label htmlFor="dept">Department <span>*</span></label>
-            <select name="dept" id="dept" onChange={setInput}>
-              <option value="">Select Your Department</option>
-              <option value="HR">HR</option>
-              <option value="Finance">Finanace</option>
-              <option value="Procurment">Procurement</option>
-              <option value="Marketing">Marketing</option>
-            </select>
-          </div> */}
-          {/* <div className="form-ctrl">
-            <label htmlFor="name">Name <span>*</span></label>
-            <input type="text" name="name" id="name" value={request.name} onChange={setInput}/>
-          </div> */}
+          
           <div className="form-ctrl">
             <label htmlFor="description">Description <span>*</span></label>
             <input type="text" name="description" id="description" value={request.description} onChange={setInput}/>
