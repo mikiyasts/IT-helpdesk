@@ -14,6 +14,7 @@ urlpatterns = [
   path('getuser/', views.GetUserView.as_view()),
   path('logout/',views.logout),
   path('generate-apikey/',views.GenerateAPIKeyView.as_view()),
+  path('SendSMS/',views.send_message_view),
    
   path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
   path('token/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
