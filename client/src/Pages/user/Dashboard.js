@@ -4,6 +4,7 @@ import Table from '../../component/DataTable'
 import axios, { Axios } from "axios";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from '../../Context/AuthContext';
+import VisibilityIcon from '@mui/icons-material/Visibility'; 
 function Dashboard() {
 
   const {isAuth,setIsAuth}=useContext(AuthContext)
@@ -93,9 +94,7 @@ const newRequest=(e)=>{
     <td data-cell="Description">{el.description}</td>
     <td className="opt-dots" data-cell="Attachment">
     {el?.attachments.length<1?null:
-    <a href={`${process.env.REACT_APP_URL}${el?.attachments[0]?.file}`} download><button className="btn-solved">Download</button></a>
-    
-    }
+    <a href={`${process.env.REACT_APP_URL}${el?.attachments[0]?.file}`} target='_blank'><button className="btn-solved" style={{display:"flex",alignItems:"center",justifyContent:"center"}}>< VisibilityIcon/></button></a>}
     </td>
     <td data-cell="Comment">Comment</td>
   </tr>)
