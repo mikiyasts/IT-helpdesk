@@ -93,7 +93,7 @@ const newRequest=(e)=>{
     <td data-cell="Description">{el.description}</td>
     <td className="opt-dots" data-cell="Attachment">
     {el?.attachments.length<1?null:
-    <a href={`${process.env.REACT_APP_URL}${el?.attachments[0]?.file}`} download><button className="btn-solved">Download</button></a>
+    <a href={`${process.env.REACT_APP_URL}/media${el?.attachments[0]?.file}`} download><button className="btn-solved">Download</button></a>
     
     }
     </td>

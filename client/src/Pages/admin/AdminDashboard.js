@@ -38,11 +38,12 @@ function AdminDashboard() {
         }
     getdashData()
 
+
   },[])
-console.log(dashdata);
+console.log(dashdata,"htht");
 
   useEffect(()=>{
-    console.log("red",dashdata && dashdata.branch_requests);
+    console.log("red",dashdata );
   },[dashdata])
   return (
       <div className="admin-dashboard">
@@ -78,7 +79,9 @@ console.log(dashdata);
           <div className="card-chart">
             <div className="card-header" style={{padding:"1rem",borderBottom:".5px solid #f2f2f225"}}><h3>Issue Ratio</h3></div>
             <div className="charts pie">
-              <PieChart/>
+              <PieChart
+              dataset={dashdata.categories}
+              />
             </div>
           </div>
           <div className="card-table">
