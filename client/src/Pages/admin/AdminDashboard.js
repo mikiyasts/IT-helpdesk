@@ -84,7 +84,7 @@ console.log(dashdata,"htht");
               />
             </div>
           </div>
-          <div className="card-table">
+          {/* <div className="card-table">
             <div className="card-header" style={{padding:"1.5rem",borderBottom:".5px solid #f2f2f225"}}><h3>Recent Requests</h3></div>
             <div className="table">
               <table>
@@ -167,7 +167,7 @@ console.log(dashdata,"htht");
                 </tbody>
               </table>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
   );
