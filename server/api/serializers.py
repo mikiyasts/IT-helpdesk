@@ -27,7 +27,7 @@ class UserSerializer(serializers.ModelSerializer):
 class CreateTicketUserSerializer(serializers.ModelSerializer):
     class Meta(object):
         model=User
-        fields=['id','username']   
+        fields=['id','username','branch']   
 class UserGetSerializer(serializers.ModelSerializer):
     class Meta(object):
         model = User 
