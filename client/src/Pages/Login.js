@@ -24,7 +24,8 @@ function Login() {
 
 
 useEffect(()=>{
-   document.cookie=`access_token=`
+  
+    document.cookie=`access_token=`
       document.cookie=`refresh_token=`
       sessionStorage.clear("isAuth")
       sessionStorage.clear("isAdmin")

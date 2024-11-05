@@ -36,8 +36,8 @@ function AdminRoutes() {
       setisLoading(false)
 
       setIsAdmin(true)
-      document.cookie=`access_token=${res.data.access}`
-      document.cookie=`refresh_token=${res.data.refresh}`
+      document.cookie=`access_token=${res.data.access}; path=/`
+      document.cookie=`refresh_token=${res.data.refresh}; path=/`
       // setisLoading(false)
       console.log("hellow ac",res.data.access);
       return console.log("hellow ref",res.data.refresh);

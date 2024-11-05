@@ -1079,7 +1079,23 @@ svg .css-1qkz8p7{
   background-color: var(--accent-secondary);
   color: #f2f2f2;
 }
+.filter-div{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .5rem;
+}
+.filter-div form{
+  display: flex;
+  gap:.5rem;
+  padding: .2rem;
+}
+.filter-div form select{
+  color: white;
+  background-color: #2b3544;
+  border: none;
+}
 
-.test{
-  transform: rotateZ('360deg');
+.filter-div form select:active{
+  outline: none;
 }

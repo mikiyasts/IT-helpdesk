@@ -8,7 +8,6 @@ import LineChart from "../../component/LineChart"
 import BarChart from "../../component/BarChart"
 import PieChart from "../../component/PieChart"
 import axios from "axios";
-import Cookies from 'js-cookie'
 
 
 function AdminDashboard() {
@@ -18,10 +17,7 @@ function AdminDashboard() {
 
 
   useEffect( ()=>{
-    const acstoken = document.cookie
-        .split('; ')
-        .find(row => row.startsWith('access_token='))
-        ?.split('=')[1];
+   
         const getdashData=async ()=>{
           await axios.get(`${process.env.REACT_APP_URL}/api/admin-dashboard/`,{
       headers:{
@@ -40,11 +36,7 @@ function AdminDashboard() {
 
 
   },[])
-console.log(dashdata,"htht");
 
-  useEffect(()=>{
-    console.log("red",dashdata );
-  },[dashdata])
   return (
       <div className="admin-dashboard">
         <div className="cards">

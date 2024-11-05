@@ -12,6 +12,12 @@ function Tickets() {
   const [ticketList,setTicketList]=useState([])
   const [activeTicket,setActiveTicket]=useState(0)
   const [activePreview,setActivePreview]=useState(null)
+  const [category,setCategory]=useState([])
+  const [filter,setFilter]=useState({
+    category:"",
+    location:"",
+    status:""
+  })
   let preview
   
 
@@ -32,13 +38,24 @@ function Tickets() {
       }
     }).then(res=>{
       setTicketList(res.data.reverse())
-      console.log("brr",res.data && res.data.branch_request);
       
-    }).catch(err=>console.log("errdash",err)
+    }).catch(err=>console.log(err)
     )
+    
         }
     getTickets()
 
+  },[])
+
+  useEffect(()=>{
+    const getcategory=async ()=>{
+      await axios.get(`${process.env.REACT_APP_URL}/api/list_ticket_category/`,{
+      headers:{
+        Authorization: `API_KEY ${process.env.REACT_APP_API_KEY}`,
+      }
+    }).then(res=>setCategory(res.data)).catch(err=>console.log(err))
+    }
+    getcategory()
   },[])
   // useEffect(()=>{
   //   if(Number(activeTicket)>0){
@@ -55,24 +72,32 @@ function Tickets() {
       }
     }).then(res=>{
       setTicketList(res.data.reverse())
-      console.log("brr",res.data && res.data.branch_request);
+     
       
-    }).catch(err=>console.log("errdash",err)
+    }).catch(err=>console.log(err)
     )
   }
-console.log("act",activeTicket)
-console.log(ticketList[0]);
 
-  const list=ticketList.map(el=>{
-    console.log("sdfs",typeof(el.id));
-    console.log("sdfs",typeof(el.id));
+
+  const list=ticketList.filter(fl=>filter.category?fl.category===Number(filter.category):fl).filter(fl=>filter.status?fl.status.toLowerCase().includes(filter.status.toLocaleLowerCase()):fl).filter(fl=>{
+    if(filter.location){
+      if(fl.created_by){
+        if(fl.created_by.branch){
+          return fl.created_by.branch.toLocaleLowerCase().includes(filter.location.toLocaleLowerCase())
+        }else{
+          return fl
+        }
+      }
+    }else{
+      return fl
+    }
+  }).map(el=>{
     
     return (<li className={el.id===Number(activeTicket)?"active":null} key={el && el.id} onClick={()=>{
       setActiveTicket(el && el.id)
       // localStorage.setItem("activeticket",el.id)
       preview=ticketList.find(fi=>fi.id===el.id)
       setActivePreview(preview)
-      console.log("gttg",preview);
       
     }}>
             <div className="list-requestor-name">
@@ -83,8 +108,37 @@ console.log(ticketList[0]);
   </li>)
   })
 
-  console.log("prev",preview)
+  const catoption=category.map(el=><option key={el.id} value={el.id}>{el.name}</option>)
+
+  const FilterTicket=(e)=>{
+    setFilter(prev=>{
+      return{
+        ...prev,
+        [e.target.name]:e.target.value
+      }
+    })
+  }
   return (
+    <>
+    <div className="filter-div">
+      <form onChange={FilterTicket}>
+        <select name="category" id="category">
+            <option value="">Category</option>
+            {catoption}
+         </select>
+        <select name="status" id="status">
+            <option value="">Status</option>
+            <option value="open">Open</option>
+            <option value="closed">Closed</option>
+            <option value="in progress">IN-Progress</option>
+         </select>
+        <select name="location" id="location">
+            <option value="">Location</option>
+            <option value="lideta">Lideta</option>
+            <option value="mekanissa">Mekanissa</option>
+         </select>
+      </form>
+    </div>
     <div className='tickets-main'>
       {/* <div className="tickets-header">
         filter and number of tickets
@@ -106,7 +160,7 @@ console.log(ticketList[0]);
 
         </div>
         <div className="ticket-note">
-          <h4>Note</h4>
+          <h4>Solution</h4>
           <p>note is temporary</p>
         </div>
         <div className="ticket-solution">
@@ -145,7 +199,7 @@ console.log(ticketList[0]);
             <h4>Details</h4> 
            { detailcollapse? <ExpandLessIcon/>: <ExpandMoreIcon sx={{ fontSize: 20 }}/>}
           <ul className={`detail-list ${detailcollapse&&"active"}`}>
-            <li><div className="detail-name">Request Time</div> <div className="detail-value">{activePreview && activePreview.created_at}</div></li>
+            <li><div className="detail-name">Request Time</div> <div className="detail-value">{ ()=>{return hello"}}</div></li>
             <li><div className="detail-name">Location</div> <div className="detail-value">{activePreview && activePreview.created_by && activePreview.created_by.branch}</div></li>
             <li><div className="detail-name">Title</div> <div className="detail-value"><p>{activePreview && activePreview.title}</p></div></li>
             <li><div className="detail-name">Note</div> <div className="detail-value"><p>Note</p></div></li>
@@ -158,6 +212,7 @@ console.log(ticketList[0]);
       </div>:<div  className="ticket-highlight"></div>}
       
     </div>
+    </>
   )
 }
 
