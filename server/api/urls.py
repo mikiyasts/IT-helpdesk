@@ -5,7 +5,7 @@ from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
 )
-from .views import CustomTokenObtainPairView
+from .views import CustomTokenObtainPairView, SubmitSolutionView
 
 urlpatterns = [
   path('',views.api_endpoints),
@@ -35,6 +35,8 @@ urlpatterns = [
   path('list_ticket_category_detail/<int:pk>/', views.list_ticket_category_detail),
   path('delete_ticket_category/<int:pk>/', views.delete_ticket_category),
   path('my_ticket/', views.my_ticket),
+  path('submit_solution/<int:ticket_id>/', SubmitSolutionView.as_view() ),
+  path('update_ticket_history/<int:id>/',views.ticket_status_history),
   
   
   

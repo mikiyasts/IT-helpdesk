@@ -51,12 +51,16 @@ class AttachmentSerializer(serializers.ModelSerializer):
 
 
 class TicketCommentSerializer(serializers.ModelSerializer):
-    author = serializers.PrimaryKeyRelatedField(read_only=True)
-    parent = serializers.PrimaryKeyRelatedField(queryset=TicketComment.objects.all(), required=False, allow_null=True)
+   
+   
 
     class Meta:
         model = TicketComment
         fields = ['id', 'ticket', 'author', 'content', 'created_at', 'parent']
+    def validate(self, data):
+        if not data.get('content'):
+            raise serializers.ValidationError('Solution content cannot be empty.')
+        return data
 
 class TicketHistorySerializer(serializers.ModelSerializer):
     updated_by = serializers.PrimaryKeyRelatedField(read_only=True)
