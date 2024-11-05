@@ -414,7 +414,7 @@ class MarkNotificationAsReadView(APIView):
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 def my_ticket(request):
-    tickets = Ticket.objects.filter(created_by=request.user)
+    tickets = Ticket.objects.filter(created_by=request.user).order_by('-created_at')
     serializer = TicketSerializer(tickets, many=True)
 
     return Response(serializer.data)
