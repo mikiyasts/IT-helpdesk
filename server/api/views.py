@@ -9,7 +9,7 @@ from rest_framework.response import Response
 import secrets
 from .authentication import APIKeyAuthentication
 from tickets.models import Attachment, Ticket,TicketCategory, TicketHistory
-from .serializers import DepartmentSerializer, RecentTicketSerializer, TicketCategorySerializer, TicketCommentSerializer, TicketSerializer, UserGetSerializer, UserSerializer
+from .serializers import DepartmentSerializer, RecentTicketSerializer, TicketCategorySerializer, TicketCommentSerializer, TicketHistorySerializer, TicketSerializer, UserGetSerializer, UserSerializer
 from rest_framework.authtoken.models import Token
 from rest_framework import status
 from users.models import Department, User
@@ -212,6 +212,7 @@ def list_tickets(request):
 def ticket(request, pk):
     tickets = Ticket.objects.get(id=pk)
     serializer = TicketSerializer(tickets)
+    
 
     return Response(serializer.data)
 
@@ -496,6 +497,15 @@ def ticket_status_history(request,id):
     except Ticket.DoesNotExist:
         return Response({'detail': 'Ticket not found'}, status=status.HTTP_404_NOT_FOUND)
     
+    
+@api_view(['GET'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+def solutions(request,id):
+    history = TicketHistory.objects.filter(ticket=id).order_by('-updated_at')
+    serializer = TicketHistorySerializer(history, many=True)
+
+    return Response(serializer.data)
     
     
     
