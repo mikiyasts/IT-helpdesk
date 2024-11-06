@@ -508,6 +508,23 @@ def solutions(request,id):
     return Response(serializer.data)
     
     
+@api_view(['POST'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+def acceptticket(request, id):
+    try:
+        ticket = Ticket.objects.get(id=id)  
+    except Ticket.DoesNotExist:
+        return Response({'error': 'Ticket not found'}, status=status.HTTP_404_NOT_FOUND)
     
+    
+    ticket.assigned_to = request.user
+    ticket.status = "Pending"
+    ticket.save()  
+    
+    return Response({'status': 'ticket accepted successfully'}, status=status.HTTP_200_OK)
+
+        
+
 
    
