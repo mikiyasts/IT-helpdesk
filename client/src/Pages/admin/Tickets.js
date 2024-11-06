@@ -142,6 +142,30 @@ function Tickets() {
   activeTicketdate()
 
   console.log(activePreview);
+ 
+  const acstoken = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('access_token='))
+        ?.split('=')[1];
+  const acceptTicket=async (id)=>{
+    await axios.get(`${process.env.REACT_APP_URL}/apiaccept_ticket/${id}/`,{
+      headers:{
+        Authorization: `Bearer ${acstoken}`,
+      }
+    }).then(async res=>{
+      console.log(res,"accepted");
+      await axios.get(`${process.env.REACT_APP_URL}/api/update_ticket_history/${id}/`,{new_value:"Pending",old_value:"Open",field_updated:"status"},{
+        headers:{
+          Authorization: `API_KEY ${process.env.REACT_APP_API_KEY}`,
+        }
+      }).then(res=>{
+       console.log("history updated");
+      }).catch(err=>console.log(err))
+     
+      
+    }).catch(err=>console.log(err)
+    )
+  }
   
   return (
     <>
@@ -192,9 +216,7 @@ function Tickets() {
         }
         {activePreview.status==='Open' &&
         <div className="ticket-solution">
-          <form >
-            <button className="btn-solved">Accept Request</button>
-          </form>
+            <button className="btn-solved" onClick={()=>acceptTicket(activePreview.id)}>Accept Request</button>
         </div>
         }
         {activePreview.status==='In progress' &&
