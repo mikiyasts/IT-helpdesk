@@ -8,8 +8,8 @@ from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.response import Response
 import secrets
 from .authentication import APIKeyAuthentication
-from tickets.models import Attachment, Ticket,TicketCategory
-from .serializers import DepartmentSerializer, RecentTicketSerializer, TicketCategorySerializer, TicketSerializer, UserGetSerializer, UserSerializer
+from tickets.models import Attachment, Ticket,TicketCategory, TicketHistory
+from .serializers import DepartmentSerializer, RecentTicketSerializer, TicketCategorySerializer, TicketCommentSerializer, TicketSerializer, UserGetSerializer, UserSerializer
 from rest_framework.authtoken.models import Token
 from rest_framework import status
 from users.models import Department, User
@@ -431,3 +431,73 @@ def send_message_view(request):
     send_message('192.168.110.11', 9710, 'admin', '@dIff%nSms0', phone_number, message)
     return Response({'status': 'Message sent successfully'}, status=status.HTTP_200_OK)
     
+    
+class SubmitSolutionView(APIView):
+    permission_classes = [IsAuthenticated]
+    @authentication_classes([JWTAuthentication])
+    def post(self, request, ticket_id):
+        try:
+            ticket = Ticket.objects.get(id=ticket_id)
+        except Ticket.DoesNotExist:
+            return Response({'detail': 'Ticket not found.'}, status=status.HTTP_404_NOT_FOUND)
+        if ticket.status == 'Closed':
+            return Response({'detail': 'Ticket is already closed.'}, status=status.HTTP_400_BAD_REQUEST)
+        data = {
+            'ticket': ticket.id,
+            'author': request.user.id,
+            'content': request.data.get('content'),
+            'parent': None  
+        }
+        serializer = TicketCommentSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            ticket.status = 'Closed'
+            ticket.save()
+
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+def ticket_status_history(request,id):
+    
+    try:
+        ticket = Ticket.objects.get(id=id)
+        
+        try:
+            TicketHistory.objects.get(ticket=ticket)
+            ticket_history=TicketHistory.objects.get(ticket=ticket)
+            new_value = request.data.get('new_value')
+            field_updated=request.data.get('field_updated')
+            TicketHistory.objects.create(
+                ticket=ticket,
+                updated_by=request.user,
+                field_name=field_updated,
+                new_value=new_value
+            )
+            ticket.save()
+            return Response({'status': 'ticket history updated'}, status=status.HTTP_200_OK)
+        except:
+            new_value = request.data.get('new_value')
+            field_updated=request.data.get('field_updated')
+            TicketHistory.objects.create(
+                ticket=ticket,
+                updated_by=request.user,
+                field_name=field_updated,
+                new_value=new_value
+            )
+            ticket.save()
+            
+    
+    
+            return Response({'status': 'ticket history updated'}, status=status.HTTP_200_OK)
+    except Ticket.DoesNotExist:
+        return Response({'detail': 'Ticket not found'}, status=status.HTTP_404_NOT_FOUND)
+    
+    
+    
+    
+
+   
