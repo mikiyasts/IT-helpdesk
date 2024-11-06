@@ -192,7 +192,7 @@ function Tickets() {
         }
         {activePreview.status==='Open' &&
         <div className="ticket-solution">
-          <form>
+          <form >
             <button className="btn-solved">Accept Request</button>
           </form>
         </div>
