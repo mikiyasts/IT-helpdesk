@@ -73,9 +73,6 @@ function Tickets() {
       }
     }).then(res=>{
       setTicketHistory(res.data)
-      console.log("jjsadaksdiasd",res);
-      
-      
     }).catch(err=>console.log(err)
     )
   }
@@ -200,7 +197,7 @@ function Tickets() {
           </form>
         </div>
         }
-        {activePreview.status==='Pending' &&
+        {activePreview.status==='In progress' &&
         <div className="ticket-solution">
           <h4>Solution</h4>
           <form>
@@ -210,6 +207,12 @@ function Tickets() {
             <button className="btn-solved">Submit</button>
           </form>
         </div>
+        }
+        {activePreview.status==='Pending' &&
+        <div className="ticket-note">
+        <h4>Solution</h4>
+        <p>note is temporary</p>
+      </div>
         }
         
       </div>:<div className="tickets-preview"></div>}
