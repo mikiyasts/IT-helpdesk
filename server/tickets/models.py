@@ -13,6 +13,7 @@ class Ticket(models.Model):
         ('Open', 'Open'),
         ('In Progress', 'In Progress'),
         ('Closed', 'Closed'),
+        ('Pending', 'Pending'),
     ]
 
     title = models.CharField(max_length=200)

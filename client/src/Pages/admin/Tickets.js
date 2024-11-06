@@ -118,6 +118,17 @@ function Tickets() {
       }
     })
   }
+  let activeDate
+  let activeTime
+  const activeTicketdate=()=>{
+    activeDate=activePreview?.created_at.split("T")[0]    
+    activeTime=activePreview?.created_at.split("T")[1].split(":")    
+  }
+
+  activeTicketdate()
+
+  console.log(activePreview);
+  
   return (
     <>
     <div className="filter-div">
@@ -159,10 +170,20 @@ function Tickets() {
           </p>
 
         </div>
+        {activePreview.status==='Closed' &&
         <div className="ticket-note">
           <h4>Solution</h4>
           <p>note is temporary</p>
         </div>
+        }
+        {activePreview.status==='Open' &&
+        <div className="ticket-solution">
+          <form>
+            <button className="btn-solved">Accept Request</button>
+          </form>
+        </div>
+        }
+        {activePreview.status==='Pending' &&
         <div className="ticket-solution">
           <h4>Solution</h4>
           <form>
@@ -172,6 +193,8 @@ function Tickets() {
             <button className="btn-solved">Submit</button>
           </form>
         </div>
+        }
+        
       </div>:<div className="tickets-preview"></div>}
 
 
@@ -199,7 +222,8 @@ function Tickets() {
             <h4>Details</h4> 
            { detailcollapse? <ExpandLessIcon/>: <ExpandMoreIcon sx={{ fontSize: 20 }}/>}
           <ul className={`detail-list ${detailcollapse&&"active"}`}>
-            {/*<li><div className="detail-name">Request Time</div> <div className="detail-value">{ ()=>{return hello"}}</div></li>*/}
+          <li><div className="detail-name">Request Date</div> <div className="detail-value">{activeDate}</div></li>
+          <li><div className="detail-name">Request Time</div> <div className="detail-value">{activeTime[0]}:{activeTime[1]}</div></li>
             <li><div className="detail-name">Location</div> <div className="detail-value">{activePreview && activePreview.created_by && activePreview.created_by.branch}</div></li>
             <li><div className="detail-name">Title</div> <div className="detail-value"><p>{activePreview && activePreview.title}</p></div></li>
             <li><div className="detail-name">Note</div> <div className="detail-value"><p>Note</p></div></li>
