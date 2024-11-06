@@ -37,6 +37,7 @@ urlpatterns = [
   path('my_ticket/', views.my_ticket),
   path('submit_solution/<int:ticket_id>/', SubmitSolutionView.as_view() ),
   path('update_ticket_history/<int:id>/',views.ticket_status_history),
+  path('list_ticket_history/<int:id>/',views.solutions),
   
   
   
