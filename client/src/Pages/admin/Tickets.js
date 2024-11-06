@@ -14,6 +14,7 @@ function Tickets() {
   const [activePreview,setActivePreview]=useState(null)
   const [category,setCategory]=useState([])
   const [ticketHistory,setTicketHistory]=useState({})
+  const [solution,setSolution]=useState({content:""})
   const [filter,setFilter]=useState({
     category:"",
     location:"",
@@ -142,31 +143,86 @@ function Tickets() {
   activeTicketdate()
 
   console.log(activePreview);
- 
-  const acstoken = document.cookie
+  const getCsrfToken = () => {
+    const cookieValue = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('csrftoken='))
+        ?.split('=')[1];
+    return cookieValue || '';
+};
+  
+  const acceptTicket=async (id)=>{
+
+        const acstoken = document.cookie
         .split('; ')
         .find(row => row.startsWith('access_token='))
         ?.split('=')[1];
-  const acceptTicket=async (id)=>{
-    await axios.get(`${process.env.REACT_APP_URL}/apiaccept_ticket/${id}/`,{
+        // console.log("alkasjdlaksjdoaishd/a;iowhdoaida;lskd",acstoken);
+        
+    
+    await axios.post(`${process.env.REACT_APP_URL}/api/accept_ticket/${id}/`,null,{
       headers:{
+        'X-CSRFToken': getCsrfToken(),
         Authorization: `Bearer ${acstoken}`,
       }
     }).then(async res=>{
-      console.log(res,"accepted");
-      await axios.get(`${process.env.REACT_APP_URL}/api/update_ticket_history/${id}/`,{new_value:"Pending",old_value:"Open",field_updated:"status"},{
+      console.log("accepted");
+      await axios.post(`${process.env.REACT_APP_URL}/api/update_ticket_history/${id}/`,{new_value:"In Progress",old_value:"Open",field_updated:"status"},{
         headers:{
-          Authorization: `API_KEY ${process.env.REACT_APP_API_KEY}`,
+          Authorization: `Bearer ${acstoken}`,
         }
       }).then(res=>{
        console.log("history updated");
+       window.location.reload()
       }).catch(err=>console.log(err))
      
       
     }).catch(err=>console.log(err)
     )
   }
+  const submitSolution=async (id)=>{
+    const acstoken = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('access_token='))
+        ?.split('=')[1];
+
+    if(solution.content!==""){
+      await axios.post(`${process.env.REACT_APP_URL}/api/submit_solution/${id}/`,solution,{
+      headers:{
+        'X-CSRFToken': getCsrfToken(),
+        Authorization: `Bearer ${acstoken}`,
+      }
+    }).then(async res=>{
+      console.log("closed");
+      await axios.post(`${process.env.REACT_APP_URL}/api/update_ticket_history/${id}/`,{new_value:"Pending",old_value:"In Progress",field_updated:"status"},{
+        headers:{
+          Authorization: `Bearer ${acstoken}`,
+        }
+      }).then(res=>{
+       console.log("history updated");
+       window.location.reload()
+      }).catch(err=>console.log(err))
+     
+      
+    }).catch(err=>console.log(err)
+    )}else{
+      console.log("solution can not be empty");
+      
+    }
+  }
+
+  const settingSolution=(e)=>{
+    setSolution(prev=>{
+      return {
+        ...prev,
+        [e.target.name]:e.target.value
+      }
+    })
+  }
+
+  console.log("solutttttttttttttion",solution);
   
+
   return (
     <>
     <div className="filter-div">
@@ -219,15 +275,15 @@ function Tickets() {
             <button className="btn-solved" onClick={()=>acceptTicket(activePreview.id)}>Accept Request</button>
         </div>
         }
-        {activePreview.status==='In progress' &&
+        {activePreview.status==='In Progress' &&
         <div className="ticket-solution">
           <h4>Solution</h4>
-          <form>
-            <textarea name="solution" id="solution" placeholder='Type here'>
+          <div className='ticket-form'>
+            <textarea name="content" id="solution" placeholder='Type here' onChange={settingSolution}>
 
             </textarea>
-            <button className="btn-solved">Submit</button>
-          </form>
+            <button className="btn-solved" onClick={()=>submitSolution(activePreview.id)}>Submit</button>
+          </div>
         </div>
         }
         {activePreview.status==='Pending' &&

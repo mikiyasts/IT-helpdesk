@@ -452,8 +452,13 @@ class SubmitSolutionView(APIView):
         serializer = TicketCommentSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
-            ticket.status = 'Closed'
-            ticket.save()
+         
+            
+            tickets=Ticket.objects.get(id=ticket_id)
+            tickets.status = 'Pending'
+            tickets.save()
+            
+
 
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -523,7 +528,7 @@ def acceptticket(request, id):
     
     
     ticket.assigned_to = request.user
-    ticket.status = "Pending"
+    ticket.status = "In Progress"
     ticket.save()  
     
     return Response({'status': 'ticket accepted successfully'}, status=status.HTTP_200_OK)
