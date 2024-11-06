@@ -13,7 +13,7 @@ function Tickets() {
   const [activeTicket,setActiveTicket]=useState(0)
   const [activePreview,setActivePreview]=useState(null)
   const [category,setCategory]=useState([])
-  const [ticketHistory,setTicketHistory]=useState([])
+  const [ticketHistory,setTicketHistory]=useState({})
   const [filter,setFilter]=useState({
     category:"",
     location:"",
@@ -65,13 +65,16 @@ function Tickets() {
   //   }
   // },[])
   const getTicketHistory=async (id)=>{
+    console.log("Historyyyyyyyyyyyyyyyyyyyyyyyy",id);
+    
     await axios.get(`${process.env.REACT_APP_URL}/api/list_ticket_history/${id}/`,{
       headers:{
         Authorization: `API_KEY ${process.env.REACT_APP_API_KEY}`,
       }
     }).then(res=>{
       setTicketHistory(res.data)
-     
+      console.log("jjsadaksdiasd",res);
+      
       
     }).catch(err=>console.log(err)
     )
