@@ -13,6 +13,7 @@ function Tickets() {
   const [activeTicket,setActiveTicket]=useState(0)
   const [activePreview,setActivePreview]=useState(null)
   const [category,setCategory]=useState([])
+  const [ticketHistory,setTicketHistory]=useState([])
   const [filter,setFilter]=useState({
     category:"",
     location:"",
@@ -63,7 +64,20 @@ function Tickets() {
   //     setActivePreview(preview)
   //   }
   // },[])
-
+  const getTicketHistory=async (id)=>{
+    await axios.get(`${process.env.REACT_APP_URL}/api/list_ticket_history/${id}/`,{
+      headers:{
+        Authorization: `API_KEY ${process.env.REACT_APP_API_KEY}`,
+      }
+    }).then(res=>{
+      setTicketHistory(res.data)
+     
+      
+    }).catch(err=>console.log(err)
+    )
+  }
+  console.log(ticketHistory,"history");
+  
   const refreshTicket= async ()=>{
     
     await axios.get(`${process.env.REACT_APP_URL}/api/list_ticket/`,{
@@ -98,7 +112,7 @@ function Tickets() {
       // localStorage.setItem("activeticket",el.id)
       preview=ticketList.find(fi=>fi.id===el.id)
       setActivePreview(preview)
-      
+      getTicketHistory(el.id)
     }}>
             <div className="list-requestor-name">
             <p>{ el && el.created_by && el.created_by.username}</p>
