@@ -471,23 +471,27 @@ def ticket_status_history(request,id):
             TicketHistory.objects.get(ticket=ticket)
             ticket_history=TicketHistory.objects.get(ticket=ticket)
             new_value = request.data.get('new_value')
+            old_value=request.data.get('old_value')
             field_updated=request.data.get('field_updated')
             TicketHistory.objects.create(
                 ticket=ticket,
                 updated_by=request.user,
                 field_name=field_updated,
-                new_value=new_value
+                new_value=new_value,
+                old_value=old_value
             )
             ticket.save()
             return Response({'status': 'ticket history updated'}, status=status.HTTP_200_OK)
         except:
+            old_value=request.data.get('old_value')
             new_value = request.data.get('new_value')
             field_updated=request.data.get('field_updated')
             TicketHistory.objects.create(
                 ticket=ticket,
                 updated_by=request.user,
                 field_name=field_updated,
-                new_value=new_value
+                new_value=new_value,
+                old_value=old_value
             )
             ticket.save()
             
