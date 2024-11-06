@@ -499,7 +499,7 @@ def ticket_status_history(request,id):
     
     
 @api_view(['GET'])
-@authentication_classes([JWTAuthentication])
+@authentication_classes([APIKeyAuthentication])
 @permission_classes([IsAuthenticated])
 def solutions(request,id):
     history = TicketHistory.objects.filter(ticket=id).order_by('-updated_at')
