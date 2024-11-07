@@ -29,6 +29,8 @@ from .serializers import JWTUserSerializer
 from users.models import User
 from .serializers import NotificationSerializer
 from notifications.models import Notification
+from django.db import transaction
+import logging
 
 
 def send_message(host, port, username, password, number, message):
@@ -517,21 +519,38 @@ def solutions(request,id):
     return Response(serializer.data)
     
     
+logger = logging.getLogger(__name__)
+
 @api_view(['POST'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 def acceptticket(request, id):
     try:
-        ticket = Ticket.objects.get(id=id)  
+        ticket = Ticket.objects.get(id=id)
+
+      
+        if ticket.assigned_to is not None:
+            return Response({'error': 'Ticket is already assigned'}, status=status.HTTP_409_CONFLICT)
+
+
+        open_tickets = Ticket.objects.filter(assigned_to=request.user, status__in=["In Progress", "Open"])
+        if open_tickets.exists():
+            return Response({'error': 'You have other open tickets. Please complete them before accepting a new ticket.'}, status=status.HTTP_403_FORBIDDEN)
+
+        with transaction.atomic():
+            ticket.assigned_to = request.user
+            ticket.status = "In Progress"
+            ticket.save()
+
+        logger.info(f'Ticket {id} accepted by user {request.user.id}')
+
+        return Response({'status': 'Ticket accepted successfully', 'ticket_id': ticket.id, 'assigned_to': ticket.assigned_to.username}, status=status.HTTP_200_OK)
+
     except Ticket.DoesNotExist:
         return Response({'error': 'Ticket not found'}, status=status.HTTP_404_NOT_FOUND)
-    
-    
-    ticket.assigned_to = request.user
-    ticket.status = "In Progress"
-    ticket.save()  
-    
-    return Response({'status': 'ticket accepted successfully'}, status=status.HTTP_200_OK)
+    except Exception as e:
+        logger.error(f'Error accepting ticket {id}: {str(e)}')
+        return Response({'error': 'An error occurred while accepting the ticket'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         
 
