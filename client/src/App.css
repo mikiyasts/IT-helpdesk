@@ -876,6 +876,59 @@ svg .css-1qkz8p7{
 }
 .tickets-main .tickets-preview{
   min-width: 55%;
+  overflow: scroll;
+  scrollbar-color: transparent transparent;
+  scrollbar-width: thin;
+}
+.tickets-main .tickets-preview:hover {
+  scrollbar-color:var(--accent-secondary-alpha) transparent ;
+}
+.ticket-history{
+}
+.ticket-history .state{
+  display: flex;
+  gap: 1rem;
+  position: relative;
+  padding-left: 2rem;
+}
+.ticket-history .state:nth-child(1)::after{
+  height: 100%;
+  top: 1rem;
+}
+
+.ticket-history .state::before{
+  content: "";
+  width: 8px;
+  height: 8px;
+  background-color: yellow;
+  position: absolute;
+  left: .5rem;
+  top: .7rem;
+  border: 2px solid green;
+  border-radius: 50%;
+  z-index: 1;
+}
+.ticket-history .state::after{
+  content: "";
+  position: absolute;
+  width: 1px;
+  height: 100%;
+  background-color: green;
+  left: .874rem;
+  top: 1rem;
+}
+.ticket-history .state:last-child::after{
+  width: 1px;
+  height: 0px;
+}
+.ticket-history .state .state-date{
+  padding-block: .5rem;
+}
+.ticket-history .state .state-detail{
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+  padding-block: .5rem;
 }
 .tickets-list{
   display: flex;
