@@ -955,13 +955,13 @@ svg .css-1qkz8p7{
   font-weight: lighter;
   font-size: smaller;
 }
-.ticket-solution form{
+.ticket-solution .ticket-form{
   display: flex;
   flex-direction: column;
   gap: 1rem;
 }
 
-.ticket-solution form textarea{
+.ticket-solution .ticket-form textarea{
   background-color: transparent;
   color: white !important;
   padding: .5rem;
@@ -971,10 +971,10 @@ svg .css-1qkz8p7{
   height: 100px;
   resize: none;
 }
-.ticket-solution form textarea::-webkit-scrollbar{
+.ticket-solution .ticket-form textarea::-webkit-scrollbar{
   display: none;
 }
-.ticket-solution form textarea:focus{
+.ticket-solution .ticket-form textarea:focus{
   outline: none;
 }
 .ticket-solution button{
