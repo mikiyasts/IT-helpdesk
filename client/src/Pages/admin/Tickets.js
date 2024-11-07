@@ -13,7 +13,7 @@ function Tickets() {
   const [activeTicket,setActiveTicket]=useState(0)
   const [activePreview,setActivePreview]=useState(null)
   const [category,setCategory]=useState([])
-  const [ticketHistory,setTicketHistory]=useState({})
+  const [ticketHistory,setTicketHistory]=useState([])
   const [solution,setSolution]=useState({content:""})
   const [filter,setFilter]=useState({
     category:"",
@@ -21,7 +21,20 @@ function Tickets() {
     status:""
   })
   let preview
-  
+  const month = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
 
 
   useEffect( ()=>{
@@ -66,7 +79,7 @@ function Tickets() {
   //   }
   // },[])
   const getTicketHistory=async (id)=>{
-    console.log("Historyyyyyyyyyyyyyyyyyyyyyyyy",id);
+    // console.log("Historyyyyyyyyyyyyyyyyyyyyyyyy",id);
     
     await axios.get(`${process.env.REACT_APP_URL}/api/list_ticket_history/${id}/`,{
       headers:{
@@ -220,6 +233,27 @@ function Tickets() {
     })
   }
 
+
+  const States=ticketHistory && ticketHistory.map(el=>{
+    const fulldate=el.updated_at.split("T")[0].split("-")
+    const fullTime=el.updated_at.split("T")[1].split(":")
+    console.log(fulldate,"date-splitted");
+    console.log(fullTime,"Time-splitted");
+    console.log(el);
+    
+    return (
+      <div className="state">
+            <div className="state-date">{`${fulldate[2]} ${month[fulldate[1]]}`}</div>
+            <div className="state-detail">
+              <div className="state-name">{el.new_value}</div>
+              <div className="state-description">this is the content</div>
+              <div className="state-time">{`${fullTime[0]}:${fullTime[1]}`}</div>
+            </div>
+          </div>
+    )
+    
+  })
+
   console.log("solutttttttttttttion",solution);
   
 
@@ -290,9 +324,21 @@ function Tickets() {
         <div className="ticket-note">
         <h4>Solution</h4>
         <p>note is temporary</p>
+        
       </div>
         }
-        
+        <div className="ticket-history">
+          <div className="state">
+            <div className="state-date">12 Aug</div>
+            <div className="state-detail">
+              <div className="state-name">Opened</div>
+              <div className="state-description">this is the content</div>
+              <div className="state-time">12:30</div>
+            </div>
+          </div>
+          
+          {States}
+        </div>
       </div>:<div className="tickets-preview"></div>}
 
 

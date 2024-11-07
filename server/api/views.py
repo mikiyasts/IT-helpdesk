@@ -513,7 +513,7 @@ def ticket_status_history(request,id):
 @authentication_classes([APIKeyAuthentication])
 @permission_classes([IsAuthenticated])
 def solutions(request,id):
-    history = TicketHistory.objects.filter(ticket=id).order_by('-updated_at')
+    history = TicketHistory.objects.filter(ticket=id)
     serializer = TicketHistorySerializer(history, many=True)
 
     return Response(serializer.data)

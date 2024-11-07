@@ -36,20 +36,28 @@ function AdminDashboard() {
 
 
   },[])
+console.log("dashjjjjs",dashdata);
 
   return (
       <div className="admin-dashboard">
         <div className="cards">
           <div className="card">
-            <div className="card-header"><h3>Completed</h3></div>
+            <div className="card-header"><h3>Closed</h3></div>
             <div className="number">
-                  <h1>{dashdata.ticket_status && dashdata.ticket_status.closed }</h1>
+                  <h1>{dashdata.ticket_status && dashdata.ticket_status.closed}</h1>
             </div>
           </div>
           <div className="card">
             <div className="card-header"><h3>Pending</h3></div>
             <div className="number">
-            <h1>{dashdata.ticket_status && dashdata.ticket_status.open }</h1>
+            <h1>{dashdata.ticket_status && dashdata.ticket_status.Pending}</h1>
+
+            </div>
+          </div>
+          <div className="card">
+            <div className="card-header"><h3>Open</h3></div>
+            <div className="number">
+            <h1>{dashdata.ticket_status && dashdata.ticket_status.open}</h1>
 
             </div>
           </div>
