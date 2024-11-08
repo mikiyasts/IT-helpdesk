@@ -5,6 +5,7 @@ import axios, { Axios } from "axios";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from '../../Context/AuthContext';
 import VisibilityIcon from '@mui/icons-material/Visibility'; 
+import Pagination from '../../component/Pagination';
 function Dashboard() {
 
   const {isAuth,setIsAuth}=useContext(AuthContext)
@@ -18,6 +19,15 @@ function Dashboard() {
     attachments:""
   })
   const [mytickets,setMytickets]=useState([])
+  const [currentPage, setCurrentPage] = useState(1);
+
+const [recordsPerPage] = useState(9);
+const indexOfLastRecord = currentPage * recordsPerPage;
+const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
+
+const currentRecords = mytickets.slice(indexOfFirstRecord, 
+  indexOfLastRecord);
+const nPages = Math.ceil(mytickets.length / recordsPerPage)
 
   const getDashdata=async ()=>{
     const acstoken = document.cookie
@@ -88,15 +98,17 @@ const newRequest=(e)=>{
     })
   }}><div className="card-name" key={el.id}>{el.name}</div></div>)
 
-  const tableRw=mytickets && mytickets.map(el=><tr>
+  const tableRw=currentRecords && currentRecords.map(el=><tr>
     <td data-cell="ID">{el.id}</td>
     <td data-cell="Title">{el.title}</td>
     <td data-cell="Description">{el.description}</td>
-    <td className="opt-dots" data-cell="Attachment">
+    <td className="opt-dots" data-cell="Attachment" style={{display:'flex',justifyContent:"flex-start"}}>
     {el?.attachments.length<1?null:
-    <a href={`${process.env.REACT_APP_URL}${el?.attachments[0]?.file}`} target='_blank'><button className="btn-solved" style={{display:"flex",alignItems:"center",justifyContent:"center"}}>< VisibilityIcon/></button></a>}
+    <a href={`${process.env.REACT_APP_URL}${el?.attachments[0]?.file}`} target='_blank' title='Preview'>< VisibilityIcon/></a>}
     </td>
-    <td data-cell="Comment">Comment</td>
+    {
+    el?.status==='Pending'?<td data-cell="Action"><button className="btn-login">Close</button></td>:null 
+    }
   </tr>)
 
   return (
@@ -127,14 +139,18 @@ const newRequest=(e)=>{
                   <td>Title</td>
                   <td>Description</td>
                   <td>Attachment</td>
-                  <td>Comment</td>
-                  <td></td>
+                  <td>Action</td>
                 </tr>
               </thead>
               <tbody>
                 {tableRw}
               </tbody>
             </table>
+            <Pagination
+            nPages={nPages}
+            currentPage={currentPage}
+            setCurrentPage={setCurrentPage}
+            />
           </div>
         </div>
       </div>

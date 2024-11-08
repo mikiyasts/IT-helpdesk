@@ -254,7 +254,7 @@
   color: var(--font-color-secondary);
   cursor: pointer;
 }
-.forgot-signin .btn-login{
+.forgot-signin .btn-login,td .btn-login{
   padding:10px 12px;
   font-size: 1em;
   font-weight: 600;
@@ -786,7 +786,34 @@ svg .css-1qkz8p7{
   border-bottom: none;
 }
 
+.pagination-main{
+  width: 100%;
+  display: flex;
+}
+.pagination-main ul{
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  gap: .5rem;
+  list-style: none;
 
+}
+.pagination-main ul li{
+  padding: 5px 10px;
+  text-decoration: none;
+}
+.pagination-main ul li a{
+  text-decoration: none;
+}
+.pagination-main ul li {
+  background-color: var(--accent-secondary);
+}
+.pagination-main ul li.active {
+  background-color: var(--accent-secondary-alpha);
+}
+.pagination-main ul li:nth-child(1),.pagination-main ul li:last-child{
+  background-color: var(--accent-tertiary);
+}
 
 
 
@@ -894,6 +921,7 @@ svg .css-1qkz8p7{
 .ticket-history .state:nth-child(1)::after{
   height: 100%;
   top: 1rem;
+  animation: timeline 1s linear var(--delay) forwards;
 }
 
 .ticket-history .state::before{
@@ -916,10 +944,23 @@ svg .css-1qkz8p7{
   background-color: green;
   left: .874rem;
   top: 1rem;
+  transform-origin: top;
+  transform: scaleY(0);
+  animation: 1s linear var(--delay) forwards timeline;
 }
 .ticket-history .state:last-child::after{
   width: 1px;
   height: 0px;
+  transform: scaleY(0);
+  animation: timeline 1s linear var(--delay) forwards ;
+}
+@keyframes timeline {
+  0%{
+    transform: scaleY(0);
+  }
+  100%{
+    transform: scaleY(1);
+  }
 }
 .ticket-history .state .state-date{
   padding-block: .5rem;
