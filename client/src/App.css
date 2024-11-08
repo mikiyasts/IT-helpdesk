@@ -23,6 +23,8 @@
   --accent-secondary:#8470ff;
   --accent-secondary-alpha:#8370ff67;
   --accent-tertiary:#2b3544;
+  --toastify-color-warning: #f1c40f;
+  --toastify-text-color-dark: #111111;
 }
 .App{
   width: 100vw;
@@ -1192,4 +1194,10 @@ svg .css-1qkz8p7{
 
 .filter-div form select:active{
   outline: none;
+}
+.Toastify__toast-body div{
+  color: black !important;
+}
+.Toastify__toast .Toastify__toast-theme--light .Toastify__toast--warning{
+  background-color: var(--accent-tertiary) !important;
 }

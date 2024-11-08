@@ -6,10 +6,12 @@ import { useNavigate } from "react-router-dom";
 import { AuthContext } from '../../Context/AuthContext';
 import VisibilityIcon from '@mui/icons-material/Visibility'; 
 import Pagination from '../../component/Pagination';
+import { ToastContainer, toast } from 'react-toastify';
+  import 'react-toastify/dist/ReactToastify.css';
 function Dashboard() {
 
   const {isAuth,setIsAuth}=useContext(AuthContext)
-  
+  const [pendingavailable,setPendingAvailable]=useState(null)
   const [popup,setPopup]=useState(false);
   const [category,setCategory]=useState([])
   const [request,setRequest]=useState({
@@ -55,6 +57,18 @@ const nPages = Math.ceil(mytickets.length / recordsPerPage)
         console.log(err);
         
       })
+
+    await axios.get(`${process.env.REACT_APP_URL}/api/check_pending_tickets/`,{
+      headers:{
+    Authorization: `Bearer ${acstoken}`,
+      }
+      }).then(res=>{
+        console.log("mytickets",res.data);
+        setPendingAvailable(res.data.has_pending_tickets)
+      }).catch(err=>{
+        console.log(err);
+        
+      })
   }
   useEffect( ()=>{
     getDashdata()
@@ -89,8 +103,15 @@ const newRequest=(e)=>{
  
   console.log(request);
   console.log("cont",isAuth);
-
-  const reqCard=category.map(el=><div className="card3" onClick={()=>{
+  console.log(pendingavailable,"asdawdweassaf");
+  
+  const reqCard=category.map(el=>
+  
+    pendingavailable?<div className="card3" onClick={()=>{
+    
+    toast.warning("You have unclosed request")
+  }}><div className="card-name" key={el.id}>{el.name}</div></div>
+  :<div className="card3" onClick={()=>{
     setPopup(true)
     setRequest({
       title:el.name,
@@ -113,6 +134,7 @@ const newRequest=(e)=>{
 
   return (
     <div className='user-dashboard_page'>
+      <ToastContainer />
         <Header/>
         <div className="dashboard-main">
           <div className="dashboard-header" ><h2>New Request</h2></div>
