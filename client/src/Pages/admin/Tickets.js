@@ -36,6 +36,7 @@ function Tickets() {
     "Dec",
   ];
 
+  
 
   useEffect( ()=>{
     // const reftoken = document.cookie
@@ -148,9 +149,12 @@ function Tickets() {
   }
   let activeDate
   let activeTime
+  let activeDateOpen
+  
   const activeTicketdate=()=>{
     activeDate=activePreview?.created_at.split("T")[0]    
-    activeTime=activePreview?.created_at.split("T")[1].split(":")    
+    activeTime=activePreview?.created_at.split("T")[1].split(":") 
+    activeDateOpen=activeDate?.split("-")   
   }
 
   activeTicketdate()
@@ -233,16 +237,16 @@ function Tickets() {
     })
   }
 
-
+  let delay=0
   const States=ticketHistory && ticketHistory.map(el=>{
     const fulldate=el.updated_at.split("T")[0].split("-")
     const fullTime=el.updated_at.split("T")[1].split(":")
     console.log(fulldate,"date-splitted");
     console.log(fullTime,"Time-splitted");
     console.log(el);
-    
+    delay+=1
     return (
-      <div className="state">
+      <div className="state" style={{'--delay':`${delay}s`}}>
             <div className="state-date">{`${fulldate[2]} ${month[fulldate[1]]}`}</div>
             <div className="state-detail">
               <div className="state-name">{el.new_value}</div>
@@ -328,12 +332,12 @@ function Tickets() {
       </div>
         }
         <div className="ticket-history">
-          <div className="state">
-            <div className="state-date">12 Aug</div>
+          <div className="state" style={{'--delay':`0s`}}>
+            <div className="state-date">{`${activeDateOpen[2]} ${month[activeDateOpen[1]]}`}</div>
             <div className="state-detail">
               <div className="state-name">Opened</div>
               <div className="state-description">this is the content</div>
-              <div className="state-time">12:30</div>
+              <div className="state-time">{activeTime[0]}:{activeTime[1]}</div>
             </div>
           </div>
           
