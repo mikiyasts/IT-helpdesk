@@ -39,6 +39,7 @@ urlpatterns = [
   path('update_ticket_history/<int:id>/',views.ticket_status_history),
   path('list_ticket_history/<int:id>/',views.solutions),
   path('accept_ticket/<int:id>/',views.acceptticket),
+  path('check_pending_tickets/',views.check_pending_tickets),
   
   
   

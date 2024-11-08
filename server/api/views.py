@@ -552,7 +552,15 @@ def acceptticket(request, id):
         logger.error(f'Error accepting ticket {id}: {str(e)}')
         return Response({'error': 'An error occurred while accepting the ticket'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        
+
+@api_view(['GET'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+def check_pending_tickets(request):
+   
+    has_pending_tickets = Ticket.objects.filter(status='Pending',created_by=request.user).exists()
+    
+    return Response({'has_pending_tickets': has_pending_tickets})
 
 
    
