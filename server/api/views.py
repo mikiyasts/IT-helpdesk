@@ -561,6 +561,14 @@ def check_pending_tickets(request):
     has_pending_tickets = Ticket.objects.filter(status='Pending',created_by=request.user).exists()
     
     return Response({'has_pending_tickets': has_pending_tickets})
+@api_view(['POST'])
+@authentication_classes([APIKeyAuthentication])
+@permission_classes([IsAuthenticated])
+def close_ticket(request,id):
+    ticket=Ticket.objects.get(id=id)
+    ticket.status="Closed"
+    ticket.save()
+    return Response({'status': 'ticket closed '}, status=status.HTTP_200_OK)
 
 
    
