@@ -250,7 +250,7 @@ function Tickets() {
             <div className="state-date">{`${fulldate[2]} ${month[fulldate[1]]}`}</div>
             <div className="state-detail">
               <div className="state-name">{el.new_value}</div>
-              <div className="state-description">this is the content</div>
+              <div className="state-description">{el?.updated_by.username}</div>
               <div className="state-time">{`${fullTime[0]}:${fullTime[1]}`}</div>
             </div>
           </div>
@@ -336,7 +336,7 @@ function Tickets() {
             <div className="state-date">{`${activeDateOpen[2]} ${month[activeDateOpen[1]]}`}</div>
             <div className="state-detail">
               <div className="state-name">Opened</div>
-              <div className="state-description">this is the content</div>
+              <div className="state-description">{activePreview?.created_by.username}</div>
               <div className="state-time">{activeTime[0]}:{activeTime[1]}</div>
             </div>
           </div>

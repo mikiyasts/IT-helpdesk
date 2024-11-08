@@ -87,7 +87,7 @@ const nPages = Math.ceil(mytickets.length / recordsPerPage)
 
   
 
-const newRequest=(e)=>{
+const newRequest=async (e)=>{
 
   e.preventDefault()
   const acstoken = document.cookie
@@ -95,7 +95,7 @@ const newRequest=(e)=>{
         .find(row => row.startsWith('access_token='))
         ?.split('=')[1];
 
-  axios.post(`${process.env.REACT_APP_URL}/api/create_ticket/`,request,{headers:{
+  await axios.post(`${process.env.REACT_APP_URL}/api/create_ticket/`,request,{headers:{
     "Content-Type": 'multipart/form-data',
     Authorization: `Bearer ${acstoken}`,
   }}).then(res=>console.log(res)).catch(err=>console.log(err))
@@ -119,6 +119,30 @@ const newRequest=(e)=>{
     })
   }}><div className="card-name" key={el.id}>{el.name}</div></div>)
 
+      const closeRequest=async (id)=>{
+
+        const acstoken = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('access_token='))
+        ?.split('=')[1];
+
+        await axios.post(`${process.env.REACT_APP_URL}/api/close_ticket/${id}/`,request,{headers:{
+          "Content-Type": 'multipart/form-data',
+          Authorization: `API_KEY ${process.env.REACT_APP_API_KEY}`,
+        }}).then(async res=>{
+          await axios.post(`${process.env.REACT_APP_URL}/api/update_ticket_history/${id}/`,{new_value:"Closed",old_value:"Pending",field_updated:"status"},{
+            headers:{
+              Authorization: `Bearer ${acstoken}`,
+            }
+          }).then(res=>{
+           console.log("history updated");
+           window.location.reload()
+          }).catch(err=>console.log(err))
+          console.log(res)
+        }).catch(err=>console.log(err))
+        getDashdata()
+      }
+
   const tableRw=currentRecords && currentRecords.map(el=><tr>
     <td data-cell="ID">{el.id}</td>
     <td data-cell="Title">{el.title}</td>
@@ -128,9 +152,10 @@ const newRequest=(e)=>{
     <a href={`${process.env.REACT_APP_URL}${el?.attachments[0]?.file}`} target='_blank' title='Preview'>< VisibilityIcon/></a>}
     </td>
     {
-    el?.status==='Pending'?<td data-cell="Action"><button className="btn-login">Close</button></td>:null 
+    el?.status==='Pending'?<td data-cell="Action"><button className="btn-login" onClick={()=>closeRequest(el.id)}>Close</button></td>:null 
     }
   </tr>)
+
 
   return (
     <div className='user-dashboard_page'>

@@ -696,7 +696,7 @@ svg .css-1qkz8p7{
   stroke: none;
   stroke-width: 0;
 }
-@media (max-width:495px) {
+/* @media (max-width:495px) {
   
   .sidebar{
     position: absolute;
@@ -704,7 +704,7 @@ svg .css-1qkz8p7{
     z-index: 1;
     width: 100%;
     transform: translate3d(-100%,0,0);
-    /* opacity: 0; */
+    
   }
   .sidebar.active{
     transform: translate3d(0,0,0);
@@ -721,10 +721,10 @@ svg .css-1qkz8p7{
   .sidebar-humburger{
     display: flex;
     transition: all 1s linear;
-  }
+  } */
 
 /* Table Css */
-.table-wrapper{
+/* .table-wrapper{
   padding-bottom: 1rem;
   margin-bottom: 1rem;
 }
@@ -741,7 +741,7 @@ svg .css-1qkz8p7{
   padding-inline: 1rem;
   color: var(--font-color-primary);
 } 
-}
+} */
 
 /* dashboard-table */
 .card-table{
