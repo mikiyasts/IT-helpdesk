@@ -4,6 +4,7 @@ import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import axios from "axios"
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../Context/AuthContext";
+import LoadingBtn from "../component/LoadingBtn";
 
 function Login() {
   const {isAuth,setIsAuth}=useContext(AuthContext)
@@ -12,6 +13,7 @@ function Login() {
   const navigate=useNavigate()
   const [forgotPopup, setforgotPopup] = useState(false)
   const [loginform, Setloginform] = useState({ username: "", password: "" })
+  const [Loading,setLoading]=useState(false)
 
   
   const getCsrfToken = () => {
@@ -33,6 +35,9 @@ useEffect(()=>{
 
   const submitLogin = (e) => {
     e.preventDefault()
+
+    setLoading(true)
+
     axios.post("http://localhost:8000/api/token/",loginform,{ withCredentials: true ,headers: {
       'X-CSRFToken': getCsrfToken(),
       Authorization: `API_KEY ${process.env.REACT_APP_API_KEY}`,
@@ -40,6 +45,7 @@ useEffect(()=>{
     .then(res => {
       document.cookie=`access_token=${res.data.access}`
       document.cookie=`refresh_token=${res.data.refresh}`
+      setLoading(false)
       if(res.data.role==="admin"){
         setIsAdmin(true)
         sessionStorage.setItem("isAdmin",true) 
@@ -53,7 +59,10 @@ useEffect(()=>{
         navigate("/dashboard")
       }
       // navigate("/dashboard")
-    }).catch(err => console.log(err))
+    }).catch(err => {
+      setLoading(false)
+      console.log(err)
+    })
   }
   const handleLoginchange = (e) => {
     Setloginform(prev => {
@@ -111,88 +120,15 @@ useEffect(()=>{
                 <p onClick={() => {
                   setforgotPopup(true)
                 }}>Forgot Password ?</p>
-                <button className="btn-login" >Sign In</button>
+                {Loading?<LoadingBtn/>:<button className="btn-login" >Sign In</button>}
+                
               </div>
             </form>
-            <div className="signup">
-              <p>
-                Don't you have an account?
-              </p> <span className="tab" onClick={() => {
-                setTab("signup")
-              }}> Sign Up</span>
-            </div>
           </div>
           {/* signin container */}
-
-          {/* signup container */}
-          <div className={`signup-container ${tab === "signup" && "active-signup"}`}>
-            <form className="login-form">
-              <div className="login-header">
-                <h1 className="create-account">Create you account</h1>
-              </div>
-              <div className="form-ctrl">
-                <label htmlFor="id">Email Address</label>
-                <input type="text" name="email" id="sid" />
-              </div>
-              <div className="form-ctrl">
-                <label htmlFor="fullname">Full Name</label>
-                <input type="fullname" name="fullname" id="fullname" />
-              </div>
-              <div className="form-ctrl">
-                <label htmlFor="brach">Branch</label>
-                <select name="branch" id="branch">
-                  <option value="">Select Your Branch</option>
-                  <option value="farm">Farm</option>
-                  <option value="lideta">Lideta</option>
-                  <option value="mekanissa">Mekanissa</option>
-                </select>
-              </div>
-              <div className="form-ctrl">
-                <label htmlFor="department">Department</label>
-                <select name="department" id="department">
-                  <option value="">Select Your Department</option>
-                  <option value="Finance">Finance</option>
-                  <option value="Marketing">Marketing</option>
-                  <option value="Finance">Finance</option>
-                  <option value="Marketing">Marketing</option>
-                </select>
-              </div>
-              <div className="form-ctrl">
-                <label htmlFor="password">Password</label>
-                <input type="password" name="password" id="spassword" />
-              </div>
-              <div className="forgot-signin sigup-btn-conatiner">
-                <button className="btn-login">Sign Up</button>
-              </div>
-            </form>
-            <div className="signup">
-              <p>
-                Have an account?
-              </p><span className="tab" onClick={() => {
-                setTab("signin")
-              }}> Sign In</span>
-            </div>
-          </div>
-          {/* signup container */}
         </div>
       </div>
       <div className="login-right"></div>
-
-      {/* <div className="login-card">
-  <div className="login-header"><h1>Login</h1></div>
-  <form className="login-form">
-      <div className="form-ctrl">
-          <label htmlFor="id">ID</label>
-          <input type="text" name="emp_id" id="id" placeholder='Enter Your Id Here'/>
-      </div>
-      <div className="form-ctrl">
-          <label htmlFor="password">Password</label>
-          <input type="text" name="password" id="password" placeholder='Enter Your Password Here'/>
-      </div>
-      <div className="forgot-password">Forgot Password ?</div>
-      <button className="btn-login">Login</button>
-  </form>
-</div> */}
 
 
     </div>

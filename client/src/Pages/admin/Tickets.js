@@ -5,6 +5,7 @@ import CachedIcon from '@mui/icons-material/Cached';
 import AccountCircleRoundedIcon from "@mui/icons-material/AccountCircleRounded";
 import CheckIcon from '@mui/icons-material/Check';
 import axios from 'axios';
+import LoadingBtn from '../../component/LoadingBtn';
 
 function Tickets() {
 
@@ -20,6 +21,7 @@ function Tickets() {
     location:"",
     status:""
   })
+  const [loading,setLoading]=useState(false)
   let preview
   const month = [
     "Jan",
@@ -170,6 +172,7 @@ function Tickets() {
   
   const acceptTicket=async (id)=>{
 
+        setLoading(true)
         const acstoken = document.cookie
         .split('; ')
         .find(row => row.startsWith('access_token='))
@@ -191,10 +194,17 @@ function Tickets() {
       }).then(res=>{
        console.log("history updated");
        window.location.reload()
-      }).catch(err=>console.log(err))
+       setLoading(false)
+      }).catch(err=>{
+       setLoading(false)        
+        console.log(err)
+      })
      
       
-    }).catch(err=>console.log(err)
+    }).catch(err=>{
+      setLoading(false)
+      console.log(err)
+    }
     )
   }
   const submitSolution=async (id)=>{
@@ -202,7 +212,7 @@ function Tickets() {
         .split('; ')
         .find(row => row.startsWith('access_token='))
         ?.split('=')[1];
-
+    setLoading(true)
     if(solution.content!==""){
       await axios.post(`${process.env.REACT_APP_URL}/api/submit_solution/${id}/`,solution,{
       headers:{
@@ -218,13 +228,18 @@ function Tickets() {
       }).then(res=>{
        console.log("history updated");
        window.location.reload()
+       setLoading(false)
       }).catch(err=>console.log(err))
      
       
-    }).catch(err=>console.log(err)
+    }).catch(err=>{
+      console.log(err)
+      setLoading(false)
+
+    }
     )}else{
       console.log("solution can not be empty");
-      
+      setLoading(false)
     }
   }
 
@@ -246,7 +261,7 @@ function Tickets() {
     console.log(el);
     delay+=1
     return (
-      <div className="state" style={{'--delay':`${delay}s`}}>
+      <div className="state" style={{'--delay':`${delay}s`}} key={el.id}>
             <div className="state-date">{`${fulldate[2]} ${month[fulldate[1]]}`}</div>
             <div className="state-detail">
               <div className="state-name">{el.new_value}</div>
@@ -310,7 +325,7 @@ function Tickets() {
         }
         {activePreview.status==='Open' &&
         <div className="ticket-solution">
-            <button className="btn-solved" onClick={()=>acceptTicket(activePreview.id)}>Accept Request</button>
+            {loading?<LoadingBtn/>:<button className="btn-solved" onClick={()=>acceptTicket(activePreview.id)}>Accept Request</button>}
         </div>
         }
         {activePreview.status==='In Progress' &&
@@ -320,7 +335,7 @@ function Tickets() {
             <textarea name="content" id="solution" placeholder='Type here' onChange={settingSolution}>
 
             </textarea>
-            <button className="btn-solved" onClick={()=>submitSolution(activePreview.id)}>Submit</button>
+            {loading?<LoadingBtn/>:<button className="btn-solved" onClick={()=>submitSolution(activePreview.id)}>Submit</button>}
           </div>
         </div>
         }
