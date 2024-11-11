@@ -8,6 +8,7 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import Pagination from '../../component/Pagination';
 import { ToastContainer, toast } from 'react-toastify';
   import 'react-toastify/dist/ReactToastify.css';
+import LoadingBtn from '../../component/LoadingBtn';
 function Dashboard() {
 
   const {isAuth,setIsAuth}=useContext(AuthContext)
@@ -22,7 +23,7 @@ function Dashboard() {
   })
   const [mytickets,setMytickets]=useState([])
   const [currentPage, setCurrentPage] = useState(1);
-
+  const [loading,setLoading]=useState(false)
 const [recordsPerPage] = useState(9);
 const indexOfLastRecord = currentPage * recordsPerPage;
 const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
@@ -94,11 +95,19 @@ const newRequest=async (e)=>{
         .split('; ')
         .find(row => row.startsWith('access_token='))
         ?.split('=')[1];
-
+        
+  setLoading(true)
   await axios.post(`${process.env.REACT_APP_URL}/api/create_ticket/`,request,{headers:{
     "Content-Type": 'multipart/form-data',
     Authorization: `Bearer ${acstoken}`,
-  }}).then(res=>console.log(res)).catch(err=>console.log(err))
+  }}).then(res=>{
+    console.log(res)
+    setLoading(false)
+
+  }).catch(err=>{
+    console.log(err)
+    setLoading(false)
+  })
 }
  
   console.log(request);
@@ -125,7 +134,7 @@ const newRequest=async (e)=>{
         .split('; ')
         .find(row => row.startsWith('access_token='))
         ?.split('=')[1];
-
+        setLoading(true)
         await axios.post(`${process.env.REACT_APP_URL}/api/close_ticket/${id}/`,request,{headers:{
           "Content-Type": 'multipart/form-data',
           Authorization: `API_KEY ${process.env.REACT_APP_API_KEY}`,
@@ -137,9 +146,17 @@ const newRequest=async (e)=>{
           }).then(res=>{
            console.log("history updated");
            window.location.reload()
-          }).catch(err=>console.log(err))
+           setLoading(false)
+          }).catch(err=>{
+            console.log(err)
+           setLoading(false)
+          })
           console.log(res)
-        }).catch(err=>console.log(err))
+        }).catch(err=>{
+          console.log(err)
+          setLoading(false)
+
+        })
         getDashdata()
       }
 
@@ -152,7 +169,7 @@ const newRequest=async (e)=>{
     <a href={`${process.env.REACT_APP_URL}${el?.attachments[0]?.file}`} target='_blank' title='Preview'>< VisibilityIcon/></a>}
     </td>
     {
-    el?.status==='Pending'?<td data-cell="Action"><button className="btn-login" onClick={()=>closeRequest(el.id)}>Close</button></td>:null 
+    el?.status==='Pending'?loading?<LoadingBtn/>:<td data-cell="Action"><button className="btn-login" onClick={()=>closeRequest(el.id)}>Close</button></td>:null
     }
   </tr>)
 
@@ -226,7 +243,8 @@ const newRequest=async (e)=>{
             <input type="file" name="attachments" id="atch" style={{width:"100%",display:"flex",alignItems:"center",paddingBlock:".3rem"}} onChange={setInput}/>
           </div>
           <div className="forgot-signin sigup-btn-conatiner">
-                <button className="btn-login">Submit</button>
+                {
+                loading? <LoadingBtn/> :<button className="btn-login">Submit</button>}
               </div>
         </form>
       </div>

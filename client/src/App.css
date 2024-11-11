@@ -256,7 +256,7 @@
   color: var(--font-color-secondary);
   cursor: pointer;
 }
-.forgot-signin .btn-login,td .btn-login{
+.forgot-signin .btn-login,td .btn-login,.loading-btn{
   padding:10px 12px;
   font-size: 1em;
   font-weight: 600;
@@ -1200,4 +1200,46 @@ svg .css-1qkz8p7{
 }
 .Toastify__toast .Toastify__toast-theme--light .Toastify__toast--warning{
   background-color: var(--accent-tertiary) !important;
+}
+
+.loading-btn{
+  padding: 4px 18px;
+}
+.spinner{
+  width: 20px;
+  height: 20px;
+  /* background-color: red; */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: conic-gradient(white 0% 45%,var(--accent-secondary) 45% 100%);
+  border-radius: 50%;
+  animation: 2s linear infinite load;
+}
+
+.spinner-top{
+  width: 80%;
+  height: 80%;
+  background-color:var(--accent-secondary);
+  border-radius: 50%;
+}
+
+@keyframes load {
+  0%,50%{
+    transform: rotate(0deg);
+  background: conic-gradient(white 0% 45%,var(--accent-secondary) 45% 100%);
+
+  }
+  70%{
+    transform: rotate(270deg);
+  background: conic-gradient(white 0% 85%,var(--accent-secondary) 85% 100%);
+
+  }
+  70%{
+    transform: rotate(360deg);
+  background: conic-gradient(white 0% 100%);
+  }
+  100%{
+    background: conic-gradient(white 0% 45%,var(--accent-secondary) 45% 100%);
+  }
 }
