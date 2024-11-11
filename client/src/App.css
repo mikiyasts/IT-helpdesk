@@ -961,7 +961,17 @@ svg .css-1qkz8p7{
 }
 
 .refresh{
-  animation:1s linear infinite refresh
+  animation:1s linear infinite refresh;
+}
+
+@keyframes refresh {
+  0%{
+    transform: rotate(0deg);
+  }
+  100%{
+    transform: rotate(360deg);
+  }
+  
 }
 
 @keyframes timeline {
