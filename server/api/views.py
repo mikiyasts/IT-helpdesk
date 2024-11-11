@@ -9,7 +9,7 @@ from rest_framework.response import Response
 import secrets
 from .authentication import APIKeyAuthentication
 from tickets.models import Attachment, Ticket,TicketCategory, TicketComment, TicketHistory
-from .serializers import DepartmentSerializer, RecentTicketSerializer, TicketCategorySerializer, TicketCommentSerializer, TicketHistorySerializer, TicketSerializer, UserGetSerializer, UserSerializer
+from .serializers import DepartmentSerializer, RecentTicketSerializer, TicketCategorySerializer, TicketCommentSerializer, TicketHistorySerializer, TicketSerializer, UserCreateSerializer, UserGetSerializer, UserSerializer
 from rest_framework.authtoken.models import Token
 from rest_framework import status
 from users.models import Department, User
@@ -367,6 +367,9 @@ def get_all_users(request):
             'branch': user.branch,
             'department': user.department.name if user.department else None, 
             'role': user.role,
+            'first_name':user.first_name,
+            'last_name':user.last_name,
+            
         })
     
     return Response(user_data, status=status.HTTP_200_OK)
@@ -388,6 +391,15 @@ def edit_user(request, pk):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     # Return validation errors if the serializer is not valid
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+@api_view(['POST'])
+@authentication_classes([APIKeyAuthentication])
+@permission_classes([IsAuthenticated])
+def create_user(request):
+    serializer = UserCreateSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()  
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class ListNotificationsView(APIView):
@@ -578,7 +590,7 @@ def list_solution(request,id):
     serializer = TicketCommentSerializer(solutions, many=True)
 
     return Response(serializer.data)
-    
+
 
 
    
