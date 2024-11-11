@@ -8,7 +8,7 @@ from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.response import Response
 import secrets
 from .authentication import APIKeyAuthentication
-from tickets.models import Attachment, Ticket,TicketCategory, TicketHistory
+from tickets.models import Attachment, Ticket,TicketCategory, TicketComment, TicketHistory
 from .serializers import DepartmentSerializer, RecentTicketSerializer, TicketCategorySerializer, TicketCommentSerializer, TicketHistorySerializer, TicketSerializer, UserGetSerializer, UserSerializer
 from rest_framework.authtoken.models import Token
 from rest_framework import status
@@ -569,6 +569,16 @@ def close_ticket(request,id):
     ticket.status="Closed"
     ticket.save()
     return Response({'status': 'ticket closed '}, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+@authentication_classes([APIKeyAuthentication])
+@permission_classes([IsAuthenticated])
+def list_solution(request,id):
+    solutions=TicketComment.objects.filter(ticket=id)
+    serializer = TicketCommentSerializer(solutions, many=True)
+
+    return Response(serializer.data)
+    
 
 
    
