@@ -252,7 +252,8 @@ function Tickets() {
     })
   }
 
-  let delay=0
+  let delay=0 
+  
   const States=ticketHistory && ticketHistory.map(el=>{
     const fulldate=el.updated_at.split("T")[0].split("-")
     const fullTime=el.updated_at.split("T")[1].split(":")
