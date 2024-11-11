@@ -23,7 +23,20 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta(object):
         model = User 
         fields = ['id', 'username', 'password', 'email',"department","branch","phone_number","role"]
-     
+    
+class UserCreateSerializer(serializers.ModelSerializer):
+    class Meta(object):
+        model = User 
+        fields = ['id', 'username', 'password', 'email',"department","branch","phone_number","role","first_name","last_name"]
+        
+    def create(self, validated_data):
+        # Get the password from validated data and hash it
+        password = validated_data.pop('password', None)
+        user = User(**validated_data)
+        if password:
+            user.set_password(password)  # Hash the password before saving
+        user.save()
+        return user
 class CreateTicketUserSerializer(serializers.ModelSerializer):
     class Meta(object):
         model=User
