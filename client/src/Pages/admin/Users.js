@@ -45,7 +45,7 @@ function Users() {
   const tableRw = users.map((el) => (
     <tr>
       <td data-cell="ID">{el.id}</td>
-      <td data-cell="User name">{el.username}</td>
+      <td data-cell="User name">{`${el.firstname} ${el.lastname}`} </td>
       <td data-cell="Role">{el.role}</td>
       <td data-cell="Branch">{el.branch}</td>
       <td data-cell="Dept">{el.department}</td>
