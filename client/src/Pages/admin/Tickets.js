@@ -3,6 +3,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import CachedIcon from '@mui/icons-material/Cached';
 import AccountCircleRoundedIcon from "@mui/icons-material/AccountCircleRounded";
+import AttachmentIcon from '@mui/icons-material/Attachment';
 import CheckIcon from '@mui/icons-material/Check';
 import axios from 'axios';
 import LoadingBtn from '../../component/LoadingBtn';
@@ -16,6 +17,7 @@ function Tickets() {
   const [category,setCategory]=useState([])
   const [ticketHistory,setTicketHistory]=useState([])
   const [solution,setSolution]=useState({content:""})
+  const [ticketSolution,setTicketSolution]=useState("")
   const [filter,setFilter]=useState({
     category:"",
     location:"",
@@ -38,6 +40,8 @@ function Tickets() {
     "Dec",
   ];
 
+  console.log(ticketSolution,"solutionnnnnnnnnnnnnnnnnnnnnnnnnnnnnnlkjasodkjasdlkjasd;lakjsd'lajsd'lkajsdl");
+  
   
 
   useEffect( ()=>{
@@ -92,20 +96,37 @@ function Tickets() {
       setTicketHistory(res.data)
     }).catch(err=>console.log(err)
     )
+    await axios.get(`${process.env.REACT_APP_URL}/api/list_solution/${id}/`,{
+      headers:{
+        Authorization: `API_KEY ${process.env.REACT_APP_API_KEY}`,
+      }
+    }).then(res=>{
+      setTicketSolution(res.data)
+    }).catch(err=>console.log(err)
+    )
+
+
   }
   console.log(ticketHistory,"history");
   
   const refreshTicket= async ()=>{
+
+    document.getElementById('refresh-icon').classList.add('refresh')
     
     await axios.get(`${process.env.REACT_APP_URL}/api/list_ticket/`,{
       headers:{
         Authorization: `API_KEY ${process.env.REACT_APP_API_KEY}`,
       }
     }).then(res=>{
+    document.getElementById('refresh-icon').classList.remove('refresh')
+
       setTicketList(res.data.reverse())
      
       
-    }).catch(err=>console.log(err)
+    }).catch(err=>{
+    document.getElementById('refresh-icon').classList.rmove('refresh')
+      console.log(err)
+    }
     )
   }
 
@@ -252,7 +273,8 @@ function Tickets() {
     })
   }
 
-  let delay=0
+  let delay=0 
+
   const States=ticketHistory && ticketHistory.map(el=>{
     const fulldate=el.updated_at.split("T")[0].split("-")
     const fullTime=el.updated_at.split("T")[1].split(":")
@@ -302,13 +324,13 @@ function Tickets() {
         filter and number of tickets
       </div> */}
       <div className="tickets-list">
-        <div className="sort-refresh"><p>Sort <ExpandMoreIcon sx={{ fontSize: 20 }} /></p> <div onClick={refreshTicket}><CachedIcon sx={{ fontSize: 20 }} className='refresh-icon' id="refresh-icon" /></div></div>
+        <div className="sort-refresh"><p></p> <div onClick={refreshTicket}><CachedIcon sx={{ fontSize: 20 }} className='refresh-icon' id="refresh-icon" /></div></div>
         <ul>
          {list ? list :<h2>Nothing to show</h2>}
         </ul>
       </div>
       { activePreview?<div className="tickets-preview">
-         <div className="ticket-status">{activePreview && activePreview.status}</div>
+         <div className="ticket-status">{activePreview && activePreview.status} <a href={`${process.env.REACT_APP_URL}${activePreview.attachments[0]?.file}`} target='_blank' title='attachment'><AttachmentIcon/></a> </div>
         <div className="ticket-title"><h2>{activePreview && activePreview.title}</h2></div>
         <div className="ticket-description">
           <h4>Description</h4>
@@ -320,7 +342,7 @@ function Tickets() {
         {activePreview.status==='Closed' &&
         <div className="ticket-note">
           <h4>Solution</h4>
-          <p>note is temporary</p>
+          <p>{ticketSolution[0]?.content}</p>
         </div>
         }
         {activePreview.status==='Open' &&
@@ -342,11 +364,12 @@ function Tickets() {
         {activePreview.status==='Pending' &&
         <div className="ticket-note">
         <h4>Solution</h4>
-        <p>note is temporary</p>
+        <p>{ticketSolution[0]?.content}</p>
         
       </div>
         }
         <div className="ticket-history">
+          <h4>Ticket Timeline</h4>
           <div className="state" style={{'--delay':`0s`}}>
             <div className="state-date">{`${activeDateOpen[2]} ${month[activeDateOpen[1]]}`}</div>
             <div className="state-detail">
@@ -389,7 +412,8 @@ function Tickets() {
           <li><div className="detail-name">Request Time</div> <div className="detail-value">{activeTime[0]}:{activeTime[1]}</div></li>
             <li><div className="detail-name">Location</div> <div className="detail-value">{activePreview && activePreview.created_by && activePreview.created_by.branch}</div></li>
             <li><div className="detail-name">Title</div> <div className="detail-value"><p>{activePreview && activePreview.title}</p></div></li>
-            <li><div className="detail-name">Note</div> <div className="detail-value"><p>Note</p></div></li>
+            <li><div className="detail-name">solution</div> <div className="detail-value"><p>{ticketSolution[0]?.content}</p>
+            </div></li>
            
           </ul>
           

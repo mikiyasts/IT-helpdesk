@@ -912,7 +912,10 @@ svg .css-1qkz8p7{
 .tickets-main .tickets-preview:hover {
   scrollbar-color:var(--accent-secondary-alpha) transparent ;
 }
-.ticket-history{
+.tickets-preview .ticket-status{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 .ticket-history .state{
   display: flex;
@@ -956,6 +959,11 @@ svg .css-1qkz8p7{
   transform: scaleY(0);
   animation: timeline 1s linear var(--delay) forwards ;
 }
+
+.refresh{
+  animation:1s linear infinite refresh
+}
+
 @keyframes timeline {
   0%{
     transform: scaleY(0);
