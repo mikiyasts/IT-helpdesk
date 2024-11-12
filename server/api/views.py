@@ -1,4 +1,4 @@
-from django.http import JsonResponse
+from django.http import FileResponse, Http404, JsonResponse
 from django.shortcuts import render
 import requests
 from rest_framework.decorators import api_view
@@ -311,6 +311,7 @@ def admin_dashboard(request):
     open_tickets = Ticket.objects.filter(status='Open').count()
     in_progress_tickets = Ticket.objects.filter(status='In Progress').count()
     closed_tickets = Ticket.objects.filter(status='Closed').count()
+    pending_tickets=Ticket.objects.filter(status="Pending").count()
 
     # Count requests from each branch
     kaliti_requests = User.objects.filter(branch='kaliti').count()
@@ -333,7 +334,8 @@ def admin_dashboard(request):
         'ticket_status': {
             'open': open_tickets,
             'in_progress': in_progress_tickets,
-            'closed': closed_tickets
+            'closed': closed_tickets,
+            'pending':pending_tickets
         },
         'branch_requests': {
             'Kaliti': kaliti_requests,
@@ -592,5 +594,13 @@ def list_solution(request,id):
     return Response(serializer.data)
 
 
-
+@api_view(['GET'])
+@authentication_classes([APIKeyAuthentication])
+@permission_classes([IsAuthenticated])
+def DownloadAttachmentView(request, id):
+    attachment = get_object_or_404(Attachment, ticket=id)
+    if not attachment.file:
+        raise Http404("Attachment not found")
+    response = FileResponse(attachment.file, as_attachment=True, filename=attachment.file.name)
+    return response
    
