@@ -11,6 +11,7 @@ class Department(models.Model):
         app_label = 'users'
 
 class User(AbstractUser):
+    email = models.EmailField(unique=True)
     phone_number = models.CharField(max_length=15, null=True, blank=True)
     profile_picture = models.ImageField(upload_to='profile_pics/', null=True, blank=True)
     branch = models.CharField(max_length=100, null=True, blank=True)  # Added max_length for branch
@@ -30,3 +31,15 @@ class User(AbstractUser):
         ],
         default='employee'
     )
+    
+    USERNAME_FIELD = 'email'  # Set email as the primary field for authentication
+    REQUIRED_FIELDS = ['username']  
+    
+    def __str__(self):
+        return self.email
+class PasswordReset(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    token = models.TextField()
+    
+
+

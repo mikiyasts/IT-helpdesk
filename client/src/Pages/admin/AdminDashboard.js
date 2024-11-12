@@ -50,7 +50,7 @@ console.log("dashjjjjs",dashdata);
           <div className="card">
             <div className="card-header"><h3>Pending</h3></div>
             <div className="number">
-            <h1>{dashdata.ticket_status && dashdata.ticket_status.Pending}</h1>
+            <h1>{dashdata.ticket_status && dashdata.ticket_status.pending}</h1>
 
             </div>
           </div>

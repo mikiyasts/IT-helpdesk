@@ -1,6 +1,25 @@
+from email.header import Header
+from email.message import EmailMessage
+from email.mime.text import MIMEText
+import json
+from django.utils.http import urlsafe_base64_decode
+import uuid
 from django.http import FileResponse, Http404, JsonResponse
 from django.shortcuts import render
+from django.utils.crypto import get_random_string
 import requests
+from django.conf import settings
+from django.contrib.auth.tokens import default_token_generator
+from django.contrib.auth import get_user_model
+from django.utils.http import urlsafe_base64_encode
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.authentication import BaseAuthentication  # Adjust your authentication class here
+from django.http import Http404
 from rest_framework.decorators import api_view
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -9,15 +28,18 @@ from rest_framework.response import Response
 import secrets
 from .authentication import APIKeyAuthentication
 from tickets.models import Attachment, Ticket,TicketCategory, TicketComment, TicketHistory
-from .serializers import DepartmentSerializer, RecentTicketSerializer, TicketCategorySerializer, TicketCommentSerializer, TicketHistorySerializer, TicketSerializer, UserCreateSerializer, UserGetSerializer, UserSerializer
+from .serializers import CustomTokenRefreshSerializer, DepartmentSerializer, PasswordResetConfirmSerializer, PasswordResetRequestSerializer, RecentTicketSerializer, TicketCategorySerializer, TicketCommentSerializer, TicketHistorySerializer, TicketSerializer, UserCreateSerializer, UserGetSerializer, UserSerializer
 from rest_framework.authtoken.models import Token
 from rest_framework import status
-from users.models import Department, User
+from users.models import Department, PasswordReset, User
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import authentication_classes, permission_classes
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
-import jwt, datetime
+import jwt
+from rest_framework_simplejwt.views import TokenRefreshView
+from rest_framework_simplejwt.serializers import TokenRefreshSerializer
+from datetime import datetime
 from .models import APIKey
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.views import TokenObtainPairView
@@ -180,7 +202,10 @@ def GetUser(request):
         return Response("Unauthorized", status=status.HTTP_401_UNAUTHORIZED)
 
 
-
+class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
+class CustomTokenRefreshView(TokenRefreshView):
+    serializer_class = CustomTokenRefreshSerializer
 #views for ticket API
 @api_view(['POST'])
 @authentication_classes([JWTAuthentication])
@@ -313,11 +338,13 @@ def admin_dashboard(request):
     closed_tickets = Ticket.objects.filter(status='Closed').count()
     pending_tickets=Ticket.objects.filter(status="Pending").count()
 
-    # Count requests from each branch
-    kaliti_requests = User.objects.filter(branch='kaliti').count()
-    lideta_requests = User.objects.filter(branch='lideta').count()
-    mekanissa_requests = User.objects.filter(branch='mekanissa').count()
-    farm_requests = User.objects.filter(branch='farm').count()
+    current_month = datetime.now().month
+
+
+    kaliti_requests = Ticket.objects.filter(created_by__branch='kaliti', created_at__month=current_month).count()
+    lideta_requests = Ticket.objects.filter(created_by__branch='lideta', created_at__month=current_month).count()
+    mekanissa_requests = Ticket.objects.filter(created_by__branch='mekanissa', created_at__month=current_month).count()
+    farm_requests = Ticket.objects.filter(created_by__branch='farm', created_at__month=current_month).count()
 
     # Get category counts
     categories = TicketCategory.objects.all()
@@ -603,4 +630,89 @@ def DownloadAttachmentView(request, id):
         raise Http404("Attachment not found")
     response = FileResponse(attachment.file, as_attachment=True, filename=attachment.file.name)
     return response
-   
+
+@api_view(['POST'])
+@authentication_classes([APIKeyAuthentication])
+@permission_classes([IsAuthenticated])
+def password_reset(request):
+    email = request.data.get('email')
+
+    if not email:
+        return Response({"error": "Email is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        # Check if the user exists in the database
+        user = User.objects.get(email=email)
+
+        # Check if the user already has a reset token in PasswordReset model
+        password_reset_entry, created = PasswordReset.objects.get_or_create(user=user)
+
+        # If the entry exists, update the token
+        if not created:
+            # Generate a new token using uuid
+            password_reset_entry.token = str(uuid.uuid4())  # Generate a new UUID token
+            password_reset_entry.save()  # Save the new token
+        
+        # Generate the reset link with the user ID and token
+        reset_url = f"http://localhost:8000/change_password/{urlsafe_base64_encode(str(user.pk).encode())}/{password_reset_entry.token}/"
+
+        # Render the email template with the reset URL
+        email_subject = 'Password Reset Request'
+        email_message = render_to_string('password_reset_email.html', {
+            'user': user,
+            'reset_url': reset_url
+        })
+
+        # Send the email with the reset URL
+        send_mail(
+            email_subject,
+            email_message,
+            settings.EMAIL_HOST_USER,
+            [user.email],
+            html_message=email_message  # Send HTML email
+        )
+
+        return Response({"message": "Password reset email sent."}, status=status.HTTP_200_OK)
+
+    except User.DoesNotExist:
+        return Response({"error": "Email not found"}, status=status.HTTP_404_NOT_FOUND)
+    
+@api_view(['POST'])
+@authentication_classes([APIKeyAuthentication])
+@permission_classes([IsAuthenticated])
+def change_password(request, uidb64, token):
+    """
+    API view to allow user to reset their password using a valid reset token.
+    """
+
+    try:
+        # Decode the user ID from the URL
+        uid = urlsafe_base64_decode(uidb64).decode()
+        user = get_user_model().objects.get(pk=uid)
+
+        # Check if the token exists for the user in PasswordReset model
+        password_reset_entry = PasswordReset.objects.filter(user=user, token=token).first()
+
+        # If no matching entry exists, the token is invalid
+        if not password_reset_entry:
+            return Response({"error": "Invalid token."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Now proceed with the password reset logic
+        new_password = request.data.get('password')
+
+        if not new_password:
+            return Response({"error": "Password is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Set the new password
+        user.set_password(new_password)
+        user.save()
+
+        # Optionally, delete the token after it has been used
+        password_reset_entry.delete()
+
+        return Response({"message": "Password has been successfully reset."}, status=status.HTTP_200_OK)
+
+    except User.DoesNotExist:
+        return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)

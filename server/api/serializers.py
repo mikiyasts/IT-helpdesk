@@ -10,6 +10,8 @@ from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.contrib.auth import authenticate
 from notifications.models import Notification
+from rest_framework_simplejwt.serializers import TokenRefreshSerializer
+from rest_framework_simplejwt.tokens import RefreshToken
 
 
 # from django.contrib.auth.models import User
@@ -113,34 +115,64 @@ class RecentTicketSerializer(serializers.ModelSerializer):
             'branch': user.branch  if user.branch else None,
         }
    
+User = get_user_model()
+
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
-    username = serializers.CharField(required=True)
-    password = serializers.CharField(required=True, write_only=True)
-
-    @classmethod
-    def get_token(cls, user):
-        token = super().get_token(user)
-        token['username'] = user.username  # Optional: include username in the token
-        return token
-
+    """Custom serializer to handle email-based authentication."""
+    
     def validate(self, attrs):
-        username = attrs.get('username')
+        email = attrs.get('email')
         password = attrs.get('password')
 
-        # Authenticate the user
-        user = authenticate(username=username, password=password)
-        if user is None:
-            raise serializers.ValidationError('Invalid username or password.')
+        # Check if the user exists and if the password is correct
+        try:
+            user = User.objects.get(email=email)
+            if not user.check_password(password):
+                raise serializers.ValidationError("Invalid credentials")
+        except User.DoesNotExist:
+            raise serializers.ValidationError("Invalid credentials")
+        
+        # Generate JWT token for the user
+        token = self.get_token(user)
 
-        # If we reach here, authentication was successful
-        data = super().validate(attrs)  # Call original validation for JWT token generation
+        # Return access and refresh tokens, along with other user info
+        return {
+            'access': str(token.access_token),  # Convert token to string
+            'refresh': str(token),  # Convert token to string
+            'user': JWTUserSerializer(user).data,  # You can add other fields like 'user.id', 'user.role', etc.
+        }
 
-        # Serialize user details
-        user_serializer = JWTUserSerializer(user)
-        data.update(user_serializer.data)  # Add user details to the response
-
-        return data
+class CustomTokenRefreshSerializer(TokenRefreshSerializer):
+    """Custom serializer to return both access and refresh tokens during refresh."""
     
+    def validate(self, attrs):
+        # Get the refresh token from the request
+        refresh = attrs.get('refresh')
+        
+        try:
+            # Decode the refresh token to get the user information
+            refresh_token = RefreshToken(refresh)
+            
+            # Extract the user_id from the refresh token payload
+            user_id = refresh_token['user_id']  # Or 'user' depending on how your payload is structured
+            
+            # Retrieve the user object using the user_id
+            User = get_user_model()  # This should be called once at the start
+            user = User.objects.get(id=user_id)
+            
+            # Generate a new access token
+            new_token = refresh_token.access_token
+            
+            return {
+                'access': str(new_token),  # Access token
+                'refresh': str(refresh_token),  # Refresh token
+                'user': JWTUserSerializer(user).data,  # User data (if needed)
+            }
+        
+        except User.DoesNotExist:
+            raise serializers.ValidationError("User matching query does not exist.")
+        except Exception as e:
+            raise serializers.ValidationError(f"Error refreshing token: {str(e)}")
 class JWTUserSerializer(serializers.ModelSerializer):
     department = DepartmentSerializer()  # Nested serializer for department details
 
@@ -161,3 +193,16 @@ class MyTicketSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ticket
         fields = ['id', 'title', 'description', 'status', 'created_at', 'updated_at', 'category', 'assigned_to', 'created_by','attachments']
+
+class PasswordResetRequestSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+class PasswordResetConfirmSerializer(serializers.Serializer):
+    token = serializers.CharField()
+    password = serializers.CharField(write_only=True)
+
+
+class SendMailSerializer(serializers.Serializer):
+    address = serializers.EmailField()
+    subject = serializers.CharField(max_length=255)
+    message = serializers.CharField()

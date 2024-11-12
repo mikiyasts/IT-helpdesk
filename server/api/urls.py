@@ -2,7 +2,7 @@
 from django.urls import path,include
 from . import views
 from rest_framework_simplejwt.views import (
-    TokenObtainPairView,
+   
     TokenRefreshView,
 )
 from .views import CustomTokenObtainPairView, DownloadAttachmentView, SubmitSolutionView
@@ -15,6 +15,9 @@ urlpatterns = [
   path('logout/',views.logout),
   path('generate-apikey/',views.GenerateAPIKeyView.as_view()),
   path('SendSMS/',views.send_message_view),
+ path('password_reset/', views.password_reset, name='password_reset_request'),
+ path('change_password/<uidb64>/<token>/', views.change_password, name='reset_password'),
+
    
   path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
   path('token/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
