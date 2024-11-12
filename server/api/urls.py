@@ -5,7 +5,7 @@ from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
 )
-from .views import CustomTokenObtainPairView, SubmitSolutionView
+from .views import CustomTokenObtainPairView, DownloadAttachmentView, SubmitSolutionView
 
 urlpatterns = [
   path('',views.api_endpoints),
@@ -42,6 +42,7 @@ urlpatterns = [
   path('check_pending_tickets/',views.check_pending_tickets),
   path('close_ticket/<int:id>/',views.close_ticket),
   path('list_solution/<int:id>/',views.list_solution),
+  path('download_attachment/<int:id>',views.DownloadAttachmentView),
   
   
   
