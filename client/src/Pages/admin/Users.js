@@ -1,11 +1,29 @@
 import React, { useEffect, useState } from "react";
+import AddIcon from '@mui/icons-material/Add';
 import axios from "axios";
+import LoadingBtn from "../../component/LoadingBtn";
 function Users() {
   const [users, setUsers] = useState([]);
   const [popup,setPopup]=useState(false)
+  const [popupadd,setPopupadd]=useState(false)
   const [form,setForm]=useState({})
   const [edited,setEdited]=useState({})
   const [dept,setDept]=useState([])
+  const [loading,setLoading]=useState(false)
+//   const [newuser,setNewuser]=useState({
+//     username,
+//     password,
+//     email,
+//     department,
+//     branch,
+//     phone_number,
+//     first_name,
+//     last_name
+    
+
+
+
+// })
   useEffect(() => {
 
     axios
@@ -45,13 +63,14 @@ function Users() {
   const tableRw = users.map((el) => (
     <tr>
       <td data-cell="ID">{el.id}</td>
-      <td data-cell="User name">{el.username}</td>
+      <td data-cell="User name">{`${el?.first_name} ${el?.last_name}`} </td>
       <td data-cell="Role">{el.role}</td>
       <td data-cell="Branch">{el.branch}</td>
       <td data-cell="Dept">{el.department}</td>
       <td className="opt-dots">
       <button className="btn-solved" onClick={()=>{
         setPopup(true)
+        setPopupadd(false)
         setForm(el)
       }}>Edit</button>
       </td>
@@ -120,6 +139,8 @@ const submitEdit=(e)=>{
             style={{ padding: "1.5rem", borderBottom: ".5px solid #f2f2f225" }}
           >
             <h3>All Users <sub style={{color:"#f2f2f2",fontWeight:"lighter",fontSize:"small"}}>{users.length}</sub></h3>
+            <button className="btn-login" title="Add User" onClick={()=>{setPopupadd(true); setPopup(false)}}><AddIcon/><span>Add User</span></button>
+
           </div>
           <div className="table">
             <table>
@@ -130,16 +151,18 @@ const submitEdit=(e)=>{
                   <td>Role</td>
                   <td>Branch</td>
                   <td>Department</td>
-                  <td></td>
+                  <td>Action</td>
                 </tr>
               </thead>
               <tbody>
                 {tableRw}
+                
               </tbody>
             </table>
           </div>
         </div>
       </div>
+
       <div className={`popup ${popup &&"active"}`}>
         <div className="popup-pin" onClick={()=>{
         setPopup(false)
@@ -190,6 +213,56 @@ const submitEdit=(e)=>{
               </div>
         </form>
       </div>
+      
+      {/* popup*/}
+      {/* <div className={`popup ${popupadd &&"active"}`}>
+        <div className="popup-pin" onClick={()=>{
+    setPopupadd(false)
+  }}></div>
+       
+        <div className="popup_header"><h2>Add New User</h2></div>
+
+        <form className="request-form" >
+          <div className="form-ctrl">
+            <label htmlFor="req_name">User Name <span>*</span></label>
+            <input type="text" name="username" id="username" required/>
+          </div>
+          
+          <div className="form-ctrl">
+            <label htmlFor="password">Password <span>*</span></label>
+            <input type="text" name="password" id="password"  onChange={setInput} required/>
+          </div>
+          <div className="form-ctrl">
+            <label htmlFor="Email">Email <span>*</span></label>
+            <input type="email" name="Email" id="Email"  onChange={setInput} required/>
+          </div>
+          <div className="form-ctrl">
+            <label htmlFor="Email">Email <span>*</span></label>
+            <input type="email" name="Email" id="Email"  onChange={setInput} required/>
+          </div>
+          <div className="form-ctrl">
+            <label htmlFor="Email">Email <span>*</span></label>
+            <input type="email" name="Email" id="Email"  onChange={setInput} required/>
+          </div>
+          <div className="form-ctrl">
+            <label htmlFor="Email">Email <span>*</span></label>
+            <input type="email" name="Email" id="Email"  onChange={setInput} required/>
+          </div>
+          <div className="form-ctrl">
+            <label htmlFor="Email">Email <span>*</span></label>
+            <input type="email" name="Email" id="Email"  onChange={setInput} required/>
+          </div>
+          <div className="form-ctrl">
+            <label htmlFor="Email">Email <span>*</span></label>
+            <input type="email" name="Email" id="Email"  onChange={setInput} required/>
+          </div>
+          <div className="forgot-signin sigup-btn-conatiner">
+                {
+                loading? <LoadingBtn/> :<button className="btn-login">Submit</button>}
+              </div>
+        </form>
+      </div> */}
+      {/* popup*/}
     </div>
   );
 }

@@ -330,7 +330,7 @@ function Tickets() {
         </ul>
       </div>
       { activePreview?<div className="tickets-preview">
-         <div className="ticket-status">{activePreview && activePreview.status} <a href={`${process.env.REACT_APP_URL}${activePreview.attachments[0]?.file}`} target='_blank' title='attachment'><AttachmentIcon/></a> </div>
+         <div className="ticket-status">{activePreview && activePreview.status}  {activePreview?.attachments.length<1?null:<a href={`${process.env.REACT_APP_URL}${activePreview.attachments[0]?.file}`} target='_blank' title='attachment'><AttachmentIcon/></a>}</div>
         <div className="ticket-title"><h2>{activePreview && activePreview.title}</h2></div>
         <div className="ticket-description">
           <h4>Description</h4>
