@@ -54,7 +54,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'corsheaders',
-    'channels'
+    'channels',
+    
     
 ]
 
@@ -108,6 +109,12 @@ SIMPLE_JWT = {
 WSGI_APPLICATION = 'it_helpdesk.wsgi.application'
 
 # settings.py
+
+SIMPLE_JWT = {
+    'USER_ID_FIELD': 'email',  # This tells JWT to use email as the unique identifier
+    'USER_ID_CLAIM': 'email',  # This adds the email to the JWT payload
+    'ALGORITHM': 'HS256',
+}
 
 
 # Database
@@ -174,3 +181,11 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587  # or use 465 for SSL (but 587 is more commonly used with TLS)
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'awashwineshelpdesk@gmail.com'  # Your Gmail address
+EMAIL_HOST_PASSWORD = 'jmwf pvut xelr xphp'  # Your Gmail password or App Password

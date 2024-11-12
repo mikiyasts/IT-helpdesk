@@ -12,7 +12,7 @@ function Login() {
   const [tab, setTab] = useState("signin");
   const navigate=useNavigate()
   const [forgotPopup, setforgotPopup] = useState(false)
-  const [loginform, Setloginform] = useState({ username: "", password: "" })
+  const [loginform, Setloginform] = useState({ email: "", password: "" })
   const [Loading,setLoading]=useState(false)
 
   
@@ -43,16 +43,18 @@ useEffect(()=>{
       Authorization: `API_KEY ${process.env.REACT_APP_API_KEY}`,
   }})
     .then(res => {
+      console.log("logged",res.data);
+      
       document.cookie=`access_token=${res.data.access}`
       document.cookie=`refresh_token=${res.data.refresh}`
       setLoading(false)
-      if(res.data.role==="admin"){
+      if(res.data?.user?.role==="admin"){
         setIsAdmin(true)
         sessionStorage.setItem("isAdmin",true) 
         console.log("ad");
         
         navigate("/admin")
-      }else if(res.data.role==="employee"){
+      }else if(res.data?.user?.role==="employee"){
         setIsAuth(true)
         sessionStorage.setItem("isAuth",true) 
         console.log("emp");
@@ -110,7 +112,7 @@ useEffect(()=>{
               </div>
               <div className="form-ctrl">
                 <label htmlFor="id">Email Address</label>
-                <input type="text" name="username" id="id" />
+                <input type="text" name="email" id="id" />
               </div>
               <div className="form-ctrl">
                 <label htmlFor="password">Password</label>
