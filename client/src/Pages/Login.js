@@ -5,6 +5,9 @@ import axios from "axios"
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../Context/AuthContext";
 import LoadingBtn from "../component/LoadingBtn";
+import { toast, ToastContainer } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
+
 
 function Login() {
   const {isAuth,setIsAuth}=useContext(AuthContext)
@@ -28,10 +31,13 @@ function Login() {
 
 useEffect(()=>{
   
-      document.cookie=`access_token=`
-      document.cookie=`refresh_token=`
-      sessionStorage.clear("isAuth")
-      sessionStorage.clear("isAdmin")
+      // Set cookies to expire
+document.cookie = 'access_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+document.cookie = 'refresh_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+
+// Clear session storage
+sessionStorage.removeItem('isAuth');
+sessionStorage.removeItem('isAdmin');
 },[])
 
   const submitLogin = (e) => {
@@ -64,6 +70,16 @@ useEffect(()=>{
       // navigate("/dashboard")
     }).catch(err => {
       setLoading(false)
+      let errors=Object.keys(err?.response?.data)
+      errors.forEach(error => {
+        console.log("error",err?.response?.data[error][0]);
+        if(error!=="non_field_errors"){
+        return  toast.warning(`${error}: ${err?.response?.data[error][0]}`)
+        }
+        return toast.warning(`${err?.response?.data[error][0]}`)
+      });
+      console.log("rorrr",errors);
+      
       console.log(err)
     })
   }
@@ -101,6 +117,7 @@ console.log("emaiiiiiiiiiiiiiil",email);
 
   return (
     <div className="login-page">
+      <ToastContainer/>
       {/* popup*/}
       <div className={`forgot-password_popup ${forgotPopup && "active"}`}>
         <div className="popup-pin" onClick={() => {
