@@ -22,6 +22,7 @@ import GroupIcon from '@mui/icons-material/Group';
 import ForumIcon from '@mui/icons-material/Forum';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import AdminRoutes from './Pages/AdminRoutes';
+import ResetPassword from './Pages/ResetPassword';
 function App() {
 
   const [isAuth, setIsAuth] = useState(sessionStorage.getItem("isAuth") || false)
@@ -96,6 +97,7 @@ function App() {
         {/* <Header/> */}
         <Routes>
           <Route index element={<Login />}></Route>
+          <Route path='/reset/:param1/:param2' element={<ResetPassword />}></Route>
           <Route element={<ProtectedRoutes/>}>
             <Route path="/dashboard" element={<Dashboard />} />
             

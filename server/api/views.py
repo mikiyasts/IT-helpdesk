@@ -654,7 +654,7 @@ def password_reset(request):
             password_reset_entry.save()  # Save the new token
         
         # Generate the reset link with the user ID and token
-        reset_url = f"http://localhost:8000/change_password/{urlsafe_base64_encode(str(user.pk).encode())}/{password_reset_entry.token}/"
+        reset_url = f"http://localhost:3000/reset/{urlsafe_base64_encode(str(user.pk).encode())}/{password_reset_entry.token}/"
 
         # Render the email template with the reset URL
         email_subject = 'Password Reset Request'
