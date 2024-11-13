@@ -123,23 +123,17 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):
         email = attrs.get('email')
         password = attrs.get('password')
-
-        # Check if the user exists and if the password is correct
         try:
             user = User.objects.get(email=email)
             if not user.check_password(password):
                 raise serializers.ValidationError("Invalid credentials")
         except User.DoesNotExist:
             raise serializers.ValidationError("user does not exist")
-        
-        # Generate JWT token for the user
         token = self.get_token(user)
-
-        # Return access and refresh tokens, along with other user info
         return {
-            'access': str(token.access_token),  # Convert token to string
-            'refresh': str(token),  # Convert token to string
-            'user': JWTUserSerializer(user).data,  # You can add other fields like 'user.id', 'user.role', etc.
+            'access': str(token.access_token),  
+            'refresh': str(token), 
+            'user': JWTUserSerializer(user).data,  
         }
 
 class CustomTokenRefreshSerializer(TokenRefreshSerializer):
