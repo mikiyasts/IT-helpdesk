@@ -118,7 +118,7 @@ class RecentTicketSerializer(serializers.ModelSerializer):
 User = get_user_model()
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
-    """Custom serializer to handle email-based authentication."""
+    
     
     def validate(self, attrs):
         email = attrs.get('email')
@@ -130,7 +130,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
             if not user.check_password(password):
                 raise serializers.ValidationError("Invalid credentials")
         except User.DoesNotExist:
-            raise serializers.ValidationError("Invalid credentials")
+            raise serializers.ValidationError("user does not exist")
         
         # Generate JWT token for the user
         token = self.get_token(user)
