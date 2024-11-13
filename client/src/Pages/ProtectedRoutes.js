@@ -33,7 +33,7 @@ function ProtectedRoutes() {
       'X-CSRFToken': getCsrfToken(),
     }}).then(res=>{
       document.cookie=`access_token=${res.data.access}`
-      document.cookie=`refresh_token=${res.data.refresh}`
+      // document.cookie=`refresh_token=${res.data.refresh}`
       setisLoading(false)
 
       setIsAuth(true)
