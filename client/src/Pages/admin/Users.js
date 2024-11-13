@@ -11,14 +11,14 @@ function Users() {
   const [dept,setDept]=useState([])
   const [loading,setLoading]=useState(false)
 //   const [newuser,setNewuser]=useState({
-//     username,
-//     password,
-//     email,
-//     department,
-//     branch,
-//     phone_number,
-//     first_name,
-//     last_name
+//     username:"",
+//     password:"",
+//     email:"",
+//     department:"",
+//     branch:"",
+//     phone_number:"",
+//     first_name:"",
+//     last_name:""
     
 
 

@@ -14,7 +14,8 @@ function Login() {
   const [forgotPopup, setforgotPopup] = useState(false)
   const [loginform, Setloginform] = useState({ email: "", password: "" })
   const [Loading,setLoading]=useState(false)
-
+  const [resetLoading,setResetLoading]=useState(false)
+  const [email,setEmail]=useState("")
   
   const getCsrfToken = () => {
     const cookieValue = document.cookie
@@ -75,7 +76,28 @@ useEffect(()=>{
     })
   }
 
+
+  const forgotPassword=async (e)=>{
+
+    e.preventDefault()
+    setResetLoading(true)
+    await axios.post(`${process.env.REACT_APP_URL}/api/password_reset/`,{email},{
+      headers:{
+        Authorization:`API_KEY ${process.env.REACT_APP_API_KEY}`
+      }
+    }).then(res=>{
+      setResetLoading(false)
+      console.log(res);
+      
+    }).catch(err=>{
+      setResetLoading(false)
+      console.log(err);
+      
+    })
+  }
+
   console.log(loginform)
+console.log("emaiiiiiiiiiiiiiil",email);
 
   return (
     <div className="login-page">
@@ -87,13 +109,13 @@ useEffect(()=>{
 
         <div className="popup_header"><h2>Reset your Password</h2></div>
 
-        <form className="reset-form">
+        <form className="reset-form" onSubmit={forgotPassword} onChange={(e)=>setEmail(e.target.value)}>
           <div className="form-ctrl">
             <label htmlFor="reset-email">Email Address <span>*</span></label>
             <input type="email" name="email" id="reset-email" />
           </div>
           <div className="forgot-signin sigup-btn-conatiner">
-            <button className="btn-login">Send Reset Link</button>
+            {resetLoading?<LoadingBtn/>:<button className="btn-login">Send Reset Link</button>}
           </div>
         </form>
       </div>

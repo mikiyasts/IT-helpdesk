@@ -27,7 +27,7 @@ function AdminRoutes() {
       try {
         const response = await axios.post(
           `${process.env.REACT_APP_URL}/api/token/refresh/`,
-          { refresh: refreshToken },
+          {refresh: refreshToken },
           {
             headers: {
               'X-CSRFToken': getCsrfToken(),
@@ -38,7 +38,6 @@ function AdminRoutes() {
         setIsLoading(false);
         setIsAdmin(true);
         document.cookie = `access_token=${response.data.access}; path=/;`;
-        document.cookie = `refresh_token=${response.data.refresh}; path=/;`;
       } catch (error) {
         setIsLoading(false);
         setIsAdmin(false);

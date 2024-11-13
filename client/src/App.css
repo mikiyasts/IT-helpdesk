@@ -723,7 +723,6 @@ svg .css-1qkz8p7{
   .admin-dashboard .table-wrapper .card-header .btn-login span{
     display: none;
   }
- }
 
   
   .sidebar{
@@ -749,7 +748,8 @@ svg .css-1qkz8p7{
   .sidebar-humburger{
     display: flex;
     transition: all 1s linear;
-  } */
+  } 
+}
 
 /* Table Css */
 /* .table-wrapper{
