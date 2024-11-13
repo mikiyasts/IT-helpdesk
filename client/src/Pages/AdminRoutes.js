@@ -3,6 +3,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { Navigate, Outlet, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../Context/AuthContext';
 import Cookies from 'js-cookie';
+import Loading from './Loading';
 
 function AdminRoutes() {
   const { isAdmin, setIsAdmin } = useContext(AuthContext);
@@ -35,7 +36,10 @@ function AdminRoutes() {
           }
         );
 
-        setIsLoading(false);
+        setTimeout(() => {
+          
+          setIsLoading(false);
+        }, 4000);
         setIsAdmin(true);
         document.cookie = `access_token=${response.data.access}; path=/;`;
       } catch (error) {
@@ -64,7 +68,7 @@ function AdminRoutes() {
   }, [isLoading, isAdmin]);
 
   if (isLoading) {
-    return <h1>Loading</h1>;
+    return <Loading/>;
   } else {
     return isAdmin ? <Outlet /> : <Navigate to="/" />;
   }

@@ -30,8 +30,21 @@
   width: 100vw;
   height: 100vh;
   background-color: var(--body-bg-primary);
-  overflow: hidden;
   position: relative;
+  overflow: hidden;
+}
+.loading-body{
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  object-fit: cover;
+}
+.loading-body video{
+  position: absolute;
+  inset:0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
  /* popups */
 .forgot-password_popup,.popup{

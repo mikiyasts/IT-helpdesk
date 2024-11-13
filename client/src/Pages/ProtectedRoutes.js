@@ -3,6 +3,7 @@ import React, { useContext, useEffect, useState } from 'react'
 import { Navigate, Outlet, useNavigate } from 'react-router-dom'
 import { AuthContext } from '../Context/AuthContext'
 import Cookies from 'js-cookie'
+import Loading from './Loading'
 function ProtectedRoutes() {
 
   const {isAuth,setIsAuth}=useContext(AuthContext)
@@ -34,7 +35,10 @@ function ProtectedRoutes() {
     }}).then(res=>{
       document.cookie=`access_token=${res.data.access}`
       // document.cookie=`refresh_token=${res.data.refresh}`
-      setisLoading(false)
+      setTimeout(()=>{
+
+        setisLoading(false)
+      },4000)
 
       setIsAuth(true)
       
@@ -75,7 +79,7 @@ function ProtectedRoutes() {
   },[isLoading,isAuth])
 
   if(isLoading){
-    return <h1>Loading</h1>
+    return <Loading/>
 }else{
 
   return isAuth && isAuth? <Outlet/> : <Navigate to="/"/>

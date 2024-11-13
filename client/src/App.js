@@ -23,6 +23,7 @@ import ForumIcon from '@mui/icons-material/Forum';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import AdminRoutes from './Pages/AdminRoutes';
 import ResetPassword from './Pages/ResetPassword';
+import Loading from './Pages/Loading';
 function App() {
 
   const [isAuth, setIsAuth] = useState(sessionStorage.getItem("isAuth") || false)
@@ -115,6 +116,7 @@ function App() {
           </Route>
 
             <Route path="*" element={<h1>ALU ALU</h1>}></Route>
+            <Route path="/loading" element={<Loading/>}></Route>
         </Routes>
       </AuthContext.Provider>
     </div>
