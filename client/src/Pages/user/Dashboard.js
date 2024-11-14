@@ -180,8 +180,7 @@ const newRequest=async (e)=>{
         <Header/>
         <div className="dashboard-main">
           <div className="dashboard-header" ><h2>New Request</h2></div>
-          <div className="dashboard-cards">
-            
+          <div className="dashboard-cards">  
             {reqCard}
           </div>
 

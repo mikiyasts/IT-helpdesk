@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import AddIcon from '@mui/icons-material/Add';
 import axios from "axios";
 import LoadingBtn from "../../component/LoadingBtn";
+import EditIcon from '@mui/icons-material/Edit';
 function Users() {
   const [users, setUsers] = useState([]);
   const [popup,setPopup]=useState(false)
@@ -10,20 +11,16 @@ function Users() {
   const [edited,setEdited]=useState({})
   const [dept,setDept]=useState([])
   const [loading,setLoading]=useState(false)
-//   const [newuser,setNewuser]=useState({
-//     username:"",
-//     password:"",
-//     email:"",
-//     department:"",
-//     branch:"",
-//     phone_number:"",
-//     first_name:"",
-//     last_name:""
-    
-
-
-
-// })
+  const [newuser,setNewuser]=useState({
+    username:"",
+    password:"",
+    email:"",
+    department:"",
+    branch:"",
+    phone_number:"",
+    first_name:"",
+    last_name:""
+})
   useEffect(() => {
 
     axios
@@ -67,12 +64,12 @@ function Users() {
       <td data-cell="Role">{el.role}</td>
       <td data-cell="Branch">{el.branch}</td>
       <td data-cell="Dept">{el.department}</td>
-      <td className="opt-dots">
-      <button className="btn-solved" onClick={()=>{
+      <td className="opt-dots" style={{display:"flex",alignItems:"center",justifyContent:"flex-start"}}>
+     <EditIcon sx={{fill:"#8470ff"}} onClick={()=>{
         setPopup(true)
         setPopupadd(false)
         setForm(el)
-      }}>Edit</button>
+      }}/>
       </td>
     </tr>
   ));
@@ -97,8 +94,30 @@ function Users() {
     console.log(form);
     
   }
+  const userInput=(e)=>{
+    console.log(e.target.value);
+    
+    setNewuser(prev=>{
+      return {
+        ...prev,
+        [e.target.name]:e.target.name==="department"? Number(e.target.value):e.target.value
+      }
+    })
+
+    setEdited(prev=>{
+      return {
+        ...prev,
+        [e.target.name]:e.target.value
+      }
+    })
+    console.log(form);
+    
+  }
+
+
 console.log("inin",form);
 console.log("ed",edited);
+console.log("new",newuser);
 
 const submitEdit=(e)=>{
   e.preventDefault()
@@ -121,6 +140,43 @@ const submitEdit=(e)=>{
     setPopup(false)
     setEdited({})
     setForm({})
+    refreshData()
+    console.log("succes",res);
+    
+  }).catch(err=>{
+    console.log(err,"errr");
+    
+  })
+}
+const createUser=(e)=>{
+  e.preventDefault()
+  const getCsrfToken = () => {
+    const cookieValue = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('csrftoken='))
+        ?.split('=')[1];
+    return cookieValue || '';
+};
+
+  axios.post(`${process.env.REACT_APP_URL}/api/create_user/`,
+    newuser ,{
+    headers: {
+      'X-CSRFToken': getCsrfToken(),
+      Authorization: `API_KEY ${process.env.REACT_APP_API_KEY}`,
+    },
+  }
+  ).then(res=>{
+    setPopup(false)
+    setNewuser({
+      username:"",
+      password:"",
+      email:"",
+      department:"",
+      branch:"",
+      phone_number:"",
+      first_name:"",
+      last_name:""
+  })
     refreshData()
     console.log("succes",res);
     
@@ -163,10 +219,10 @@ const submitEdit=(e)=>{
         </div>
       </div>
 
-      <div className={`popup ${popup &&"active"}`}>
+      <div className={`popup ${popup &&"active"}`} style={{backgroundColor:"#111827"}}>
         <div className="popup-pin" onClick={()=>{
         setPopup(false)
-  }}></div>
+  }} style={{backgroundColor:"#1f2937"}}></div>
        
         <div className="popup_header"><h2>Edit User</h2></div>
 
@@ -215,53 +271,63 @@ const submitEdit=(e)=>{
       </div>
       
       {/* popup*/}
-      {/* <div className={`popup ${popupadd &&"active"}`}>
+      <div className={`popup ${popupadd &&"active"}`} style={{backgroundColor:"#111827"}}>
         <div className="popup-pin" onClick={()=>{
     setPopupadd(false)
-  }}></div>
+  }} style={{backgroundColor:"#01f2937"}}></div>
        
         <div className="popup_header"><h2>Add New User</h2></div>
 
-        <form className="request-form" >
+        <form className="request-form" onChange={userInput} onSubmit={createUser}>
           <div className="form-ctrl">
             <label htmlFor="req_name">User Name <span>*</span></label>
-            <input type="text" name="username" id="username" required/>
+            <input type="text" name="username" id="username" required value={newuser && newuser.username}/>
           </div>
           
           <div className="form-ctrl">
             <label htmlFor="password">Password <span>*</span></label>
-            <input type="text" name="password" id="password"  onChange={setInput} required/>
+            <input type="text" name="password" id="password" required  value={newuser && newuser.password}/>
           </div>
           <div className="form-ctrl">
-            <label htmlFor="Email">Email <span>*</span></label>
-            <input type="email" name="Email" id="Email"  onChange={setInput} required/>
+            <label htmlFor="email">Email <span>*</span></label>
+            <input type="email" name="email" id="email" required  value={newuser && newuser.email}/>
           </div>
           <div className="form-ctrl">
-            <label htmlFor="Email">Email <span>*</span></label>
-            <input type="email" name="Email" id="Email"  onChange={setInput} required/>
+            <label htmlFor="dept">Department</label>
+            <select name="department" id="dept" value={newuser && newuser.department===null?"":newuser.department}>
+              <option value="">Select Department</option>
+              {deptOption}
+            </select>
           </div>
           <div className="form-ctrl">
-            <label htmlFor="Email">Email <span>*</span></label>
-            <input type="email" name="Email" id="Email"  onChange={setInput} required/>
+            <label htmlFor="branch">Branch</label>
+            <select name="branch" id="branch"  value={newuser && newuser.branch===null?"":newuser.branch}>
+            <option value="">Select Your Branch</option>
+              <option value="Farm">Farm</option>
+              <option value="Kality">Kality</option>
+              <option value="Lideta">Lideta</option>
+              <option value="Mekanissa">Mekanissa</option>
+            </select>
           </div>
           <div className="form-ctrl">
-            <label htmlFor="Email">Email <span>*</span></label>
-            <input type="email" name="Email" id="Email"  onChange={setInput} required/>
+            <label htmlFor="phone_number">Phone_number <span>*</span></label>
+            <input type="phone_number" name="phone_number" id="phone_number" required value={newuser && newuser.phone_number}/>
           </div>
           <div className="form-ctrl">
-            <label htmlFor="Email">Email <span>*</span></label>
-            <input type="email" name="Email" id="Email"  onChange={setInput} required/>
+            <label htmlFor="first_name">First_name <span>*</span></label>
+            <input type="first_name" name="first_name" id="first_name" required  value={newuser && newuser.first_name}/>
           </div>
           <div className="form-ctrl">
-            <label htmlFor="Email">Email <span>*</span></label>
-            <input type="email" name="Email" id="Email"  onChange={setInput} required/>
+            <label htmlFor="last_name">Last_name <span>*</span></label>
+            <input type="last_name" name="last_name" id="last_name" required  value={newuser && newuser.last_name}/>
           </div>
+         
           <div className="forgot-signin sigup-btn-conatiner">
                 {
                 loading? <LoadingBtn/> :<button className="btn-login">Submit</button>}
               </div>
         </form>
-      </div> */}
+      </div>
       {/* popup*/}
     </div>
   );
