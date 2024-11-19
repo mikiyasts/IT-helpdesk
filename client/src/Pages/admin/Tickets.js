@@ -7,6 +7,9 @@ import AttachmentIcon from '@mui/icons-material/Attachment';
 import CheckIcon from '@mui/icons-material/Check';
 import axios from 'axios';
 import LoadingBtn from '../../component/LoadingBtn';
+import { ToastContainer,toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 
 function Tickets() {
 
@@ -217,14 +220,15 @@ function Tickets() {
        window.location.reload()
        setLoading(false)
       }).catch(err=>{
-       setLoading(false)        
-        console.log(err)
+       setLoading(false)
+        console.log(err,"tiktiktik")
       })
      
       
     }).catch(err=>{
       setLoading(false)
-      console.log(err)
+      toast.warning(err?.response?.data?.error)        
+      console.log(err,"tiktiktik")
     }
     )
   }
@@ -300,6 +304,7 @@ function Tickets() {
 
   return (
     <>
+    <ToastContainer/>
     <div className="filter-div">
       <form onChange={FilterTicket}>
         <select name="category" id="category">
