@@ -159,11 +159,15 @@ const newRequest=async (e)=>{
         })
         getDashdata()
       }
-
-  const tableRw=currentRecords && currentRecords.map(el=><tr>
-    <td data-cell="ID">{el.id}</td>
+      let nor=0
+  const tableRw=currentRecords && currentRecords.map(el=>{
+    nor++
+  return (<tr>
+    <td data-cell="ID">{nor}</td>
     <td data-cell="Title">{el.title}</td>
     <td data-cell="Description">{el.description}</td>
+    <td data-cell="Description">{el?.assigned_to?.username}</td>
+    <td data-cell="Description">{el?.status}</td>
     <td className="opt-dots" data-cell="Attachment" style={{display:'flex',justifyContent:"flex-start"}}>
     {el?.attachments.length<1?null:
     <a href={`${process.env.REACT_APP_URL}${el?.attachments[0]?.file}`} target='_blank' title='Preview'>< VisibilityIcon/></a>}
@@ -171,7 +175,8 @@ const newRequest=async (e)=>{
     {
     el?.status==='Pending'?loading?<LoadingBtn/>:<td data-cell="Action"><button className="btn-login" onClick={()=>closeRequest(el.id)}>Close</button></td>:null
     }
-  </tr>)
+  </tr>)})
+console.log(mytickets,"tov");
 
 
   return (
@@ -180,8 +185,7 @@ const newRequest=async (e)=>{
         <Header/>
         <div className="dashboard-main">
           <div className="dashboard-header" ><h2>New Request</h2></div>
-          <div className="dashboard-cards">
-            
+          <div className="dashboard-cards">  
             {reqCard}
           </div>
 
@@ -202,6 +206,8 @@ const newRequest=async (e)=>{
                   <td>ID</td>
                   <td>Title</td>
                   <td>Description</td>
+                  <td>Holder</td>
+                  <td>Status</td>
                   <td>Attachment</td>
                   <td>Action</td>
                 </tr>

@@ -23,6 +23,7 @@ import ForumIcon from '@mui/icons-material/Forum';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import AdminRoutes from './Pages/AdminRoutes';
 import ResetPassword from './Pages/ResetPassword';
+import Loading from './Pages/Loading';
 function App() {
 
   const [isAuth, setIsAuth] = useState(sessionStorage.getItem("isAuth") || false)
@@ -72,7 +73,6 @@ function App() {
             <Link to="/admin" onClick={() => setPage("dashboard")} className={page === "dashboard" ? "active":""}><DashboardIcon/> Dashboard</Link>
             <Link to="tickets" onClick={() => setPage("tickets")} className={page === "tickets" ? "active":""}><ConfirmationNumberIcon/> Tickets</Link>
             <Link to="users" onClick={() => setPage("users")} className={page === "users" ? "active":""}><GroupIcon/>Users</Link>
-            <Link to="inprogress" onClick={() => setPage("In Progress")} className={page === "In Progress" ? "active":""}><ForumIcon/>Chat</Link>
             <Link to="manage" onClick={() => setPage("manage")} className={page === "manage" ? "active":""}><AssessmentIcon/>Report</Link>
           </ul>
         </div>
@@ -104,17 +104,16 @@ function App() {
           </Route>
           <Route element={<AdminRoutes/>}>
 
-          <Route path="/admin" element={<AdminLayout />}>
-              <Route index element={<AdminDashboard />} />
-              <Route path='completed' element={<Completed />} />
+          <Route  element={<AdminLayout />}>
+              <Route path="/admin/dashboard" element={<AdminDashboard />} />
               <Route path='tickets' element={<Tickets />} />
               <Route path='users' element={<Users />} />
-              <Route path='inprogress' element={<Inprogress />} />
               <Route path='manage' element={<Manage />} />
             </Route>
           </Route>
 
             <Route path="*" element={<h1>ALU ALU</h1>}></Route>
+            <Route path="/loading" element={<Loading/>}></Route>
         </Routes>
       </AuthContext.Provider>
     </div>

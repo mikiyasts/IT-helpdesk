@@ -30,8 +30,21 @@
   width: 100vw;
   height: 100vh;
   background-color: var(--body-bg-primary);
-  overflow: hidden;
   position: relative;
+  overflow: hidden;
+}
+.loading-body{
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  object-fit: cover;
+}
+.loading-body video{
+  position: absolute;
+  inset:0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
  /* popups */
 .forgot-password_popup,.popup{
@@ -551,7 +564,9 @@
 .user{
   position: relative;
   border-bottom: 1px solid var(--accent-secondary-alpha);
+  cursor:pointer;
 }
+
 .logout{
   padding: 2px 4px;
   position: absolute;
@@ -566,9 +581,17 @@
   transform-origin: top;
   cursor: pointer;
 }
+
+
+
+ 
 .logout.active{
-  animation: 1s ease-in-out forwards logouta;
+  animation: .5s ease-in-out forwards logouta;
 }
+
+
+
+ 
 @keyframes logouta {
   0%{
     opacity: 0;
@@ -976,7 +999,7 @@ svg .css-1qkz8p7{
   width: 1px;
   height: 100%;
   background-color: green;
-  left: .874rem;
+  left: .85rem;
   top: 1rem;
   transform-origin: top;
   transform: scaleY(0);
