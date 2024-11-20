@@ -2,6 +2,7 @@ from email.header import Header
 from email.message import EmailMessage
 from email.mime.text import MIMEText
 import json
+from django.contrib.auth.models import Group
 from django.utils.http import urlsafe_base64_decode
 import uuid
 from django.http import FileResponse, Http404, JsonResponse
@@ -211,18 +212,88 @@ class CustomTokenRefreshView(TokenRefreshView):
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 def create_ticket(request):
+    # Serialize the ticket data
     serializer = TicketSerializer(data=request.data)
+    
     if serializer.is_valid():
-        
+       
         ticket = serializer.save(created_by=request.user)
         
-        # Handle file attachments
+        
         files = request.FILES.getlist('attachments')
         for file in files:
             Attachment.objects.create(ticket=ticket, file=file)
         
-        return Response('Ticket created successfully', status=status.HTTP_201_CREATED)
+        
+        it_officers = User.objects.filter(role="admin")
+        requestor = request.user
+        ticket_title = ticket.title
+        ticket_description = ticket.description
+        ticket_category = ticket.category.name  # Assuming 'name' is the field that holds the category name
+        
+        requestor_message = f"""
+Awash Wine S.C IT Helpdesk
+---------------------------
+Your Ticket Request has been successfully submitted.
+
+🔹 Ticket Title: {ticket_title}
+🔹 Category: {ticket_category}
+🔹 Description: {ticket_description}
+
+Your request is currently under review. Someone will be assigned to it shortly.
+
+For updates, please log in to the IT Helpdesk system:
+https://localhost:3000/
+
+Best regards,
+Awash Wine S.C IT Helpdesk
+"""
+        send_message('drinkawash.com', 9797, 'admin', '@dIff%nSms0', requestor.phone_number, requestor_message)
+        # Create the SMS message for each IT officer
+        for it_officer in it_officers:
+            
+            phone_number = it_officer.phone_number  # Assuming you have phone numbers stored in the User model
+            
+            # Get ticket details
+            requestor = request.user
+            ticket_title = ticket.title
+            ticket_description = ticket.description
+            ticket_status = ticket.status
+            ticket_category = ticket.category.name  # Assuming 'name' is the field that holds the category name
+            assigned_to = ticket.assigned_to.first_name if ticket.assigned_to else "Not Assigned"
+            requestor_name = f"{requestor.first_name} {requestor.last_name}"
+            requestor_department = requestor.department  # Assuming you have a 'department' field
+            
+            # Format the message
+            message = f"""
+Awash Wine S.C IT Helpdesk
+---------------------------
+New Ticket Request
+
+🔹 Requestor: {requestor_name}
+🔹 Department: {requestor_department}
+🔹 Category: {ticket_category}
+🔹 Description: {ticket_description}
+
+---------------------------
+Please review the details above and take the necessary actions as soon as possible.
+
+For more information, log in to the IT Helpdesk system:
+https://localhost:3000/
+
+Best regards,
+Awash Wine S.C IT Helpdesk
+"""
+           
+
+            # Send SMS using the function you mentioned
+            send_message('drinkawash.com', 9797, 'admin', '@dIff%nSms0', phone_number, message)
+          
+            
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 @api_view(['GET'])
 @authentication_classes([APIKeyAuthentication])
@@ -433,7 +504,7 @@ def create_user(request):
 
 class ListNotificationsView(APIView):
     permission_classes = [IsAuthenticated]
-    @authentication_classes([APIKeyAuthentication])
+    @authentication_classes([JWTAuthentication])
 
     def get(self, request):
         notifications = Notification.objects.filter(user=request.user,read=False).order_by('-created_at')
@@ -452,7 +523,19 @@ class MarkNotificationAsReadView(APIView):
             return Response({'status': 'notification marked as read'}, status=status.HTTP_200_OK)
         except Notification.DoesNotExist:
             return Response({'error': 'Notification not found or does not belong to the user'}, status=status.HTTP_404_NOT_FOUND)
+class MarkAllNotificationAsRead(APIView):
+    permission_classes = [IsAuthenticated]
+    @authentication_classes([JWTAuthentication])
 
+    def post(self, request):
+        try:
+            notification = Notification.objects.get( user=request.user)
+            notification.read = True
+            notification.save()
+            return Response({'status': 'all notification marked as read'}, status=status.HTTP_200_OK)
+        except Notification.DoesNotExist:
+            return Response({'error': 'Notification not found or does not belong to the user'}, status=status.HTTP_404_NOT_FOUND)
+    
 
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
@@ -582,9 +665,25 @@ def acceptticket(request, id):
             ticket.assigned_to = request.user
             ticket.status = "In Progress"
             ticket.save()
-
+        
         logger.info(f'Ticket {id} accepted by user {request.user.id}')
+        requestor = request.user
+        requestor_name = f"{requestor.first_name} {requestor.last_name}"
+        phone=ticket.created_by
+        requestor_message = f"""
+Awash Wine S.C IT Helpdesk
+---------------------------
+Your Ticket Request has been successfully Accepted.
+Your request is currently under review by {requestor_name}.
 
+For updates, please log in to the IT Helpdesk system:
+https://localhost:3000/
+
+Best regards,
+Awash Wine S.C IT Helpdesk
+"""
+        send_message('drinkawash.com', 9797, 'admin', '@dIff%nSms0', phone.phone_number, requestor_message)
+        print("message sent")
         return Response({'status': 'Ticket accepted successfully', 'ticket_id': ticket.id, 'assigned_to': ticket.assigned_to.username}, status=status.HTTP_200_OK)
 
     except Ticket.DoesNotExist:
