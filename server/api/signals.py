@@ -34,9 +34,13 @@ def create_notification_on_ticket_creation(sender, instance, created, **kwargs):
             
 @receiver(post_save, sender=Ticket)
 def notify_ticket_assigned(sender, instance, created, **kwargs):
-    if not created and instance.assigned_to and instance.status == "In Progress":
-        Notification.objects.create(
-            user=instance.created_by,
-            message=f"Your ticket '{instance.title}' has been accepted by {instance.assigned_to.get_full_name()}.",
-            notification_type='Ticket'
-        )
+    # Ensure the signal only runs when the ticket has been updated (not created)
+    if not created:
+        # Check if the ticket has been assigned to a user and its status is "In Progress"
+        if instance.assigned_to and instance.status == "In Progress":
+            # Check if the notification has already been created
+                Notification.objects.create(
+                    user=instance.created_by,
+                    message=f"Your ticket '{instance.title}' has been accepted by {instance.assigned_to.get_full_name()}.",
+                    notification_type='Ticket'
+                )
