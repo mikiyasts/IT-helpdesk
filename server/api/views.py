@@ -585,6 +585,19 @@ class SubmitSolutionView(APIView):
             tickets.status = 'Pending'
             tickets.save()
             
+            Notification.objects.create(
+            user=ticket.created_by,
+            message=f"Your ticket '{ticket.title}' has been resolved by {ticket.assigned_to.get_full_name()}. Kindly close the ticket to confirm that the issue has been successfully addressed."
+            
+            
+            
+            
+            
+            
+            ,
+            notification_type='Ticket'
+                )
+            
 
 
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -685,6 +698,11 @@ Awash Wine S.C IT Helpdesk
 """
         send_message('drinkawash.com', 9797, 'admin', '@dIff%nSms0', phone.phone_number, requestor_message)
         print("message sent")
+        Notification.objects.create(
+            user=ticket.created_by,
+            message=f"Your ticket '{ticket.title}' has been accepted by {ticket.assigned_to.get_full_name()}.",
+            notification_type='Ticket'
+                )
         return Response({'status': 'Ticket accepted successfully', 'ticket_id': ticket.id, 'assigned_to': ticket.assigned_to.username}, status=status.HTTP_200_OK)
 
     except Ticket.DoesNotExist:
@@ -709,6 +727,11 @@ def close_ticket(request,id):
     ticket=Ticket.objects.get(id=id)
     ticket.status="Closed"
     ticket.save()
+    Notification.objects.create(
+            user=ticket.assigned_to,
+            message=f"Ticket '{ticket.title}' has been closed  by {ticket.created_by.get_full_name()}.",
+            notification_type='Ticket'
+                )
     return Response({'status': 'ticket closed '}, status=status.HTTP_200_OK)
 
 @api_view(['GET'])
