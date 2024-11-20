@@ -145,6 +145,7 @@
   justify-content: space-between;
   color: var(--font-color-primary);
   border-bottom: 1px solid var(--font-color-secondary-alpha);
+  z-index: 500;
 }
 .header-left{
   display: flex;
@@ -168,6 +169,62 @@
 .header h2{
   font-size: clamp(0.8em,2.7vw,1.2em);
   font-family: nueuelight;
+}
+
+.notification{
+  position: relative;
+}
+.notification.active::after{
+  content: attr(aria-valuenow);
+  position: absolute;
+  top: -.5rem;
+  left:-.5rem;
+  width: 10px;
+  height: 10px;
+  background-color: red;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: .2rem;
+  font-size: small;
+  font-weight: bold;
+}
+.notification_list{
+  position: absolute;
+  width: fit-content;
+  min-width: 300px;
+  right: 100%;
+  top: 100%;
+  height: 400px;
+  padding: .5rem;
+  overflow: scroll;
+  scrollbar-color: transparent transparent;
+  scrollbar-width: thin;
+  background-color: var(--body-bg-primary);
+  z-index: 2 ;
+}
+.notification_list:hover{
+    scrollbar-color:var(--accent-secondary-alpha) transparent ;  
+}
+.notification_list ul{
+  list-style: none;
+}
+.notification_list ul li{
+  padding: .2rem;
+  display: flex;
+  flex-direction: column;
+  gap: .2rem;
+  border-bottom: 1px solid var(--accent-secondary-alpha);
+}
+.notification_list ul li:last-child{
+  border-bottom: none;
+}
+@media (max-width:563px) {
+  .notification_list{
+    right: -75%;
+    transform: translateX(30%);
+  }
 }
 .login-page{
   width: 100%;
@@ -464,6 +521,7 @@
   align-items: start;
   gap:2rem;
   transition:transform .5s ease-in;
+  z-index: 1000 !important;
   
 }
 .sidebar-humburger{

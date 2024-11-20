@@ -60,7 +60,7 @@ sessionStorage.removeItem('isAdmin');
         sessionStorage.setItem("isAdmin",true) 
         console.log("ad");
         
-        navigate("/admin")
+        navigate("/admin/dashboard")
       }else if(res.data?.user?.role==="employee"){
         setIsAuth(true)
         sessionStorage.setItem("isAuth",true) 
