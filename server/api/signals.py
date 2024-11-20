@@ -15,13 +15,13 @@ def create_notification_on_ticket_creation(sender, instance, created, **kwargs):
         )
         
         # Notify users based on their roles
-        it_officer=User.objects.filter(role='it_officer')
-        for it_officers in it_officer:
-            Notification.objects.create(
-                user=it_officers,
-                message=f"A new ticket '{instance.title}' has been assigned to you.",
-                notification_type='Ticket'
-            )
+        # it_officer=User.objects.filter(role='it_officer')
+        # for it_officers in it_officer:
+        #     Notification.objects.create(
+        #         user=it_officers,
+        #         message=f"A new ticket '{instance.title}' has been assigned to you.",
+        #         notification_type='Ticket'
+        #     )
         
         # Notify all admins
         admins = User.objects.filter(role='admin')
@@ -31,3 +31,12 @@ def create_notification_on_ticket_creation(sender, instance, created, **kwargs):
                 message=f"A new ticket '{instance.title}' has been created by {instance.created_by.username}.",
                 notification_type='Ticket'
             )
+            
+@receiver(post_save, sender=Ticket)
+def notify_ticket_assigned(sender, instance, created, **kwargs):
+    if not created and instance.assigned_to and instance.status == "In Progress":
+        Notification.objects.create(
+            user=instance.created_by,
+            message=f"Your ticket '{instance.title}' has been accepted by {instance.assigned_to.get_full_name()}.",
+            notification_type='Ticket'
+        )

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Support Ticket Request</title>
+</head>
+<body style="background-color:#111827; display: flex; align-items: center; justify-content:center; width:100%; overflow: hidden; min-width: 450px;">
+    <div class="container" style="margin:2rem 2rem; background-color:#1f2937; width:50% ;color: white; padding: 1rem; border-radius: 12px; width: fit-content;">
+        <div class="header" style="display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #939ba7;">
+            <h1>New Support Ticket Request</h1>
+        </div>
+        <div class="content">
+            <p>Hello IT Support Team,</p>
+            <p>You have received a new support ticket request from <strong>{{ user.first_name }} {{ user.last_name }}</strong>.</p>
+            <p><strong>Ticket Request Details:</strong></p>
+            <ul style="color: white;">
+                <li><strong>User:</strong> {{ user.first_name }} {{ user.last_name }}</li>
+                <li><strong>Email:</strong> {{ user.email }}</li>
+                <li><strong>Request Description:</strong> {{ ticket_description }}</li>
+                <li><strong>Requested On:</strong> {{ ticket_created_at }}</li>
+            </ul>
+            <p>Click the button below to view or manage the ticket.</p>
+            <a href="{{ ticket_url }}" class="button" style="color: white; text-decoration: none;">
+                <button style="color: white; border: none; padding: 10px 25px !important; background-color: #8470ff; border-radius:15px !important; font-weight: bold !important;">
+                    View Ticket
+                </button>
+            </a>
+            <p style="color:#e54141;">⚠️ If you did not request this, please disregard this email.</p>
+        </div>
+        <div class="footer" style="line-height: 1.5rem;">
+            <p>Best regards, <br> Your IT Helpdesk Team</p>
+        </div>
+    </div>
+</body>
+</html>
