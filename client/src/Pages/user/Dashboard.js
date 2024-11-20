@@ -145,7 +145,7 @@ const newRequest=async (e)=>{
             }
           }).then(res=>{
            console.log("history updated");
-           window.location.reload()
+           getDashdata()
            setLoading(false)
           }).catch(err=>{
             console.log(err)
