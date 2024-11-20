@@ -203,12 +203,23 @@
   scrollbar-width: thin;
   background-color: var(--body-bg-primary);
   z-index: 2 ;
+  visibility: hidden;
+  opacity: 0;
+  transition: visibility .2s ease-in-out,opacity .2s ease-in-out;
+}
+.notification_list.active{
+  visibility: visible;
+  opacity: 1;
+  
 }
 .notification_list:hover{
     scrollbar-color:var(--accent-secondary-alpha) transparent ;  
 }
 .notification_list ul{
   list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap:.2rem;
 }
 .notification_list ul li{
   padding: .2rem;
@@ -217,9 +228,18 @@
   gap: .2rem;
   border-bottom: 1px solid var(--accent-secondary-alpha);
 }
+.notification_list ul li .notification_header{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
 .notification_list ul li:last-child{
   border-bottom: none;
 }
+
+/* .unread{
+  background-color: var(--accent-secondary-alpha);
+} */
 @media (max-width:563px) {
   .notification_list{
     right: -75%;

@@ -442,7 +442,7 @@ class ListNotificationsView(APIView):
 
 class MarkNotificationAsReadView(APIView):
     permission_classes = [IsAuthenticated]
-    @authentication_classes([APIKeyAuthentication])
+    @authentication_classes([JWTAuthentication])
 
     def post(self, request, pk):
         try:
