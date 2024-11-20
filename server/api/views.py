@@ -529,9 +529,10 @@ class MarkAllNotificationAsRead(APIView):
 
     def post(self, request):
         try:
-            notification = Notification.objects.get( user=request.user)
-            notification.read = True
-            notification.save()
+            notification = Notification.objects.filter( user=request.user)
+            for notifications in notification:
+             notifications.read = True
+             notifications.save()
             return Response({'status': 'all notification marked as read'}, status=status.HTTP_200_OK)
         except Notification.DoesNotExist:
             return Response({'error': 'Notification not found or does not belong to the user'}, status=status.HTTP_404_NOT_FOUND)

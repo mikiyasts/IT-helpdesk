@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import Cookies from 'js-cookie'
 import axios from 'axios';
 import DraftsIcon from '@mui/icons-material/Drafts';
+import DoneAllIcon from '@mui/icons-material/DoneAll';
 function Header() {
   const [notifications,setNotifications]=useState([])
   const navigate=useNavigate()
@@ -76,12 +77,29 @@ function Header() {
     
     return(
       <li>
-        <div className='notification_header'><h4>{requestor[requestor.length-1]} </h4> <div title="mark as read" onClick={()=>markasRead(el.id)}><DraftsIcon sx={{fontSize:20}} /></div></div>
+        <div className='notification_header'><h4>{requestor[requestor.length-1]} </h4> <div  className="mark_as_read" title="mark as read" onClick={()=>markasRead(el.id)}><DraftsIcon sx={{fontSize:20}} /></div></div>
         <h5>{el.notification_type}</h5>
         <p>{el.message}</p>
       </li>
     )
   })
+
+  const markAllasRead=async ()=>{
+    const acstoken = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('access_token='))
+        ?.split('=')[1];
+
+    await axios.post(`${process.env.REACT_APP_URL}/api/mark_all_as_read/`,null,{
+      headers:{
+          'X-CSRFToken': getCsrfToken(),
+          Authorization:`Bearer ${acstoken}`
+      }
+    }).then(res=>{
+      console.log(res)
+      getNotification()
+    }).catch(err=>console.log(err))
+  }
   return (
     <div className='header'>
       <div className="header-left">
@@ -94,7 +112,7 @@ function Header() {
           setNotificationToggle(prev=>!prev)
           }} />
         <div className={`notification_list ${notificationToggle && "active"}`}>
-          <div className="mark_all_asread"></div>
+          <div className="mark_all_asread">{notificationList.length>1&&<div  className="mark_all_asread" title="mark all as read" onClick={markAllasRead}><DoneAllIcon/></div>}</div>
             <ul>
               {notificationList.length>0 ? notificationList : <h3 style={{textAlign:"center"}}>No Notifications</h3>}
             </ul>

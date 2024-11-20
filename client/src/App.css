@@ -233,6 +233,19 @@
   align-items: center;
   justify-content: space-between;
 }
+
+.mark_all_asread{
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-block: .5rem;
+  cursor: pointer;
+}
+
+.mark_as_read{
+  cursor: pointer;
+}
 .notification_list ul li:last-child{
   border-bottom: none;
 }
