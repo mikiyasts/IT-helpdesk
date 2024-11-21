@@ -3,7 +3,9 @@ from email.message import EmailMessage
 from django.db.models import Q
 from email.mime.text import MIMEText
 import json
-from django.db.models import Count, Avg, F, ExpressionWrapper, fields
+from datetime import timedelta
+from django.db.models.functions import Concat
+from django.db.models import Count, Avg, F, ExpressionWrapper, fields, Value
 from django.utils.dateparse import parse_datetime
 from django.contrib.auth.models import Group
 from django.utils.http import urlsafe_base64_decode
@@ -58,6 +60,33 @@ from notifications.models import Notification
 from django.db import transaction
 import logging
 
+def convert_duration(seconds):
+    # Check if the input is a timedelta object
+    if isinstance(seconds, timedelta):
+        # Convert timedelta to total seconds
+        seconds = seconds.total_seconds()
+
+    # If the duration is less than 60 seconds, show seconds
+    if seconds < 60:
+        return f"{int(seconds)} sec"
+
+    # If the duration is greater than or equal to 60 seconds, convert to minutes
+    elif seconds < 3600:  # 3600 seconds = 1 hour
+        minutes = seconds // 60
+        remaining_seconds = int(seconds % 60)
+        return f"{int(minutes)} min" if remaining_seconds == 0 else f"{int(minutes)} min {remaining_seconds} sec"
+
+    # If the duration is greater than or equal to 3600 seconds, convert to hours
+    else:
+        hours = seconds // 3600
+        remaining_minutes = (seconds % 3600) // 60
+        remaining_seconds = int(seconds % 60)
+        if remaining_minutes == 0 and remaining_seconds == 0:
+            return f"{int(hours)} hr"
+        elif remaining_seconds == 0:
+            return f"{int(hours)} hr {int(remaining_minutes)} min"
+        else:
+            return f"{int(hours)} hr {int(remaining_minutes)} min {remaining_seconds} sec"
 
 def send_message(host, port, username, password, number, message):
     
@@ -887,23 +916,30 @@ def TicketReportView(request):
         .order_by('status')
 
 
-    department_counts = tickets.values('assigned_to__department__name') \
+    department_counts = tickets.values('created_by__department__name') \
         .annotate(total=Count('id')) \
-        .order_by('assigned_to__department__name')
+        .order_by('created_by__department__name')
 
  
     category_counts = tickets.values('category__name') \
         .annotate(total=Count('id')) \
         .order_by('category__name')
 
-    branch_counts = tickets.values('assigned_to__branch') \
+    branch_counts = tickets.values('created_by__branch') \
         .annotate(total=Count('id')) \
-        .order_by('assigned_to__branch')
+        .order_by('created_by__branch')
 
 
-    case_holder_counts = tickets.values('assigned_to__email') \
-        .annotate(total=Count('id')) \
-        .order_by('assigned_to__email')
+    case_holder_counts = tickets.values('assigned_to__first_name', 'assigned_to__last_name') \
+    .annotate(
+        assigned_to__=Concat(
+            F('assigned_to__first_name'), 
+            Value(' '), 
+            F('assigned_to__last_name')
+        )
+    ) \
+    .annotate(total=Count('id')) \
+    .order_by('assigned_to__')
 
 
     avg_response_time = TicketHistory.objects.filter(field_name='status', new_value='In Progress', ticket__in=tickets) \
@@ -916,6 +952,7 @@ def TicketReportView(request):
                 )
             )
         ).aggregate(Avg('response_time'))
+    
 
     avg_fixing_time = TicketHistory.objects.filter(field_name='status', new_value='Pending', ticket__in=tickets) \
         .values('ticket') \
@@ -934,8 +971,8 @@ def TicketReportView(request):
         'category_counts': category_counts,
         'branch_counts': branch_counts,
         'case_holder_counts': case_holder_counts,
-        'avg_response_time': avg_response_time['response_time__avg'],
-        'avg_fixing_time': avg_fixing_time['fixing_time__avg']
+        'avg_response_time': convert_duration(avg_response_time['response_time__avg']),
+        'avg_fixing_time': convert_duration(avg_fixing_time['fixing_time__avg'])
     }
 
  
