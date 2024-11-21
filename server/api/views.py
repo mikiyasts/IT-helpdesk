@@ -587,6 +587,7 @@ class SubmitSolutionView(APIView):
             
             Notification.objects.create(
             user=ticket.created_by,
+<<<<<<< HEAD
             message=f"Your ticket '{ticket.title}' has been resolved by {ticket.assigned_to.get_full_name()}. Kindly close the ticket to confirm that the issue has been successfully addressed."
             
             
@@ -595,6 +596,9 @@ class SubmitSolutionView(APIView):
             
             
             ,
+=======
+            message=f"Your ticket '{ticket.title}' has been resolved by {ticket.assigned_to.get_full_name()}. Kindly close the ticket to confirm that the issue has been successfully addressed.",
+>>>>>>> ac8e727c077dcfcf2d5f3aed219d059e77e113fd
             notification_type='Ticket'
                 )
             
