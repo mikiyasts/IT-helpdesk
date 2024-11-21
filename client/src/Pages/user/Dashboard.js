@@ -102,6 +102,14 @@ const newRequest=async (e)=>{
     Authorization: `Bearer ${acstoken}`,
   }}).then(res=>{
     console.log(res)
+    setRequest({
+      title:"",
+      description:"",
+      category:0,
+      attachments:""
+    })
+    toast.success("Request Sent Successfully")
+    setPopup(false)
     setLoading(false)
 
   }).catch(err=>{
@@ -159,7 +167,29 @@ const newRequest=async (e)=>{
         })
         getDashdata()
       }
+      const downloadImage= async (id,url)=>{
+        const fileName=url.split("/").pop()
+        await axios.get(`${process.env.REACT_APP_URL}/api/download_attachment/${id}`,{
+          responseType: 'blob',
+          headers:{
+            Authorization:`API_KEY ${process.env.REACT_APP_API_KEY}`,
+            'Content-Type': 'application/json'
+          }
+        }).then(res=>{
+          const type = res.headers['content-type']
+          const blob = new Blob([res.data], { type: type, encoding: 'UTF-8' })
+          const link = document.createElement('a')
+          link.href = window.URL.createObjectURL(blob)
+          link.download =fileName
+          link.click()          
+        }).catch(err=>{
+          console.log(err);
+        })
+        
+      }
+
       let nor=0
+
   const tableRw=currentRecords && currentRecords.map(el=>{
     nor++
   return (<tr>
@@ -170,7 +200,7 @@ const newRequest=async (e)=>{
     <td data-cell="Description">{el?.status}</td>
     <td className="opt-dots" data-cell="Attachment" style={{display:'flex',justifyContent:"flex-start"}}>
     {el?.attachments.length<1?null:
-    <a href={`${process.env.REACT_APP_URL}${el?.attachments[0]?.file}`} target='_blank' title='Preview'>< VisibilityIcon/></a>}
+    <div title='Preview' onClick={()=>downloadImage(el.id,`${process.env.REACT_APP_URL}${el?.attachments[0]?.file}`)}>< VisibilityIcon/></div>}
     </td>
     {
     el?.status==='Pending'?loading?<LoadingBtn/>:<td data-cell="Action"><button className="btn-login" onClick={()=>closeRequest(el.id)}>Close</button></td>:null
@@ -203,7 +233,7 @@ console.log(mytickets,"tov");
             <table>
               <thead>
                 <tr>
-                  <td>ID</td>
+                  <td>No</td>
                   <td>Title</td>
                   <td>Description</td>
                   <td>Holder</td>
@@ -237,12 +267,12 @@ console.log(mytickets,"tov");
         <form className="request-form" onSubmit={newRequest}>
           <div className="form-ctrl">
             <label htmlFor="req_name">Request Name <span>*</span></label>
-            <input type="text" name="req_name" id="req-name" value={request.title} readOnly/>
+            <input type="text" name="req_name" id="req-name" value={request.title} readOnly required/>
           </div>
           
           <div className="form-ctrl">
             <label htmlFor="description">Description <span>*</span></label>
-            <input type="text" name="description" id="description" value={request.description} onChange={setInput}/>
+            <input type="text" name="description" id="description" value={request.description} onChange={setInput} required/>
           </div>
           <div className="form-ctrl">
             <label htmlFor="atch">Attachment <span>*</span></label>
