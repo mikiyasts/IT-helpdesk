@@ -178,8 +178,8 @@ function Tickets() {
   let activeDateOpen
   
   const activeTicketdate=()=>{
-    activeDate=activePreview?.created_at.split("T")[0]    
-    activeTime=activePreview?.created_at.split("T")[1].split(":") 
+    activeDate=activePreview?.updated_at.split("T")[0]    
+    activeTime=activePreview?.updated_at.split("T")[1].split(":") 
     activeDateOpen=activeDate?.split("-")   
   }
 
@@ -380,7 +380,7 @@ function Tickets() {
             <div className="state-detail">
               <div className="state-name">Opened</div>
               <div className="state-description">{activePreview?.created_by.username}</div>
-              <div className="state-time">{activeTime[0]}:{activeTime[1]}</div>
+              <div className="state-time">{activePreview && activePreview.created_at}</div>
             </div>
           </div>
           
@@ -414,7 +414,7 @@ function Tickets() {
            { detailcollapse? <ExpandLessIcon/>: <ExpandMoreIcon sx={{ fontSize: 20 }}/>}
           <ul className={`detail-list ${detailcollapse&&"active"}`}>
           <li><div className="detail-name">Request Date</div> <div className="detail-value">{activeDate}</div></li>
-          <li><div className="detail-name">Request Time</div> <div className="detail-value">{activeTime[0]}:{activeTime[1]}</div></li>
+          <li><div className="detail-name">Request Time</div> <div className="detail-value">{activePreview && activePreview.created_at}</div></li>
             <li><div className="detail-name">Location</div> <div className="detail-value">{activePreview && activePreview.created_by && activePreview.created_by.branch}</div></li>
             <li><div className="detail-name">Title</div> <div className="detail-value"><p>{activePreview && activePreview.title}</p></div></li>
             <li><div className="detail-name">solution</div> <div className="detail-value"><p>{ticketSolution[0]?.content}</p>
