@@ -99,6 +99,7 @@ function Tickets() {
       setTicketHistory(res.data)
     }).catch(err=>console.log(err)
     )
+    
     await axios.get(`${process.env.REACT_APP_URL}/api/list_solution/${id}/`,{
       headers:{
         Authorization: `API_KEY ${process.env.REACT_APP_API_KEY}`,
