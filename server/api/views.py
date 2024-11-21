@@ -1,7 +1,9 @@
 from email.header import Header
 from email.message import EmailMessage
+from django.db.models import Q
 from email.mime.text import MIMEText
 import json
+from django.utils.dateparse import parse_datetime
 from django.contrib.auth.models import Group
 from django.utils.http import urlsafe_base64_decode
 import uuid
@@ -832,3 +834,49 @@ def change_password(request, uidb64, token):
         return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
         return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+    
+
+@api_view(['GET'])
+@authentication_classes([APIKeyAuthentication])
+@permission_classes([IsAuthenticated])
+
+def TicketReportView(request):
+        start_date_filter = request.GET.get('start_date', None)
+        end_date_filter = request.GET.get('end_date', None)
+        status_filter = request.GET.get('status', None)
+        branch_filter = request.GET.get('branch', None)
+        department_filter = request.GET.get('department', None)
+        assigned_to_filter = request.GET.get('assigned_to', None)
+        catagory_filter=request.GET.get('catagory',None)
+        filters = Q()
+         
+        if start_date_filter:
+            start_date = parse_datetime(start_date_filter)
+            if start_date:
+                filters &= Q(created_at__gte=start_date)
+
+        
+        if end_date_filter:
+            end_date = parse_datetime(end_date_filter)
+            if end_date:
+                filters &= Q(created_at__lte=end_date)
+
+        if status_filter:
+            filters &= Q(status=status_filter)
+
+        if branch_filter:
+            filters &= Q(assigned_to__branch=branch_filter)
+
+        if department_filter:
+            filters &= Q(assigned_to__department__name=department_filter)
+
+        if assigned_to_filter:
+            filters &= Q(assigned_to__email=assigned_to_filter)
+        if catagory_filter:
+            filters &= Q(category__name=catagory_filter)
+   
+        tickets = Ticket.objects.filter(filters).order_by('-created_at')
+
+        serializer = TicketSerializer(tickets, many=True)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)

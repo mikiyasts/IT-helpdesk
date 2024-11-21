@@ -5,7 +5,7 @@ from rest_framework_simplejwt.views import (
    
     TokenRefreshView,
 )
-from .views import CustomTokenObtainPairView, DownloadAttachmentView, SubmitSolutionView
+from .views import CustomTokenObtainPairView, DownloadAttachmentView, SubmitSolutionView, TicketReportView
 
 urlpatterns = [
   path('',views.api_endpoints),
@@ -62,4 +62,8 @@ urlpatterns = [
   path('notifications/<int:pk>/mark-as-read/', views.MarkNotificationAsReadView.as_view()),
   path('mark_all_as_read/',views.MarkAllNotificationAsRead.as_view()),
 
+
+
+
+  path('report/tickets/', views.TicketReportView, name='ticket-report'),
 ] 
