@@ -1404,3 +1404,22 @@ svg .css-1qkz8p7{
     background: conic-gradient(white 0% 45%,var(--accent-secondary) 45% 100%);
   }
 }
+
+.report-page{
+}
+.report-page .filters{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+.report-page .filters .form-ctrl{
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+}
+.report-page .filters .form-ctrl input,.report-page .filters .form-ctrl select{
+  padding: .2rem;
+  border-radius: 4px;
+  border: none;
+}

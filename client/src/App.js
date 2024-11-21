@@ -24,6 +24,7 @@ import AssessmentIcon from '@mui/icons-material/Assessment';
 import AdminRoutes from './Pages/AdminRoutes';
 import ResetPassword from './Pages/ResetPassword';
 import Loading from './Pages/Loading';
+import Report from './Pages/admin/Report';
 function App() {
 
   const [isAuth, setIsAuth] = useState(sessionStorage.getItem("isAuth") || false)
@@ -70,10 +71,11 @@ function App() {
         <div className="logo"><img src={Logo} alt="logo" width="45px" /></div>
         <div className="sidebar-main">
           <ul>
-            <Link to="/admin" onClick={() => setPage("dashboard")} className={page === "dashboard" ? "active":""}><DashboardIcon/> Dashboard</Link>
+            <Link to="/admin/dashboard" onClick={() => setPage("dashboard")} className={page === "dashboard" ? "active":""}><DashboardIcon/> Dashboard</Link>
             <Link to="tickets" onClick={() => setPage("tickets")} className={page === "tickets" ? "active":""}><ConfirmationNumberIcon/> Tickets</Link>
             <Link to="users" onClick={() => setPage("users")} className={page === "users" ? "active":""}><GroupIcon/>Users</Link>
             <Link to="manage" onClick={() => setPage("manage")} className={page === "manage" ? "active":""}><AssessmentIcon/>Report</Link>
+            <Link to="reports" onClick={() => setPage("reports")} className={page === "reports" ? "active":""}><AssessmentIcon/>Report</Link>
           </ul>
         </div>
       </div>
@@ -109,6 +111,7 @@ function App() {
               <Route path='tickets' element={<Tickets />} />
               <Route path='users' element={<Users />} />
               <Route path='manage' element={<Manage />} />
+              <Route path='reports' element={<Report />} />
             </Route>
           </Route>
 
