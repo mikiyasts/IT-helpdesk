@@ -3,6 +3,9 @@ from email.message import EmailMessage
 from django.db.models import Q
 from email.mime.text import MIMEText
 import json
+from datetime import timedelta
+from django.db.models.functions import Concat
+from django.db.models import Count, Avg, F, ExpressionWrapper, fields, Value
 from django.utils.dateparse import parse_datetime
 from django.contrib.auth.models import Group
 from django.utils.http import urlsafe_base64_decode
@@ -57,6 +60,33 @@ from notifications.models import Notification
 from django.db import transaction
 import logging
 
+def convert_duration(seconds):
+    # Check if the input is a timedelta object
+    if isinstance(seconds, timedelta):
+        # Convert timedelta to total seconds
+        seconds = seconds.total_seconds()
+
+    # If the duration is less than 60 seconds, show seconds
+    if seconds < 60:
+        return f"{int(seconds)} sec"
+
+    # If the duration is greater than or equal to 60 seconds, convert to minutes
+    elif seconds < 3600:  # 3600 seconds = 1 hour
+        minutes = seconds // 60
+        remaining_seconds = int(seconds % 60)
+        return f"{int(minutes)} min" if remaining_seconds == 0 else f"{int(minutes)} min {remaining_seconds} sec"
+
+    # If the duration is greater than or equal to 3600 seconds, convert to hours
+    else:
+        hours = seconds // 3600
+        remaining_minutes = (seconds % 3600) // 60
+        remaining_seconds = int(seconds % 60)
+        if remaining_minutes == 0 and remaining_seconds == 0:
+            return f"{int(hours)} hr"
+        elif remaining_seconds == 0:
+            return f"{int(hours)} hr {int(remaining_minutes)} min"
+        else:
+            return f"{int(hours)} hr {int(remaining_minutes)} min {remaining_seconds} sec"
 
 def send_message(host, port, username, password, number, message):
     
@@ -759,35 +789,32 @@ def password_reset(request):
         return Response({"error": "Email is required"}, status=status.HTTP_400_BAD_REQUEST)
 
     try:
-        # Check if the user exists in the database
         user = User.objects.get(email=email)
-
-        # Check if the user already has a reset token in PasswordReset model
         password_reset_entry, created = PasswordReset.objects.get_or_create(user=user)
 
-        # If the entry exists, update the token
+
         if not created:
-            # Generate a new token using uuid
-            password_reset_entry.token = str(uuid.uuid4())  # Generate a new UUID token
-            password_reset_entry.save()  # Save the new token
+
+            password_reset_entry.token = str(uuid.uuid4()) 
+            password_reset_entry.save() 
         
-        # Generate the reset link with the user ID and token
+
         reset_url = f"http://localhost:3000/reset/{urlsafe_base64_encode(str(user.pk).encode())}/{password_reset_entry.token}/"
 
-        # Render the email template with the reset URL
+
         email_subject = 'Password Reset Request'
         email_message = render_to_string('password_reset_email.html', {
             'user': user,
             'reset_url': reset_url
         })
 
-        # Send the email with the reset URL
+  
         send_mail(
             email_subject,
             email_message,
             settings.EMAIL_HOST_USER,
             [user.email],
-            html_message=email_message  # Send HTML email
+            html_message=email_message 
         )
 
         return Response({"message": "Password reset email sent."}, status=status.HTTP_200_OK)
@@ -804,28 +831,28 @@ def change_password(request, uidb64, token):
     """
 
     try:
-        # Decode the user ID from the URL
+ 
         uid = urlsafe_base64_decode(uidb64).decode()
         user = get_user_model().objects.get(pk=uid)
 
-        # Check if the token exists for the user in PasswordReset model
+
         password_reset_entry = PasswordReset.objects.filter(user=user, token=token).first()
 
-        # If no matching entry exists, the token is invalid
+
         if not password_reset_entry:
             return Response({"error": "Invalid token."}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Now proceed with the password reset logic
+
         new_password = request.data.get('password')
 
         if not new_password:
             return Response({"error": "Password is required."}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Set the new password
+
         user.set_password(new_password)
         user.save()
 
-        # Optionally, delete the token after it has been used
+      
         password_reset_entry.delete()
 
         return Response({"message": "Password has been successfully reset."}, status=status.HTTP_200_OK)
@@ -839,44 +866,119 @@ def change_password(request, uidb64, token):
 @api_view(['GET'])
 @authentication_classes([APIKeyAuthentication])
 @permission_classes([IsAuthenticated])
-
 def TicketReportView(request):
-        start_date_filter = request.GET.get('start_date', None)
-        end_date_filter = request.GET.get('end_date', None)
-        status_filter = request.GET.get('status', None)
-        branch_filter = request.GET.get('branch', None)
-        department_filter = request.GET.get('department', None)
-        assigned_to_filter = request.GET.get('assigned_to', None)
-        catagory_filter=request.GET.get('catagory',None)
-        filters = Q()
-         
-        if start_date_filter:
-            start_date = parse_datetime(start_date_filter)
-            if start_date:
-                filters &= Q(created_at__gte=start_date)
+    start_date_filter = request.GET.get('start_date', None)
+    end_date_filter = request.GET.get('end_date', None)
+    status_filter = request.GET.get('status', None)
+    branch_filter = request.GET.get('branch', None)
+    department_filter = request.GET.get('department', None)
+    assigned_to_filter = request.GET.get('assigned_to', None)
+    category_filter = request.GET.get('category', None)
 
-        
-        if end_date_filter:
-            end_date = parse_datetime(end_date_filter)
-            if end_date:
-                filters &= Q(created_at__lte=end_date)
 
-        if status_filter:
-            filters &= Q(status=status_filter)
+    filters = Q()
 
-        if branch_filter:
-            filters &= Q(assigned_to__branch=branch_filter)
 
-        if department_filter:
-            filters &= Q(assigned_to__department__name=department_filter)
+    if start_date_filter:
+        start_date = parse_datetime(start_date_filter)
+        if start_date:
+            filters &= Q(created_at__gte=start_date)
 
-        if assigned_to_filter:
-            filters &= Q(assigned_to__email=assigned_to_filter)
-        if catagory_filter:
-            filters &= Q(category__name=catagory_filter)
-   
-        tickets = Ticket.objects.filter(filters).order_by('-created_at')
+    if end_date_filter:
+        end_date = parse_datetime(end_date_filter)
+        if end_date:
+            filters &= Q(created_at__lte=end_date)
 
-        serializer = TicketSerializer(tickets, many=True)
+    if status_filter:
+        filters &= Q(status=status_filter)
 
-        return Response(serializer.data, status=status.HTTP_200_OK)
+    if branch_filter:
+        filters &= Q(assigned_to__branch=branch_filter)
+
+    if department_filter:
+        filters &= Q(assigned_to__department__name=department_filter)
+
+    if assigned_to_filter:
+        filters &= Q(assigned_to__email=assigned_to_filter)
+
+    if category_filter:
+        filters &= Q(category__name=category_filter)
+
+
+    tickets = Ticket.objects.filter(filters).order_by('-created_at')
+
+  
+    ticket_serializer = TicketSerializer(tickets, many=True)
+
+
+    ticket_status_counts = tickets.values('status') \
+        .annotate(total=Count('id')) \
+        .order_by('status')
+
+
+    department_counts = tickets.values('created_by__department__name') \
+        .annotate(total=Count('id')) \
+        .order_by('created_by__department__name')
+
+ 
+    category_counts = tickets.values('category__name') \
+        .annotate(total=Count('id')) \
+        .order_by('category__name')
+
+    branch_counts = tickets.values('created_by__branch') \
+        .annotate(total=Count('id')) \
+        .order_by('created_by__branch')
+
+
+    case_holder_counts = tickets.values('assigned_to__first_name', 'assigned_to__last_name') \
+    .annotate(
+        assigned_to__=Concat(
+            F('assigned_to__first_name'), 
+            Value(' '), 
+            F('assigned_to__last_name')
+        )
+    ) \
+    .annotate(total=Count('id')) \
+    .order_by('assigned_to__')
+
+
+    avg_response_time = TicketHistory.objects.filter(field_name='status', new_value='In Progress', ticket__in=tickets) \
+        .values('ticket') \
+        .annotate(
+            response_time=Avg(
+                ExpressionWrapper(
+                    F('updated_at') - F('ticket__created_at'),
+                    output_field=fields.DurationField()
+                )
+            )
+        ).aggregate(Avg('response_time'))
+    
+
+    avg_fixing_time = TicketHistory.objects.filter(field_name='status', new_value='Pending', ticket__in=tickets) \
+        .values('ticket') \
+        .annotate(
+            fixing_time=Avg(
+                ExpressionWrapper(
+                    F('updated_at') - F('ticket__created_at'),
+                    output_field=fields.DurationField()
+                )
+            )
+        ).aggregate(Avg('fixing_time'))
+
+    statistics = {
+        'ticket_status_counts': ticket_status_counts,
+        'department_counts': department_counts,
+        'category_counts': category_counts,
+        'branch_counts': branch_counts,
+        'case_holder_counts': case_holder_counts,
+        'avg_response_time': convert_duration(avg_response_time['response_time__avg']),
+        'avg_fixing_time': convert_duration(avg_fixing_time['fixing_time__avg'])
+    }
+
+ 
+    response_data = {
+        'report': ticket_serializer.data,  
+        'statistics': statistics  
+    }
+
+    return Response(response_data, status=status.HTTP_200_OK)
