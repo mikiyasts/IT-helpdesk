@@ -182,6 +182,7 @@ const newRequest=async (e)=>{
           link.href = window.URL.createObjectURL(blob)
           link.download =fileName
           link.click()          
+          
         }).catch(err=>{
           console.log(err);
         })
