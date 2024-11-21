@@ -99,6 +99,7 @@ function Tickets() {
       setTicketHistory(res.data)
     }).catch(err=>console.log(err)
     )
+
     await axios.get(`${process.env.REACT_APP_URL}/api/list_solution/${id}/`,{
       headers:{
         Authorization: `API_KEY ${process.env.REACT_APP_API_KEY}`,
@@ -177,13 +178,13 @@ function Tickets() {
   let activeTime
   let activeDateOpen
   
-  const activeTicketdate=()=>{
-    activeDate=activePreview?.updated_at.split("T")[0]    
-    activeTime=activePreview?.updated_at.split("T")[1].split(":") 
-    activeDateOpen=activeDate?.split("-")   
-  }
+  // const activeTicketdate=()=>{
+  //   activeDate=activePreview?.updated_at.split("T")[0]    
+  //   activeTime=activePreview?.updated_at.split("T")[1].split(":") 
+  //   activeDateOpen=activeDate?.split("-")   
+  // }
 
-  activeTicketdate()
+  // activeTicketdate()
 
   console.log(activePreview);
   const getCsrfToken = () => {
@@ -280,8 +281,8 @@ function Tickets() {
   let delay=0 
 
   const States=ticketHistory && ticketHistory.map(el=>{
-    const fulldate=el.updated_at.split("T")[0].split("-")
-    const fullTime=el.updated_at.split("T")[1].split(":")
+    const fulldate=el.updated_at.split(" ")[0].split("-")
+    const fullTime=el.updated_at.split(" ")[1] + " " +el.updated_at.split(" ")[2]
     console.log(fulldate,"date-splitted");
     console.log(fullTime,"Time-splitted");
     console.log(el);
@@ -292,7 +293,7 @@ function Tickets() {
             <div className="state-detail">
               <div className="state-name">{el.new_value}</div>
               <div className="state-description">{el?.updated_by.username}</div>
-              <div className="state-time">{`${fullTime[0]}:${fullTime[1]}`}</div>
+              <div className="state-time">{`${fullTime}`}</div>
             </div>
           </div>
     )
@@ -376,11 +377,11 @@ function Tickets() {
         <div className="ticket-history">
           <h4>Ticket Timeline</h4>
           <div className="state" style={{'--delay':`0s`}}>
-            <div className="state-date">{`${activeDateOpen[2]} ${month[activeDateOpen[1]]}`}</div>
+            <div className="state-date">{activePreview && month[activePreview.created_at.split(" ")[0].split("-")[1]] +" "+activePreview.created_at.split(" ")[0].split("-")[2]}</div>
             <div className="state-detail">
               <div className="state-name">Opened</div>
               <div className="state-description">{activePreview?.created_by.username}</div>
-              <div className="state-time">{activePreview && activePreview.created_at}</div>
+              <div className="state-time">{activePreview && activePreview.created_at.split(" ")[1] +" " +activePreview.created_at.split(" ")[2]}</div>
             </div>
           </div>
           
@@ -413,8 +414,8 @@ function Tickets() {
             <h4>Details</h4> 
            { detailcollapse? <ExpandLessIcon/>: <ExpandMoreIcon sx={{ fontSize: 20 }}/>}
           <ul className={`detail-list ${detailcollapse&&"active"}`}>
-          <li><div className="detail-name">Request Date</div> <div className="detail-value">{activeDate}</div></li>
-          <li><div className="detail-name">Request Time</div> <div className="detail-value">{activePreview && activePreview.created_at}</div></li>
+          <li><div className="detail-name">Request Date</div> <div className="detail-value">{activePreview.created_at.split(" ")[0]}</div></li>
+          <li><div className="detail-name">Request Time</div> <div className="detail-value">{activePreview && activePreview.created_at.split(" ")[1] +" "+activePreview.created_at.split(" ")[2]}</div></li>
             <li><div className="detail-name">Location</div> <div className="detail-value">{activePreview && activePreview.created_by && activePreview.created_by.branch}</div></li>
             <li><div className="detail-name">Title</div> <div className="detail-value"><p>{activePreview && activePreview.title}</p></div></li>
             <li><div className="detail-name">solution</div> <div className="detail-value"><p>{ticketSolution[0]?.content}</p>
