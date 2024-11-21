@@ -94,7 +94,7 @@ class TicketSerializer(serializers.ModelSerializer):
     created_by = CreateTicketUserSerializer(read_only=True)
     assigned_to = UserSerializer(read_only=True)
     category = serializers.PrimaryKeyRelatedField(queryset=TicketCategory.objects.all())
-    created_at = serializers.DateTimeField(format='%Y-%m-%d %I:%M %p')
+    created_at = serializers.DateTimeField(format='%Y-%m-%d %I:%M %p',read_only=True)
 
 
     class Meta:
