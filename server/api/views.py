@@ -61,9 +61,12 @@ from django.db import transaction
 import logging
 
 def convert_duration(seconds):
-    # Check if the input is a timedelta object
+    # Check if the value is None
+    if seconds is None:
+        return "N/A"  # Or another default value that makes sense for your case
+
+    # If the input is a timedelta object, convert to total seconds
     if isinstance(seconds, timedelta):
-        # Convert timedelta to total seconds
         seconds = seconds.total_seconds()
 
     # If the duration is less than 60 seconds, show seconds
@@ -893,7 +896,7 @@ def TicketReportView(request):
         filters &= Q(status=status_filter)
 
     if branch_filter:
-        filters &= Q(assigned_to__branch=branch_filter)
+        filters &= Q(created_by__branch=branch_filter)
 
     if department_filter:
         filters &= Q(assigned_to__department__name=department_filter)
