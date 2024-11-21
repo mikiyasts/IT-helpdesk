@@ -79,7 +79,7 @@ class TicketCommentSerializer(serializers.ModelSerializer):
 
 class TicketHistorySerializer(serializers.ModelSerializer):
     updated_by = CreateTicketUserSerializer()
-    created_at = serializers.DateTimeField(format='%Y-%m-%d %I:%M %p')
+    updated_at = serializers.DateTimeField(format='%Y-%m-%d %I:%M %p')
     class Meta:
         model = TicketHistory
         fields = ['id', 'ticket', 'updated_at', 'updated_by', 'field_name', 'old_value', 'new_value']
