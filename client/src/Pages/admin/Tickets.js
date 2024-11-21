@@ -29,6 +29,7 @@ function Tickets() {
   const [loading,setLoading]=useState(false)
   let preview
   const month = [
+    "nan",
     "Jan",
     "Feb",
     "Mar",
@@ -289,7 +290,7 @@ function Tickets() {
     delay+=1
     return (
       <div className="state" style={{'--delay':`${delay}s`}} key={el.id}>
-            <div className="state-date">{`${fulldate[2]} ${month[fulldate[1]]}`}</div>
+            <div className="state-date">{` ${month[fulldate[1]]} ${fulldate[2]}`}</div>
             <div className="state-detail">
               <div className="state-name">{el.new_value}</div>
               <div className="state-description">{el?.updated_by.username}</div>
