@@ -1406,12 +1406,24 @@ svg .css-1qkz8p7{
 }
 
 .report-page{
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 .report-page .filters{
   display: flex;
   align-items: center;
-  justify-content: center;
+  /* justify-content: center; */
   gap: 1rem;
+  background-color: var(--accent-tertiary);
+  padding: 1.5rem;
+  border-radius: 5px;
+  overflow-x: scroll;
+  scrollbar-color: transparent transparent;
+  scrollbar-width: thin;
+}
+.report-page .filters:hover{
+  scrollbar-color:var(--accent-secondary-alpha) transparent ;
 }
 .report-page .filters .form-ctrl{
   display: flex;
@@ -1419,7 +1431,29 @@ svg .css-1qkz8p7{
   gap: .5rem;
 }
 .report-page .filters .form-ctrl input,.report-page .filters .form-ctrl select{
-  padding: .2rem;
+  padding: .4rem;
   border-radius: 4px;
-  border: none;
+  border: 1px solid var(--body-bg-primary);
+  text-align: center;
+  background-color: transparent;
+  color: white;
+}
+.report-page .filters .form-ctrl select option{
+  -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    padding: 105px;
+  text-align: left;
+  
+}
+.report-page .filters .form-ctrl input:focus,.report-page .filters .form-ctrl select:focus{
+  outline-color: var(--accent-secondary) !important;
+
+}
+.report-page .table-wrapper{
+  scrollbar-color: transparent transparent;
+  scrollbar-width: thin;
+}
+.report-page .table-wrapper:hover{
+  scrollbar-color:var(--accent-secondary-alpha) transparent ;
 }
