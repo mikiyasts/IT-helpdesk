@@ -102,6 +102,7 @@ const newRequest=async (e)=>{
     Authorization: `Bearer ${acstoken}`,
   }}).then(res=>{
     console.log(res)
+    getDashdata()
     setRequest({
       title:"",
       description:"",

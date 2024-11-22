@@ -1457,3 +1457,48 @@ svg .css-1qkz8p7{
 .report-page .table-wrapper:hover{
   scrollbar-color:var(--accent-secondary-alpha) transparent ;
 }
+
+.statistics{
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+}
+.statistics-container{
+  display: flex;
+  gap: 1rem;
+  overflow: scroll;
+  scrollbar-color: transparent transparent;
+  scrollbar-width: thin;
+  justify-content: space-between;
+}
+.statistics-container:hover{
+  scrollbar-color:var(--accent-secondary-alpha) transparent ;
+}
+.statistics-container>div{
+  background-color: var(--body-bg-primary);
+}
+.statistics-clmns{
+  min-width: fit-content;
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+  padding: 1rem;
+  flex: 1;
+  border-radius: 8px;
+}
+.statistics-rws{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  color: #f2f2f2de;
+  font-size: small;
+}
+.statistics-rws .value{
+  color: var(--accent-secondary);
+}
+.statistics-rws:first-child{
+  border-bottom: 1px solid var(--accent-secondary-alpha);
+  /* font-weight: 600; */
+  font-size:larger;
+}
