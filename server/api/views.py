@@ -942,7 +942,8 @@ def TicketReportView(request):
     .order_by('assigned_to__')
 
 
-    avg_response_time = TicketHistory.objects.filter(field_name='status', new_value='In Progress', ticket__in=tickets) \
+    try:
+     avg_response_time = TicketHistory.objects.filter(field_name='status', new_value='In Progress', ticket__in=tickets) \
         .values('ticket') \
         .annotate(
             response_time=Avg(
@@ -952,7 +953,8 @@ def TicketReportView(request):
                 )
             )
         ).aggregate(Avg('response_time'))
-    
+    except:
+        avg_response_time
 
     avg_fixing_time = TicketHistory.objects.filter(field_name='status', new_value='Pending', ticket__in=tickets) \
         .values('ticket') \
