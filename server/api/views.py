@@ -982,8 +982,8 @@ def TicketReportView(request):
         'category_counts': category_counts,
         'branch_counts': branch_counts,
         'case_holder_counts': case_holder_counts,
-        'avg_response_time': avg_response_time['response_time__avg'],
-        'avg_fixing_time': avg_fixing_time['fixing_time__avg']
+        'avg_response_time': convert_duration(avg_response_time['response_time__avg']),
+        'avg_fixing_time': convert_duration(avg_fixing_time['fixing_time__avg'])
     }
 
     response_data = {
