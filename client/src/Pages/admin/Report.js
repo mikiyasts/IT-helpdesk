@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import axios from 'axios'
+import IosShareIcon from '@mui/icons-material/IosShare';
 function Report() {
 
 
@@ -170,6 +171,10 @@ const filterReport=(e)=>{
                 <option value="Kality">Kality</option>
             </select>
         </div>
+        <div className="form-ctrl">
+            <label htmlFor="assigned_to">Export</label>
+            <div className="export"><IosShareIcon/></div>
+        </div>
       </form>
       <div className="table-wrapper" style={{width:"100%",padding:"1rem 0",height:"63vh",overflow:"scroll",display:"flex",flexDirection:"column",gap:"1rem"}}>
         <div className="card-table" style={{width:"100%"}}>
@@ -206,7 +211,7 @@ const filterReport=(e)=>{
           >
             <h3>All Users <sub style={{color:"#f2f2f2",fontWeight:"lighter",fontSize:"small"}}>{users.length}</sub></h3>
 
-            
+
           </div> */}
           <div className="statistics">
             <h4>Statistics</h4>
