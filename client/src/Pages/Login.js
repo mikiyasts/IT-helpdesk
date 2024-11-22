@@ -73,15 +73,21 @@ sessionStorage.removeItem('isAdmin');
       // navigate("/dashboard")
     }).catch(err => {
       setLoading(false)
-      let errors=Object.keys(err?.response?.data)
-      errors.forEach(error => {
+      if(typeof(err?.response?.data)==="object"){
+        console.log("in iffffffff");
+        
+        let errors=Object.keys(err?.response?.data)
+        errors.forEach(error => {
         console.log("error",err?.response?.data[error][0]);
         if(error!=="non_field_errors"){
         return  toast.warning(`${error}: ${err?.response?.data[error][0]}`)
         }
         return toast.warning(`${err?.response?.data[error][0]}`)
       });
-      console.log("rorrr",errors);
+      }else{
+        toast.warning(`Server Error Please Try Again Later`)
+      }
+      
       
       console.log(err)
     })
