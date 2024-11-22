@@ -1,8 +1,12 @@
 from email.header import Header
 from email.message import EmailMessage
+from io import BytesIO
+from time import localtime
 from django.db.models import Q
 from email.mime.text import MIMEText
 import json
+from openpyxl import Workbook
+from openpyxl.utils.dataframe import dataframe_to_rows
 from datetime import timedelta
 from django.db.models.functions import Concat
 from django.db.models import Count, Avg, F, ExpressionWrapper, fields, Value
@@ -10,9 +14,10 @@ from django.utils.dateparse import parse_datetime
 from django.contrib.auth.models import Group
 from django.utils.http import urlsafe_base64_decode
 import uuid
-from django.http import FileResponse, Http404, JsonResponse
+from django.http import FileResponse, Http404, HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.utils.crypto import get_random_string
+import pandas as pd
 import requests
 from django.conf import settings
 from django.contrib.auth.tokens import default_token_generator
@@ -34,7 +39,7 @@ from rest_framework.response import Response
 import secrets
 from .authentication import APIKeyAuthentication
 from tickets.models import Attachment, Ticket,TicketCategory, TicketComment, TicketHistory
-from .serializers import CustomTokenRefreshSerializer, DepartmentSerializer, PasswordResetConfirmSerializer, PasswordResetRequestSerializer, RecentTicketSerializer, TicketCategorySerializer, TicketCommentSerializer, TicketHistorySerializer, TicketSerializer, UserCreateSerializer, UserGetSerializer, UserSerializer
+from .serializers import CustomTokenRefreshSerializer, DepartmentSerializer, PasswordResetConfirmSerializer, PasswordResetRequestSerializer, RecentTicketSerializer, ReportTicketSerializer, TicketCategorySerializer, TicketCommentSerializer, TicketHistorySerializer, TicketSerializer, UserCreateSerializer, UserGetSerializer, UserSerializer
 from rest_framework.authtoken.models import Token
 from rest_framework import status
 from users.models import Department, PasswordReset, User
@@ -61,9 +66,12 @@ from django.db import transaction
 import logging
 
 def convert_duration(seconds):
-    # Check if the input is a timedelta object
+    # Check if the value is None
+    if seconds is None:
+        return "N/A"  # Or another default value that makes sense for your case
+
+    # If the input is a timedelta object, convert to total seconds
     if isinstance(seconds, timedelta):
-        # Convert timedelta to total seconds
         seconds = seconds.total_seconds()
 
     # If the duration is less than 60 seconds, show seconds
@@ -867,6 +875,7 @@ def change_password(request, uidb64, token):
 @authentication_classes([APIKeyAuthentication])
 @permission_classes([IsAuthenticated])
 def TicketReportView(request):
+    # Fetching filters from request
     start_date_filter = request.GET.get('start_date', None)
     end_date_filter = request.GET.get('end_date', None)
     status_filter = request.GET.get('status', None)
@@ -874,10 +883,10 @@ def TicketReportView(request):
     department_filter = request.GET.get('department', None)
     assigned_to_filter = request.GET.get('assigned_to', None)
     category_filter = request.GET.get('category', None)
+    export_flag = request.GET.get('export', 'false')  # Check if the user wants to export
 
-
+    # Build query filters
     filters = Q()
-
 
     if start_date_filter:
         start_date = parse_datetime(start_date_filter)
@@ -893,7 +902,7 @@ def TicketReportView(request):
         filters &= Q(status=status_filter)
 
     if branch_filter:
-        filters &= Q(assigned_to__branch=branch_filter)
+        filters &= Q(created_by__branch=branch_filter)
 
     if department_filter:
         filters &= Q(assigned_to__department__name=department_filter)
@@ -904,23 +913,24 @@ def TicketReportView(request):
     if category_filter:
         filters &= Q(category__name=category_filter)
 
-
+    # Fetch tickets based on filters
     tickets = Ticket.objects.filter(filters).order_by('-created_at')
 
-  
-    ticket_serializer = TicketSerializer(tickets, many=True)
+    # If user wants to export to Excel
+    if export_flag.lower() == 'true':
+        return generate_excel_report(tickets)
 
+    # If no export, return normal JSON report
+    ticket_serializer = ReportTicketSerializer(tickets, many=True)
 
     ticket_status_counts = tickets.values('status') \
         .annotate(total=Count('id')) \
         .order_by('status')
 
-
     department_counts = tickets.values('created_by__department__name') \
         .annotate(total=Count('id')) \
         .order_by('created_by__department__name')
 
- 
     category_counts = tickets.values('category__name') \
         .annotate(total=Count('id')) \
         .order_by('category__name')
@@ -929,20 +939,18 @@ def TicketReportView(request):
         .annotate(total=Count('id')) \
         .order_by('created_by__branch')
 
-
     case_holder_counts = tickets.values('assigned_to__first_name', 'assigned_to__last_name') \
-    .annotate(
-        assigned_to__=Concat(
-            F('assigned_to__first_name'), 
-            Value(' '), 
-            F('assigned_to__last_name')
-        )
-    ) \
-    .annotate(total=Count('id')) \
-    .order_by('assigned_to__')
-
-
-    avg_response_time = TicketHistory.objects.filter(field_name='status', new_value='In Progress', ticket__in=tickets) \
+        .annotate(
+            assigned_to__=Concat(
+                F('assigned_to__first_name'), 
+                Value(' '), 
+                F('assigned_to__last_name')
+            )
+        ) \
+        .annotate(total=Count('id')) \
+        .order_by('assigned_to__')
+    try:
+     avg_response_time = TicketHistory.objects.filter(field_name='status', new_value='In Progress', ticket__in=tickets) \
         .values('ticket') \
         .annotate(
             response_time=Avg(
@@ -952,9 +960,11 @@ def TicketReportView(request):
                 )
             )
         ).aggregate(Avg('response_time'))
-    
-
-    avg_fixing_time = TicketHistory.objects.filter(field_name='status', new_value='Pending', ticket__in=tickets) \
+    except:
+        avg_response_time=0
+    try:
+            
+     avg_fixing_time = TicketHistory.objects.filter(field_name='status', new_value='Pending', ticket__in=tickets) \
         .values('ticket') \
         .annotate(
             fixing_time=Avg(
@@ -964,21 +974,109 @@ def TicketReportView(request):
                 )
             )
         ).aggregate(Avg('fixing_time'))
-
+    except:
+        avg_fixing_time=0
     statistics = {
         'ticket_status_counts': ticket_status_counts,
         'department_counts': department_counts,
         'category_counts': category_counts,
         'branch_counts': branch_counts,
         'case_holder_counts': case_holder_counts,
-        'avg_response_time': convert_duration(avg_response_time['response_time__avg']),
-        'avg_fixing_time': convert_duration(avg_fixing_time['fixing_time__avg'])
+        'avg_response_time': avg_response_time['response_time__avg'],
+        'avg_fixing_time': avg_fixing_time['fixing_time__avg']
     }
 
- 
     response_data = {
-        'report': ticket_serializer.data,  
-        'statistics': statistics  
+        'report': ticket_serializer.data,
+        'statistics': statistics
     }
 
     return Response(response_data, status=status.HTTP_200_OK)
+
+
+def generate_excel_report(tickets):
+    # Convert the queryset into a pandas DataFrame
+    data = list(tickets.values(
+        'id', 'created_at', 'status', 'created_by__branch', 
+        'assigned_to__department__name', 'assigned_to__first_name',
+        'assigned_to__last_name', 'category__name'
+    ))
+
+    df = pd.DataFrame(data)
+
+    # Debug: Print the column types to ensure all datetime columns are correct
+    print("Dataframe columns and types before processing:", df.dtypes)
+
+    # Ensure all datetime columns are timezone-naive
+    datetime_columns = df.select_dtypes(include=['datetime64']).columns
+    for column in datetime_columns:
+        # Debug: Print the datetime column before conversion
+        print(f"Before conversion - Column: {column} - Types: {df[column].dtype}")
+
+        # Convert the column to timezone-naive, removing any timezone information
+        df[column] = df[column].apply(lambda x: x.tz_localize(None) if pd.notnull(x) and x.tz is not None else x)
+
+        # Debug: Check the column after conversion
+        print(f"After conversion - Column: {column} - Types: {df[column].dtype}")
+
+    # Debug: Ensure no datetime columns still have timezone info
+    print("Dataframe columns and types after processing:", df.dtypes)
+
+    # Create a new column for 'Assigned To' as first_name + last_name
+    df['Assigned To'] = df['assigned_to__first_name'] + ' ' + df['assigned_to__last_name']
+    
+    # Drop the individual first and last name columns
+    df.drop(['assigned_to__first_name', 'assigned_to__last_name'], axis=1, inplace=True)
+
+    # Rename columns for better readability
+    df.columns = ['Ticket ID', 'Created At', 'Status', 'Branch', 'Department', 'Assigned To', 'Category']
+
+    # Create an Excel file using openpyxl
+    wb = Workbook()
+    ws1 = wb.active
+    ws1.title = "Ticket Report"
+
+    # Write the DataFrame to the first sheet of the Excel file
+    for r in dataframe_to_rows(df, index=False, header=True):
+        ws1.append(r)
+
+    # Calculate and insert statistics into a new sheet
+    ws2 = wb.create_sheet(title="Statistics")
+
+    # Compute statistics (these should be computed beforehand in your view)
+    ticket_status_counts = df['Status'].value_counts().to_dict()
+    department_counts = df['Department'].value_counts().to_dict()
+    category_counts = df['Category'].value_counts().to_dict()
+    branch_counts = df['Branch'].value_counts().to_dict()
+    assigned_to_counts = df['Assigned To'].value_counts().to_dict()
+
+    # For average times, ensure you have relevant data to compute
+    avg_response_time = 0  # Example: Replace with your logic for response time
+    avg_fixing_time = 0  # Example: Replace with your logic for fixing time
+
+    statistics = [
+        ('Ticket Status Counts', str(ticket_status_counts)),
+        ('Department Counts', str(department_counts)),
+        ('Category Counts', str(category_counts)),
+        ('Branch Counts', str(branch_counts)),
+        ('Assigned To Counts', str(assigned_to_counts)),
+        ('Avg Response Time', str(avg_response_time)),
+        ('Avg Fixing Time', str(avg_fixing_time)),
+    ]
+
+    # Insert statistics into the second sheet
+    for row in statistics:
+        ws2.append(row)
+
+    # Save the workbook to a BytesIO object to return as a file response
+    file_stream = BytesIO()
+    wb.save(file_stream)
+
+    # Seek to the beginning of the file stream
+    file_stream.seek(0)
+
+    # Return the Excel file as a response
+    response = HttpResponse(file_stream, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename="ticket_report.xlsx"'
+
+    return response
