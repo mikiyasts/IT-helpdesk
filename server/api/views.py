@@ -940,15 +940,16 @@ def TicketReportView(request):
         .order_by('created_by__branch')
 
     case_holder_counts = tickets.values('assigned_to__first_name', 'assigned_to__last_name') \
-        .annotate(
-            assigned_to__=Concat(
-                F('assigned_to__first_name'), 
-                Value(' '), 
-                F('assigned_to__last_name')
-            )
-        ) \
-        .annotate(total=Count('id')) \
-        .order_by('assigned_to__')
+    .annotate(
+        assigned_to__=Concat(
+            F('assigned_to__first_name'), 
+            Value(' '), 
+            F('assigned_to__last_name')
+        )
+    ) \
+    .annotate(total=Count('id')) \
+    .order_by('assigned_to__')
+
     try:
      avg_response_time = TicketHistory.objects.filter(field_name='status', new_value='In Progress', ticket__in=tickets) \
         .values('ticket') \
@@ -963,7 +964,6 @@ def TicketReportView(request):
     except:
         avg_response_time=0
     try:
-            
      avg_fixing_time = TicketHistory.objects.filter(field_name='status', new_value='Pending', ticket__in=tickets) \
         .values('ticket') \
         .annotate(
