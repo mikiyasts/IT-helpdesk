@@ -982,8 +982,8 @@ def TicketReportView(request):
         'category_counts': category_counts,
         'branch_counts': branch_counts,
         'case_holder_counts': case_holder_counts,
-        'avg_response_time': avg_response_time['response_time__avg'],
-        'avg_fixing_time': avg_fixing_time['fixing_time__avg']
+        'avg_response_time': convert_duration(avg_response_time['response_time__avg']),
+        'avg_fixing_time': convert_duration(avg_fixing_time['fixing_time__avg'])
     }
 
     response_data = {
@@ -995,49 +995,48 @@ def TicketReportView(request):
 
 
 def generate_excel_report(tickets):
-    # Step 1: Fetch data from the database
+
     data = list(tickets.values(
         'id', 'status', 'created_by__branch', 
         'assigned_to__department__name', 'assigned_to__first_name',
         'assigned_to__last_name', 'category__name'
     ))
 
-    # Step 2: Convert data to DataFrame
+
     df = pd.DataFrame(data)
 
-    # Step 3: Create 'Assigned To' column (combining first name and last name)
     df['Assigned To'] = df['assigned_to__first_name'] + ' ' + df['assigned_to__last_name']
     
-    # Step 4: Drop unnecessary individual columns (we no longer need 'created_at' or other datetime columns)
+  
     df.drop(['assigned_to__first_name', 'assigned_to__last_name'], axis=1, inplace=True)
 
-    # Step 5: Rename columns for better readability
+    
     df.columns = ['Ticket ID', 'Status', 'Branch', 'Department', 'Assigned To', 'Category']
 
-    # Step 6: Create an Excel workbook using openpyxl
+    
     wb = Workbook()
     ws1 = wb.active
     ws1.title = "Ticket Report"
 
-    # Write the DataFrame to the first sheet of the Excel file
+    
     for row in dataframe_to_rows(df, index=False, header=True):
         ws1.append(row)
 
-    # Step 7: Generate statistics for the second sheet
+  
     ws2 = wb.create_sheet(title="Statistics")
 
-    # Example statistics (replace with your actual logic)
+ 
     ticket_status_counts = df['Status'].value_counts().to_dict()
     department_counts = df['Department'].value_counts().to_dict()
     category_counts = df['Category'].value_counts().to_dict()
     branch_counts = df['Branch'].value_counts().to_dict()
     assigned_to_counts = df['Assigned To'].value_counts().to_dict()
 
-    # Example averages (replace with actual logic if available)
-    avg_response_time = 0  # Placeholder
-    avg_fixing_time = 0  # Placeholder
+    
+    avg_response_time = 0 
+    avg_fixing_time = 0 
 
-    # Prepare statistics to be written
+
     statistics = [
         ('Ticket Status Counts', str(ticket_status_counts)),
         ('Department Counts', str(department_counts)),
@@ -1048,19 +1047,19 @@ def generate_excel_report(tickets):
         ('Avg Fixing Time', str(avg_fixing_time)),
     ]
 
-    # Write statistics to the second sheet
+
     for row in statistics:
         ws2.append(row)
 
-    # Step 8: Save the workbook to a BytesIO object
+
     file_stream = BytesIO()
     wb.save(file_stream)
 
-    # Step 9: Seek to the beginning of the file stream
+
     file_stream.seek(0)
 
-    # Step 10: Return the Excel file as an HTTP response
+
     response = HttpResponse(file_stream, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     response['Content-Disposition'] = 'attachment; filename="ticket_report.xlsx"'
 
-    return response
+    return response 
