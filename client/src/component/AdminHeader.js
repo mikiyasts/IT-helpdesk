@@ -1,4 +1,4 @@
-import React,{useState,useEffect} from "react";
+import React,{useState,useEffect, useContext} from "react";
 import axios from "axios";
 import Logo from "../asset/Image/logo.png";
 import QuestionAnswerRoundedIcon from "@mui/icons-material/QuestionAnswerRounded";
@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import Cookies from 'js-cookie'
 import DraftsIcon from '@mui/icons-material/Drafts';
 import DoneAllIcon from '@mui/icons-material/DoneAll'; 
+import { AuthContext } from "../Context/AuthContext";
 
 function Header(props) {
 
@@ -15,6 +16,7 @@ function Header(props) {
   const [logout,setLogout]=useState(false)
   const [notifications,setNotifications]=useState([])
   const [notificationToggle,setNotificationToggle]=useState(false)
+  const {user,setIsAdmin,setIsAuth}=useContext(AuthContext)
 
   const getCsrfToken = () => {
     const cookieValue = document.cookie
@@ -126,10 +128,20 @@ function Header(props) {
           </div>
         </div>
         <div className="user" id="user" onClick={activeLogout}>
-        <AccountCircleRoundedIcon /> <span>Wanofi</span>
+        <AccountCircleRoundedIcon /> <span>{user}</span>
           <div className={`logout ${logout && "active"}`} onClick={()=>{
+            document.cookie = 'access_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+            document.cookie = 'refresh_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
             Cookies.remove('access_token')
             Cookies.remove('refresh_token')
+            sessionStorage.removeItem('isAuth');
+            sessionStorage.removeItem('isAdmin');
+            localStorage.removeItem("user")
+            localStorage.removeItem("isAuth")
+            localStorage.removeItem("isAdmin")
+            localStorage.removeItem("user")
+            setIsAdmin(false)
+            setIsAuth(false)
             navigate("/")
           }}>
             Logout
