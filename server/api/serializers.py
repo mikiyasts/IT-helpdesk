@@ -100,6 +100,7 @@ class TicketSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ticket
         fields = ['id', 'title', 'description', 'status', 'created_at', 'updated_at', 'category', 'assigned_to', 'created_by','attachments']
+
 class RecentTicketSerializer(serializers.ModelSerializer):
     created_by = serializers.SerializerMethodField()
     department = serializers.StringRelatedField(source='department.name')
@@ -202,3 +203,18 @@ class SendMailSerializer(serializers.Serializer):
     address = serializers.EmailField()
     subject = serializers.CharField(max_length=255)
     message = serializers.CharField()
+    
+    
+class ReportTicketSerializer(serializers.ModelSerializer):
+    attachments=TicketAttachmentSerializer(many=True,read_only=True)
+    created_by = CreateTicketUserSerializer(read_only=True)
+    assigned_to = UserSerializer(read_only=True)
+    category = serializers.PrimaryKeyRelatedField(queryset=TicketCategory.objects.all())
+    created_at = serializers.DateTimeField(format='%Y-%m-%d %I:%M %p',read_only=True)
+    history = TicketHistorySerializer(many=True, read_only=True)  # Change here to allow multiple history records
+    solution = TicketCommentSerializer(many=True, read_only=True) 
+
+
+    class Meta:
+        model = Ticket
+        fields = ['id', 'title', 'description', 'status', 'created_at', 'updated_at', 'category', 'assigned_to', 'created_by','history','solution','attachments']
