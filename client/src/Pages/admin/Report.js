@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import axios from 'axios'
+import IosShareIcon from '@mui/icons-material/IosShare';
 function Report() {
 
 
@@ -32,7 +33,7 @@ function Report() {
 
 
     const getReport=async ()=>{
-      await axios.get(`${process.env.REACT_APP_URL}/api/report/tickets?status=${filter?.status}`,{
+      await axios.get(`${process.env.REACT_APP_URL}/api/report/tickets?status=${filter?.status}&department=${filter?.department}`,{
         headers:{
           Authorization:`API_KEY ${process.env.REACT_APP_API_KEY}`
         }
@@ -46,6 +47,21 @@ function Report() {
       })
     }
 
+    const downloadReport=async ()=>{
+      let download=true
+        await axios.get(`${process.env.REACT_APP_URL}/api/report/tickets?status=${filter?.status}&department=${filter?.department}&export=${download}`,{
+          headers:{
+            Authorization:`API_KEY ${process.env.REACT_APP_API_KEY}`
+          }
+        }).then(res=>{
+          setReports(res.data)
+          console.log("report",res);
+        }
+        ).catch(err=>{
+          console.log(err);
+          
+        })
+    }
     useEffect(()=>{
         getDepartment()
       },[])
@@ -53,7 +69,7 @@ function Report() {
         getReport()
       },[filter])
 
-    const deptOpt=department?.map(el=><option key={el.id} value={el.id}>
+    const deptOpt=department?.map(el=><option key={el.id} value={el.name}>
         {el.name}
     </option>)
 
@@ -105,9 +121,12 @@ function Report() {
 
 
 console.log("iuaydoiuasydad",reports);
+console.log("----------------",filter);
 
 
 const filterReport=(e)=>{
+  console.log("filll",e.target.name);
+  
   setFilter(prev=>{
     return{
       ...prev,
@@ -170,6 +189,10 @@ const filterReport=(e)=>{
                 <option value="Kality">Kality</option>
             </select>
         </div>
+        <div className="form-ctrl">
+            <label htmlFor="assigned_to">Export</label>
+            <div className="export" onClick={downloadReport}><IosShareIcon/></div>
+        </div>
       </form>
       <div className="table-wrapper" style={{width:"100%",padding:"1rem 0",height:"63vh",overflow:"scroll",display:"flex",flexDirection:"column",gap:"1rem"}}>
         <div className="card-table" style={{width:"100%"}}>
@@ -206,7 +229,7 @@ const filterReport=(e)=>{
           >
             <h3>All Users <sub style={{color:"#f2f2f2",fontWeight:"lighter",fontSize:"small"}}>{users.length}</sub></h3>
 
-            
+
           </div> */}
           <div className="statistics">
             <h4>Statistics</h4>
