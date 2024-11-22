@@ -29,6 +29,7 @@ function App() {
 
   const [isAuth, setIsAuth] = useState(sessionStorage.getItem("isAuth") || false)
   const [isAdmin, setIsAdmin] = useState(sessionStorage.getItem("isAdmin") || false)
+  const [user,setUser]=useState(localStorage.getItem("user") ||null)
 
   const [page, setPage] = useState(sessionStorage.getItem("page") || "Dashboard")
 
@@ -95,7 +96,7 @@ function App() {
   return (
 
     <div className="App">
-      <AuthContext.Provider value={{ isAuth, setIsAuth,isAdmin, setIsAdmin }}>
+      <AuthContext.Provider value={{ isAuth, setIsAuth,isAdmin, setIsAdmin,user,setUser }}>
         {/* <Header/> */}
         <Routes>
           <Route index element={<Login />}></Route>

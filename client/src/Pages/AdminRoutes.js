@@ -45,6 +45,7 @@ function AdminRoutes() {
       } catch (error) {
         setIsLoading(false);
         setIsAdmin(false);
+        localStorage.removeItem("isAdmin")
         Cookies.remove('access_token', { path: '/' });
         Cookies.remove('refresh_token', { path: '/' });
         Cookies.remove('access_token', { path: '/admin' });

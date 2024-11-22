@@ -12,6 +12,7 @@ import 'react-toastify/dist/ReactToastify.css';
 function Login() {
   const {isAuth,setIsAuth}=useContext(AuthContext)
   const {isAdmin,setIsAdmin}=useContext(AuthContext)
+  const {setUser}=useContext(AuthContext)
   const [tab, setTab] = useState("signin");
   const navigate=useNavigate()
   const [forgotPopup, setforgotPopup] = useState(false)
@@ -55,10 +56,12 @@ sessionStorage.removeItem('isAdmin');
       document.cookie=`access_token=${res.data.access}`
       document.cookie=`refresh_token=${res.data.refresh}`
       setLoading(false)
+      localStorage.setItem("user",res?.data?.user?.username)
+      setUser(res?.data?.user?.username)
       if(res.data?.user?.role==="admin"){
         setIsAdmin(true)
         sessionStorage.setItem("isAdmin",true) 
-        console.log("ad");
+        console.log("adddddddddddddddd",res?.data?.user?.username);
         
         navigate("/admin/dashboard")
       }else if(res.data?.user?.role==="employee"){
