@@ -43,8 +43,8 @@ export default function BarsDataset(props) {
       }}
       xAxis={[{ scaleType: 'band', dataKey: 'month' }]}
       series={[
-        { dataKey: 'Lideta', label: 'Lideta', valueFormatter ,color:"#493775"},
         { dataKey: 'Kality', label: 'Kality', valueFormatter,color:"#ac88df" },
+        { dataKey: 'Lideta', label: 'Lideta', valueFormatter ,color:"#493775"},
         { dataKey: 'Mekanissa', label: 'Mekanissa', valueFormatter,color:"#365be6" },
         { dataKey: 'Farm', label: 'Farm', valueFormatter ,color:"#1dc8ba"},
       ]}

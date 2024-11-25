@@ -39,7 +39,7 @@ function Report() {
 
 
     const getReport=async ()=>{
-      await axios.get(`${process.env.REACT_APP_URL}/api/report/tickets?status=${filter?.status}&department=${filter?.department}&branch=${filter?.branch}&category=${filter?.category}`,{
+      await axios.get(`${process.env.REACT_APP_URL}/api/report/tickets?status=${filter?.status}&department=${filter?.department}&branch=${filter?.branch}&category=${filter?.category}&start_date=${filter?.from}&end_date=${filter?.to}`,{
         headers:{
           Authorization:`API_KEY ${process.env.REACT_APP_API_KEY}`
         }
@@ -116,6 +116,7 @@ function Report() {
 
 
 console.log("iuaydoiuasydad",reports);
+console.log("filterrrrrrrrrrrrrrrrrrrrrr",filter);
 
 
 const filterReport=(e)=>{
