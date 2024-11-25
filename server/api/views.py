@@ -414,7 +414,7 @@ def create_department(request):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(['POST'])
+@api_view(['PATCH'])
 @authentication_classes([APIKeyAuthentication])
 @permission_classes([IsAuthenticated])
 def edit_department(request, pk):

@@ -25,6 +25,7 @@ import AdminRoutes from './Pages/AdminRoutes';
 import ResetPassword from './Pages/ResetPassword';
 import Loading from './Pages/Loading';
 import Report from './Pages/admin/Report';
+import Department from './Pages/admin/Department';
 function App() {
 
   const [isAuth, setIsAuth] = useState(sessionStorage.getItem("isAuth") || false)
@@ -75,7 +76,7 @@ function App() {
             <Link to="/admin/dashboard" onClick={() => setPage("dashboard")} className={page === "dashboard" ? "active":""}><DashboardIcon/> Dashboard</Link>
             <Link to="tickets" onClick={() => setPage("tickets")} className={page === "tickets" ? "active":""}><ConfirmationNumberIcon/> Tickets</Link>
             <Link to="users" onClick={() => setPage("users")} className={page === "users" ? "active":""}><GroupIcon/>Users</Link>
-            <Link to="manage" onClick={() => setPage("manage")} className={page === "manage" ? "active":""}><AssessmentIcon/>Report</Link>
+            <Link to="department" onClick={() => setPage("department")} className={page === "department" ? "active":""}><AssessmentIcon/>Department</Link>
             <Link to="reports" onClick={() => setPage("reports")} className={page === "reports" ? "active":""}><AssessmentIcon/>Report</Link>
           </ul>
         </div>
@@ -112,6 +113,7 @@ function App() {
               <Route path='tickets' element={<Tickets />} />
               <Route path='users' element={<Users />} />
               <Route path='manage' element={<Manage />} />
+              <Route path='department' element={<Department />} />
               <Route path='reports' element={<Report />} />
             </Route>
           </Route>

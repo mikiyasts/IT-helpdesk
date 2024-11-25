@@ -276,13 +276,13 @@ const createUser=(e)=>{
       <div className={`popup ${popupadd &&"active"}`} style={{backgroundColor:"#111827"}}>
         <div className="popup-pin" onClick={()=>{
     setPopupadd(false)
-  }} style={{backgroundColor:"#01f2937"}}></div>
+  }} style={{backgroundColor:"#1f2937"}}></div>
        
         <div className="popup_header"><h2>Add New User</h2></div>
 
         <form className="request-form" onChange={userInput} onSubmit={createUser}>
           <div className="form-ctrl">
-            <label htmlFor="req_name">User Name <span>*</span></label>
+            <label htmlFor="username">User Name <span>*</span></label>
             <input type="text" name="username" id="username" required value={newuser && newuser.username}/>
           </div>
           

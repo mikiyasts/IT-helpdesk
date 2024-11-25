@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import axios from 'axios'
 
 function Report() {
@@ -6,6 +7,7 @@ function Report() {
 
     const [department,setDepartment]=useState([])
     const [reports,setReports]=useState({})
+    const [assignedto,setAssignedto]=useState([])
     const [category,setCategory]=useState([])
     const [statistics,setStatistics]=useState([])
     const [filter,setFilter]=useState({
@@ -19,6 +21,35 @@ function Report() {
     })
 
 
+    const exportReport=async ()=>{
+
+      console.log("exportiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiing");
+      
+      let download=true
+      await axios.get(`${process.env.REACT_APP_URL}/api/report/tickets?assigned_to=${filter.assigned_to}&status=${filter?.status}&department=${filter?.department}&branch=${filter?.branch}&category=${filter?.category}&start_date=${filter?.from}&end_date=${filter?.to}&export=${download}`,{
+        headers:{
+          Authorization:`API_KEY ${process.env.REACT_APP_API_KEY}`
+        }
+      }).then(async res=>{
+        await axios.get(`${process.env.REACT_APP_URL}/api/report/tickets?assigned_to=${filter.assigned_to}&status=${filter?.status}&department=${filter?.department}&branch=${filter?.branch}&category=${filter?.category}&start_date=${filter?.from}&end_date=${filter?.to}&export=false`,{
+          headers:{
+            Authorization:`API_KEY ${process.env.REACT_APP_API_KEY}`
+          }
+        }).then(res=>{
+          
+          console.log("report",res);
+        }
+        ).catch(err=>{
+          console.log(err);
+          
+        })
+        console.log("report",res);
+      }
+      ).catch(err=>{
+        console.log(err);
+        
+      })
+    }
     const getDepartment=async ()=>{
       await axios.get(`${process.env.REACT_APP_URL}/api/departments`,{
             headers:{
@@ -39,7 +70,7 @@ function Report() {
 
 
     const getReport=async ()=>{
-      await axios.get(`${process.env.REACT_APP_URL}/api/report/tickets?status=${filter?.status}&department=${filter?.department}&branch=${filter?.branch}&category=${filter?.category}&start_date=${filter?.from}&end_date=${filter?.to}`,{
+      await axios.get(`${process.env.REACT_APP_URL}/api/report/tickets?assigned_to=${filter.assigned_to}&status=${filter?.status}&department=${filter?.department}&branch=${filter?.branch}&category=${filter?.category}&start_date=${filter?.from}&end_date=${filter?.to}`,{
         headers:{
           Authorization:`API_KEY ${process.env.REACT_APP_API_KEY}`
         }
@@ -53,9 +84,27 @@ function Report() {
       })
     }
 
+    const getAssignedto=async ()=>{
+
+      await axios.get(`${process.env.REACT_APP_URL}/api/systemusers/`, {
+        headers: {
+          Authorization: `API_KEY ${process.env.REACT_APP_API_KEY}`,
+        },
+      })
+      .then((res) =>{
+        console.log("useerklvmvlksd",res.data);
+        
+                setAssignedto(res.data.filter(fl=>fl.department==="IT"))
+                console.log("assigned to",assignedto);
+                
+      })
+      .catch((err) => console.log(err));
+    }
     useEffect(()=>{
         getDepartment()
+        getAssignedto()
       },[])
+
       useEffect(()=>{
         getReport()
       },[filter])
@@ -67,6 +116,12 @@ function Report() {
     const deptOpt=department?.map(el=><option key={el.id} value={el.name}>
         {el.name}
     </option>)
+    const assignedtOpt=assignedto?.map(el=><option key={el.id} value={el.email}>
+        {el.username}
+    </option>)
+
+
+console.log("assgdtebnbujc",assignedto);
 
 
     let rwno=0
@@ -175,10 +230,12 @@ const filterReport=(e)=>{
             <label htmlFor="assigned_to">Assigned To</label>
             <select name="assigned_to" value={filter.assigned_to}>
                 <option value="">Select Holder</option>
-                <option value="Lideta">Lideta</option>
-                <option value="Mekanissa">Mekanissa</option>
-                <option value="Kality">Kality</option>
+                {assignedtOpt}
             </select>
+        </div>
+        <div className="form-ctrl">
+            <label htmlFor="assigned_to">Export</label>
+            <div onClick={exportReport}><FileDownloadIcon/></div>
         </div>
       </form>
       <div className="table-wrapper" style={{width:"100%",padding:"1rem 0",height:"63vh",overflow:"scroll",display:"flex",flexDirection:"column",gap:"1rem"}}>
