@@ -452,16 +452,16 @@ def admin_dashboard(request):
     current_month = datetime.now().month
 
 
-    kaliti_requests = Ticket.objects.filter(created_by__branch='kaliti', created_at__month=current_month).count()
-    lideta_requests = Ticket.objects.filter(created_by__branch='lideta', created_at__month=current_month).count()
-    mekanissa_requests = Ticket.objects.filter(created_by__branch='mekanissa', created_at__month=current_month).count()
-    farm_requests = Ticket.objects.filter(created_by__branch='farm', created_at__month=current_month).count()
+    kaliti_requests = Ticket.objects.filter(created_by__branch='Kaliti',created_at__month=current_month ).count()
+    lideta_requests = Ticket.objects.filter(created_by__branch='Lideta', created_at__month=current_month).count()
+    mekanissa_requests = Ticket.objects.filter(created_by__branch='Mekanissa' ,created_at__month=current_month).count()
+    farm_requests = Ticket.objects.filter(created_by__branch='Farm',created_at__month=current_month ).count()
 
     # Get category counts
     categories = TicketCategory.objects.all()
     category_counts = {}
     for category in categories:
-        category_counts[category.name] = Ticket.objects.filter(category=category).count()
+        category_counts[category.name] = Ticket.objects.filter(category=category,created_at__month=current_month).count()
 
     # Get recent 10 requests
     recent_requests = Ticket.objects.all().order_by('-created_at')[:10]
@@ -896,6 +896,7 @@ def TicketReportView(request):
     if end_date_filter:
         end_date = parse_datetime(end_date_filter)
         if end_date:
+            end_date = end_date.replace(hour=23, minute=59, second=59, microsecond=999999)
             filters &= Q(created_at__lte=end_date)
 
     if status_filter:
