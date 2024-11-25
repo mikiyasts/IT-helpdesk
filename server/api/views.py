@@ -4,6 +4,8 @@ from io import BytesIO
 from time import localtime
 from django.db.models import Q
 from email.mime.text import MIMEText
+from django.utils import timezone
+from datetime import timedelta
 import json
 from openpyxl import Workbook
 from openpyxl.utils.dataframe import dataframe_to_rows
@@ -891,12 +893,18 @@ def TicketReportView(request):
     if start_date_filter:
         start_date = parse_datetime(start_date_filter)
         if start_date:
+            # Make sure it's timezone-aware
+            if timezone.is_naive(start_date):
+                start_date = timezone.make_aware(start_date, timezone.get_current_timezone())
             filters &= Q(created_at__gte=start_date)
 
     if end_date_filter:
         end_date = parse_datetime(end_date_filter)
         if end_date:
+            # Ensure end date is timezone-aware and at the last moment of the day
             end_date = end_date.replace(hour=23, minute=59, second=59, microsecond=999999)
+            if timezone.is_naive(end_date):
+                end_date = timezone.make_aware(end_date, timezone.get_current_timezone())
             filters &= Q(created_at__lte=end_date)
 
     if status_filter:
@@ -952,31 +960,33 @@ def TicketReportView(request):
     .order_by('assigned_to__')
 
     try:
-     avg_response_time = TicketHistory.objects.filter(field_name='status', new_value='In Progress', ticket__in=tickets) \
-        .values('ticket') \
-        .annotate(
-            response_time=Avg(
-                ExpressionWrapper(
-                    F('updated_at') - F('ticket__created_at'),
-                    output_field=fields.DurationField()
+        avg_response_time = TicketHistory.objects.filter(field_name='status', new_value='In Progress', ticket__in=tickets) \
+            .values('ticket') \
+            .annotate(
+                response_time=Avg(
+                    ExpressionWrapper(
+                        F('updated_at') - F('ticket__created_at'),
+                        output_field=fields.DurationField()
+                    )
                 )
-            )
-        ).aggregate(Avg('response_time'))
+            ).aggregate(Avg('response_time'))
     except:
         avg_response_time=0
+    
     try:
-     avg_fixing_time = TicketHistory.objects.filter(field_name='status', new_value='Pending', ticket__in=tickets) \
-        .values('ticket') \
-        .annotate(
-            fixing_time=Avg(
-                ExpressionWrapper(
-                    F('updated_at') - F('ticket__created_at'),
-                    output_field=fields.DurationField()
+        avg_fixing_time = TicketHistory.objects.filter(field_name='status', new_value='Pending', ticket__in=tickets) \
+            .values('ticket') \
+            .annotate(
+                fixing_time=Avg(
+                    ExpressionWrapper(
+                        F('updated_at') - F('ticket__created_at'),
+                        output_field=fields.DurationField()
+                    )
                 )
-            )
-        ).aggregate(Avg('fixing_time'))
+            ).aggregate(Avg('fixing_time'))
     except:
         avg_fixing_time=0
+    
     statistics = {
         'ticket_status_counts': ticket_status_counts,
         'department_counts': department_counts,
@@ -993,7 +1003,6 @@ def TicketReportView(request):
     }
 
     return Response(response_data, status=status.HTTP_200_OK)
-
 
 def generate_excel_report(tickets):
     # Step 1: Fetch data from the database
