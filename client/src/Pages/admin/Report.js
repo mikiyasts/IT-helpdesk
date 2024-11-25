@@ -27,10 +27,20 @@ function Report() {
       
       let download=true
       await axios.get(`${process.env.REACT_APP_URL}/api/report/tickets?assigned_to=${filter.assigned_to}&status=${filter?.status}&department=${filter?.department}&branch=${filter?.branch}&category=${filter?.category}&start_date=${filter?.from}&end_date=${filter?.to}&export=${download}`,{
+        responseType: 'blob',
         headers:{
-          Authorization:`API_KEY ${process.env.REACT_APP_API_KEY}`
+          Authorization:`API_KEY ${process.env.REACT_APP_API_KEY}`,
+          'Content-Type': 'application/json'
         }
       }).then(async res=>{
+
+        const type = res.headers['content-type']
+          const blob = new Blob([res.data], { type: type, encoding: 'UTF-8' })
+          const link = document.createElement('a')
+          link.href = window.URL.createObjectURL(blob)
+          link.download =`Report`
+          link.click()
+
         await axios.get(`${process.env.REACT_APP_URL}/api/report/tickets?assigned_to=${filter.assigned_to}&status=${filter?.status}&department=${filter?.department}&branch=${filter?.branch}&category=${filter?.category}&start_date=${filter?.from}&end_date=${filter?.to}&export=false`,{
           headers:{
             Authorization:`API_KEY ${process.env.REACT_APP_API_KEY}`
