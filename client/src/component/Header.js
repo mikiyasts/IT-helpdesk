@@ -79,7 +79,7 @@ function Header() {
     
     return(
       <li>
-        <div className='notification_header'><h4>{`${requestor[requestor.length-2]} ${requestor[requestor.length-1]}`} </h4> <div className="mark_as_read" title="mark as read" onClick={()=>markasRead(el.id)}><DraftsIcon sx={{fontSize:20}}/></div></div>
+        <div className='notification_header'><div className="mark_as_read" title="mark as read" onClick={()=>markasRead(el.id)}><DraftsIcon sx={{fontSize:20}}/></div></div>
         <h5>{el.notification_type}</h5>
         <p>{el.message}</p>
       </li>
