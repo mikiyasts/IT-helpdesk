@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import axios from 'axios'
+
 function Report() {
 
 
     const [department,setDepartment]=useState([])
     const [reports,setReports]=useState({})
+    const [category,setCategory]=useState([])
     const [statistics,setStatistics]=useState([])
     const [filter,setFilter]=useState({
       from:"",
@@ -28,11 +30,16 @@ function Report() {
             console.log("You are Not Authorized !!");
             
           })
+          await axios.get(`${process.env.REACT_APP_URL}/api/list_ticket_category/`,{
+            headers:{
+              Authorization: `API_KEY ${process.env.REACT_APP_API_KEY}`,
+            }
+          }).then(res=>setCategory(res.data)).catch(err=>console.log(err))
     }
 
 
     const getReport=async ()=>{
-      await axios.get(`${process.env.REACT_APP_URL}/api/report/tickets?status=${filter?.status}`,{
+      await axios.get(`${process.env.REACT_APP_URL}/api/report/tickets?status=${filter?.status}&department=${filter?.department}&branch=${filter?.branch}&category=${filter?.category}`,{
         headers:{
           Authorization:`API_KEY ${process.env.REACT_APP_API_KEY}`
         }
@@ -53,7 +60,11 @@ function Report() {
         getReport()
       },[filter])
 
-    const deptOpt=department?.map(el=><option key={el.id} value={el.id}>
+    
+    const catOpt=category?.map(el=><option key={el.id} value={el.name}>
+        {el.name}
+    </option>)
+    const deptOpt=department?.map(el=><option key={el.id} value={el.name}>
         {el.name}
     </option>)
 
@@ -128,11 +139,9 @@ const filterReport=(e)=>{
         </div>
         <div className="form-ctrl">
             <label htmlFor="category">Category</label>
-            <select name="category" value={filter.branch}>
+            <select name="category" value={filter.category}>
                 <option value="">Select Branch</option>
-                <option value="Lideta">Lideta</option>
-                <option value="Mekanissa">Mekanissa</option>
-                <option value="Farm">Farm</option>
+                {catOpt}
             </select>
         </div>
         <div className="form-ctrl">
@@ -154,7 +163,7 @@ const filterReport=(e)=>{
         <div className="form-ctrl">
             <label htmlFor="status">Status</label>
             <select name="status"  value={filter.status}>
-                <option value=" ">Select Status</option>
+                <option value="">Select Status</option>
                 <option value="Open">Open</option>
                 <option value="Closed">Closed</option>
                 <option value="Pending">Pending</option>
@@ -205,6 +214,7 @@ const filterReport=(e)=>{
             style={{ padding: "1.5rem", borderBottom: ".5px solid #f2f2f225" }}
           >
             <h3>All Users <sub style={{color:"#f2f2f2",fontWeight:"lighter",fontSize:"small"}}>{users.length}</sub></h3>
+
 
           </div> */}
           <div className="statistics">
