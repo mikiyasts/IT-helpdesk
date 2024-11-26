@@ -1003,28 +1003,36 @@ def TicketReportView(request):
     }
 
     return Response(response_data, status=status.HTTP_200_OK)
-
 def generate_excel_report(tickets):
     # Step 1: Fetch data from the database
     data = list(tickets.values(
-        'id', 'status', 'created_by__branch', 
+        'id', 'status', 'created_by__branch', 'created_at',
         'assigned_to__department__name', 'assigned_to__first_name',
-        'assigned_to__last_name', 'category__name'
+        'category__name', 'created_by__first_name', 'created_by__last_name'
     ))
 
     # Step 2: Convert data to DataFrame
     df = pd.DataFrame(data)
 
-    # Step 3: Create 'Assigned To' column (combining first name and last name)
-    df['Assigned To'] = df['assigned_to__first_name'] + ' ' + df['assigned_to__last_name']
-    
-    # Step 4: Drop unnecessary individual columns (we no longer need 'created_at' or other datetime columns)
-    df.drop(['assigned_to__first_name', 'assigned_to__last_name'], axis=1, inplace=True)
+    # Step 3: Remove timezone information from 'created_at' column
+    df['created_at'] = df['created_at'].apply(lambda x: x.replace(tzinfo=None))
 
-    # Step 5: Rename columns for better readability
-    df.columns = ['Ticket ID', 'Status', 'Branch', 'Department', 'Assigned To', 'Category']
+    # Step 4: Create 'Created By' column (combining first name and last name)
+    df['Created By'] = df['created_by__first_name'] + ' ' + df['created_by__last_name']
 
-    # Step 6: Create an Excel workbook using openpyxl
+    # Step 5: Drop unnecessary individual columns
+    df.drop(['created_by__first_name', 'created_by__last_name'], axis=1, inplace=True)
+
+    # Step 6: Rename columns for better readability
+    df.columns = ['Ticket ID', 'Status', 'Branch', 'Created At', 'Department', 'Assigned To', 'Category', 'Created By']
+
+    # Step 7: Ensure row order is preserved
+    df.reset_index(drop=True, inplace=True)
+
+    # Ensure column order is as expected
+    df = df[['Ticket ID', 'Status', 'Branch', 'Created At', 'Department', 'Assigned To', 'Category', 'Created By']]
+
+    # Step 8: Create an Excel workbook using openpyxl
     wb = Workbook()
     ws1 = wb.active
     ws1.title = "Ticket Report"
@@ -1033,7 +1041,7 @@ def generate_excel_report(tickets):
     for row in dataframe_to_rows(df, index=False, header=True):
         ws1.append(row)
 
-    # Step 7: Generate statistics for the second sheet
+    # Step 9: Generate statistics for the second sheet
     ws2 = wb.create_sheet(title="Statistics")
 
     # Example statistics (replace with your actual logic)
@@ -1047,29 +1055,64 @@ def generate_excel_report(tickets):
     avg_response_time = 0  # Placeholder
     avg_fixing_time = 0  # Placeholder
 
-    # Prepare statistics to be written
-    statistics = [
-        ('Ticket Status Counts', str(ticket_status_counts)),
-        ('Department Counts', str(department_counts)),
-        ('Category Counts', str(category_counts)),
-        ('Branch Counts', str(branch_counts)),
-        ('Assigned To Counts', str(assigned_to_counts)),
-        ('Avg Response Time', str(avg_response_time)),
-        ('Avg Fixing Time', str(avg_fixing_time)),
-    ]
+    # Write a header row for the statistics sheet
+    ws2.append(['Statistic', 'Count'])
 
-    # Write statistics to the second sheet
-    for row in statistics:
-        ws2.append(row)
+    # Write statistics to be more visually appealing
+    ws2.append(['Ticket Status Counts'])
+    for status, count in ticket_status_counts.items():
+        ws2.append([status, count])
 
-    # Step 8: Save the workbook to a BytesIO object
+    ws2.append([''])  # Empty row for separation
+
+    ws2.append(['Department Counts'])
+    for department, count in department_counts.items():
+        ws2.append([department, count])
+
+    ws2.append([''])  # Empty row for separation
+
+    ws2.append(['Category Counts'])
+    for category, count in category_counts.items():
+        ws2.append([category, count])
+
+    ws2.append([''])  # Empty row for separation
+
+    ws2.append(['Branch Counts'])
+    for branch, count in branch_counts.items():
+        ws2.append([branch, count])
+
+    ws2.append([''])  # Empty row for separation
+
+    ws2.append(['Assigned To Counts'])
+    for assignee, count in assigned_to_counts.items():
+        ws2.append([assignee, count])
+
+    ws2.append([''])  # Empty row for separation
+
+    # Write average response and fixing time (if any)
+    ws2.append(['Avg Response Time', avg_response_time])
+    ws2.append(['Avg Fixing Time', avg_fixing_time])
+
+    # Step 10: Add some basic formatting
+    from openpyxl.styles import Font, Alignment
+
+    # Apply bold to the header row
+    for cell in ws2[1]:
+        cell.font = Font(bold=True)
+
+    # Center align the text in the statistics sheet
+    for row in ws2.iter_rows(min_row=2, min_col=1, max_col=2):
+        for cell in row:
+            cell.alignment = Alignment(horizontal='center')
+
+    # Step 11: Save the workbook to a BytesIO object
     file_stream = BytesIO()
     wb.save(file_stream)
 
-    # Step 9: Seek to the beginning of the file stream
+    # Step 12: Seek to the beginning of the file stream
     file_stream.seek(0)
 
-    # Step 10: Return the Excel file as an HTTP response
+    # Step 13: Return the Excel file as an HTTP response
     response = HttpResponse(file_stream, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     response['Content-Disposition'] = 'attachment; filename="ticket_report.xlsx"'
 
