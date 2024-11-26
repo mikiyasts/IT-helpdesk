@@ -3,6 +3,8 @@ import AddIcon from '@mui/icons-material/Add';
 import axios from "axios";
 import LoadingBtn from "../../component/LoadingBtn";
 import EditIcon from '@mui/icons-material/Edit';
+import Pagination from '../../component/Pagination';
+
 function Users() {
   const [users, setUsers] = useState([]);
   const [popup,setPopup]=useState(false)
@@ -10,6 +12,7 @@ function Users() {
   const [form,setForm]=useState({})
   const [edited,setEdited]=useState({})
   const [dept,setDept]=useState([])
+  const [keyword,setKeyword]=useState("")
   const [loading,setLoading]=useState(false)
   const [newuser,setNewuser]=useState({
     username:"",
@@ -21,6 +24,16 @@ function Users() {
     first_name:"",
     last_name:""
 })
+
+
+const [currentPage, setCurrentPage] = useState(1);
+const [recordsPerPage] = useState(20);
+const indexOfLastRecord = currentPage * recordsPerPage;
+const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
+
+const currentRecords = users.slice(indexOfFirstRecord, 
+indexOfLastRecord);
+const nPages = Math.ceil(users.length / recordsPerPage)
   useEffect(() => {
 
     axios
@@ -57,7 +70,10 @@ function Users() {
       .catch((err) => console.log(err));
   }
   console.log(users);
-  const tableRw = users.map((el) => (
+  console.log(keyword);
+  const tableRw = currentRecords.filter(fl=>{
+    return `${fl?.first_name} ${fl?.last_name}`.toLowerCase().includes(keyword.toLowerCase())
+  }).map((el) => (
     <tr>
       <td data-cell="ID">{el.id}</td>
       <td data-cell="User name">{`${el?.first_name} ${el?.last_name}`} </td>
@@ -186,6 +202,10 @@ const createUser=(e)=>{
   })
 }
 
+const search=(e)=>{
+  setKeyword(e.target.value)
+}
+
 
   return (
     <div className="admin-dashboard">
@@ -197,6 +217,7 @@ const createUser=(e)=>{
             style={{ padding: "1.5rem", borderBottom: ".5px solid #f2f2f225" }}
           >
             <h3>All Users <sub style={{color:"#f2f2f2",fontWeight:"lighter",fontSize:"small"}}>{users.length}</sub></h3>
+            <form ><input type="text" name="user" id="user" className="search-input" placeholder="Search" onChange={search}/></form>
             <button className="btn-login" title="Add User" onClick={()=>{setPopupadd(true); setPopup(false)}}><AddIcon/><span>Add User</span></button>
 
           </div>
@@ -217,6 +238,11 @@ const createUser=(e)=>{
                 
               </tbody>
             </table>
+            <Pagination
+            nPages={nPages}
+            currentPage={currentPage}
+            setCurrentPage={setCurrentPage}
+            />
           </div>
         </div>
       </div>
