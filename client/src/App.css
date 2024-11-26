@@ -173,6 +173,7 @@
 
 .notification{
   position: relative;
+
 }
 .notification.active::after{
   content: attr(aria-valuenow);
@@ -202,7 +203,7 @@
   scrollbar-color: transparent transparent;
   scrollbar-width: thin;
   background-color: var(--body-bg-primary);
-  z-index: 2 ;
+  z-index: 2;
   visibility: hidden;
   opacity: 0;
   transition: visibility .2s ease-in-out,opacity .2s ease-in-out;
@@ -869,7 +870,7 @@ svg .css-1qkz8p7{
   stroke: none;
   stroke-width: 0;
 }
- @media (max-width:495px) {
+ @media (max-width:815px) {
   .admin-dashboard .table-wrapper .card-header .btn-login{
     padding: 4px 8px;
   }
@@ -1075,6 +1076,8 @@ svg .css-1qkz8p7{
  display: flex;
  height: 80vh;
  gap: .1rem;
+ position:relative;
+ overflow: hidden;
 }
 
 .tickets-main>div{
@@ -1086,6 +1089,7 @@ svg .css-1qkz8p7{
   border-top-left-radius: 15px;
 }
 .tickets-main .tickets-preview{
+  position: relative;
   min-width: 55%;
   overflow: scroll;
   scrollbar-color: transparent transparent;
@@ -1098,6 +1102,14 @@ svg .css-1qkz8p7{
   display: flex;
   align-items: center;
   justify-content: space-between;
+}
+.tickets-preview .expand-ticketlist,.tickets-list .expand-ticketlist{
+  display: none;
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  filter: grayscale(1);
 }
 .ticket-history .state{
   display: flex;
@@ -1145,6 +1157,8 @@ svg .css-1qkz8p7{
 .refresh{
   animation:1s linear infinite refresh;
 }
+
+
 
 @keyframes refresh {
   0%{
@@ -1330,7 +1344,7 @@ svg .css-1qkz8p7{
   opacity: 0;
   visibility: hidden;
   transition: all .1s;
-  z-index: 2000;
+  z-index: 3;
   border-bottom:1px solid var(--body-bg-primary);
 }
 .ticket-highlight-datail .detail-header>ul.active{
@@ -1357,6 +1371,25 @@ svg .css-1qkz8p7{
   100%{
     opacity: 1;
     visibility: visible;
+  }
+}
+
+@media (max-width:710px){
+  .tickets-list{
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    width:fit-content !important;
+    transform: translateX(-100%);
+    transition: .5s transform ease-in-out;
+    border-right: 3px solid var(--body-bg-primary);
+  }
+  .tickets-list.expand{
+    transform: translateX(0);
+    
+  }
+  .tickets-preview .expand-ticketlist,.tickets-list .expand-ticketlist{
+    display: block;
   }
 }
 

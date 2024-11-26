@@ -4,7 +4,8 @@ import axios from "axios";
 import LoadingBtn from "../../component/LoadingBtn";
 import EditIcon from '@mui/icons-material/Edit';
 import Pagination from '../../component/Pagination';
-
+import { ToastContainer, toast } from 'react-toastify';
+  import 'react-toastify/dist/ReactToastify.css';
 function Users() {
   const [users, setUsers] = useState([]);
   const [popup,setPopup]=useState(false)
@@ -72,6 +73,7 @@ const nPages = Math.ceil(users.length / recordsPerPage)
   console.log(users);
   console.log(keyword);
   const tableRw = currentRecords.filter(fl=>{
+
     return `${fl?.first_name} ${fl?.last_name}`.toLowerCase().includes(keyword.toLowerCase())
   }).map((el) => (
     <tr>
@@ -157,9 +159,13 @@ const submitEdit=(e)=>{
     setEdited({})
     setForm({})
     refreshData()
+    toast.success("User Editted Successfuly")
     console.log("succes",res);
     
   }).catch(err=>{
+    setPopup(false)
+    toast.error("User Edit Failed")
+
     console.log(err,"errr");
     
   })
@@ -194,9 +200,12 @@ const createUser=(e)=>{
       last_name:""
   })
     refreshData()
+    toast.success("User Created Successfuly")
     console.log("succes",res);
     
   }).catch(err=>{
+    toast.error("Creating User Failed")
+
     console.log(err,"errr");
     
   })
@@ -209,6 +218,7 @@ const search=(e)=>{
 
   return (
     <div className="admin-dashboard">
+      <ToastContainer />
       
       <div className="table-wrapper">
         <div className="card-table">
