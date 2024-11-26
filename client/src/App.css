@@ -374,6 +374,7 @@
   justify-content: space-between;
 
 }
+
 .admin-dashboard .table-wrapper{
   height: 100%;
   overflow: scroll;
@@ -388,6 +389,7 @@
   justify-content: center;
   gap:.5rem;
 }
+
 .signup{
   color: var(--font-color-secondary);
   width: 55%;
@@ -801,7 +803,44 @@
   height: 10%;
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  position: relative;
 }
+.card-header form{
+  width: 40%;
+}
+.search-input{
+  width: 100%;
+  border: 1px solid var(--body-bg-primary);
+  background-color: var(--accent-primary);
+  padding: .4rem;
+  color: white;
+}
+.search-input:focus{
+  outline: none;
+}
+@media (max-width:636px) {
+  .card-header form{
+    width: 30px;
+    height: 30px;
+    position: relative;
+  }
+  .search-input{
+    height: 100%;
+    border-radius: 50%;
+  }
+  .search-input:focus{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    width: 200px;
+    border-radius: 0;
+    z-index: 5;
+  }
+  
+}
+
 .admin-dashboard .cards .card-chart .charts{
   /* overflow: scroll; */
   height: 90%;
