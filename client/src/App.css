@@ -632,6 +632,7 @@
   flex-direction: column;
   align-items: center;
   gap: .3rem;
+  font-size: small;
 }
 
 .sidebar .logo{
