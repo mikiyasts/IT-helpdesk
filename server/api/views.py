@@ -258,56 +258,36 @@ def create_ticket(request):
     serializer = TicketSerializer(data=request.data)
     
     if serializer.is_valid():
-       
-        ticket = serializer.save(created_by=request.user)
-        
-        
-        files = request.FILES.getlist('attachments')
-        for file in files:
-            Attachment.objects.create(ticket=ticket, file=file)
-        
-        
-        it_officers = User.objects.filter(role="admin")
-        requestor = request.user
+    # Save the ticket and associate it with the logged-in user
+     ticket = serializer.save(created_by=request.user)
+
+    # Handle file attachments
+     files = request.FILES.getlist('attachments')
+     for file in files:
+        Attachment.objects.create(ticket=ticket, file=file)
+
+    # Get the branch of the user who created the ticket
+     ticket_branch = ticket.created_by.branch
+    
+    # Get all IT officers (admins) in the same branch
+     it_officers = User.objects.filter(role="admin", branch=ticket_branch)
+
+    # For each IT officer, send both SMS and email
+    for it_officer in it_officers:
+        phone_number = it_officer.phone_number  # Assuming phone number is in User model
+
+        # Ticket details
+        requestor = request.user  # The user who created the ticket (requestor)
         ticket_title = ticket.title
         ticket_description = ticket.description
-        ticket_category = ticket.category.name  # Assuming 'name' is the field that holds the category name
-        
-        requestor_message = f"""
-Awash Wine S.C IT Helpdesk
----------------------------
-Your Ticket Request has been successfully submitted.
+        ticket_status = ticket.status
+        ticket_category = ticket.category.name  # Assuming 'name' is the field for category
+        assigned_to = ticket.assigned_to.first_name if ticket.assigned_to else "Not Assigned"
+        requestor_name = f"{requestor.first_name} {requestor.last_name}"
+        requestor_department = requestor.department  # Assuming there's a 'department' field
 
-🔹 Ticket Title: {ticket_title}
-🔹 Category: {ticket_category}
-🔹 Description: {ticket_description}
-
-Your request is currently under review. Someone will be assigned to it shortly.
-
-For updates, please log in to the IT Helpdesk system:
-https://localhost:3000/
-
-Best regards,
-Awash Wine S.C IT Helpdesk
-"""
-        send_message('drinkawash.com', 9797, 'admin', '@dIff%nSms0', requestor.phone_number, requestor_message)
-        # Create the SMS message for each IT officer
-        for it_officer in it_officers:
-            
-            phone_number = it_officer.phone_number  # Assuming you have phone numbers stored in the User model
-            
-            # Get ticket details
-            requestor = request.user
-            ticket_title = ticket.title
-            ticket_description = ticket.description
-            ticket_status = ticket.status
-            ticket_category = ticket.category.name  # Assuming 'name' is the field that holds the category name
-            assigned_to = ticket.assigned_to.first_name if ticket.assigned_to else "Not Assigned"
-            requestor_name = f"{requestor.first_name} {requestor.last_name}"
-            requestor_department = requestor.department  # Assuming you have a 'department' field
-            
-            # Format the message
-            message = f"""
+        # Format SMS message
+        message = f"""
 Awash Wine S.C IT Helpdesk
 ---------------------------
 New Ticket Request
@@ -326,16 +306,42 @@ https://localhost:3000/
 Best regards,
 Awash Wine S.C IT Helpdesk
 """
-           
 
-            # Send SMS using the function you mentioned
-            send_message('drinkawash.com', 9797, 'admin', '@dIff%nSms0', phone_number, message)
-          
-            
+        # Send the SMS
+        print("Sending SMS to", phone_number)
+        send_message('drinkawash.com', 9797, 'user', 'admin', phone_number, message)  # SMS sending function
+
+        # Prepare email details for IT officers
+        email_subject = 'New Support Ticket Request'
+        ticketurl=f"http://localhost:3000"
+        # Render the email using the template (pass ticket info and IT officer data)
+        email_message = render_to_string('new_ticket.html', {
+            'user': ticket.created_by,
+            'ticket_description': ticket_description,
+            'ticket_created_at': ticket.created_at,
+            'ticket_title': ticket_title,
+            'assigned_to': assigned_to,
+            'ticket_status': ticket_status,
+            'ticket_category': ticket_category,
+            'requestor_name': requestor_name,
+            'requestor_department': requestor_department,
+            'ticketurl':ticketurl
+        })
+        print(f"sending email to {it_officer.email}")
+        # Send the email to the IT officer
+        send_mail(
+            email_subject,              # Subject of the email
+            email_message,              # HTML email content
+            settings.EMAIL_HOST_USER,   # Sender's email address (configured in Django settings)
+            [it_officer.email],         # Recipient's email address (IT officer)
+            html_message=email_message  # HTML content for the email
+        )
+        
+    # Return a successful response
         return Response(serializer.data, status=status.HTTP_201_CREATED)
-    
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+# If serializer is not valid, return errors
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
 @authentication_classes([APIKeyAuthentication])
@@ -926,8 +932,7 @@ def TicketReportView(request):
     tickets = Ticket.objects.filter(filters).order_by('-created_at')
 
     # If user wants to export to Excel
-    if export_flag.lower() == 'true':
-        return generate_excel_report(tickets)
+    
 
     # If no export, return normal JSON report
     ticket_serializer = ReportTicketSerializer(tickets, many=True)
@@ -1001,9 +1006,11 @@ def TicketReportView(request):
         'report': ticket_serializer.data,
         'statistics': statistics
     }
+    if export_flag.lower() == 'true':
+        return generate_excel_report(tickets, avg_response_time, avg_fixing_time)
 
     return Response(response_data, status=status.HTTP_200_OK)
-def generate_excel_report(tickets):
+def generate_excel_report(tickets, avg_response_time, avg_fixing_time):
     # Step 1: Fetch data from the database
     data = list(tickets.values(
         'id', 'status', 'created_by__branch', 'created_at',
@@ -1051,10 +1058,6 @@ def generate_excel_report(tickets):
     branch_counts = df['Branch'].value_counts().to_dict()
     assigned_to_counts = df['Assigned To'].value_counts().to_dict()
 
-    # Example averages (replace with actual logic if available)
-    avg_response_time = 0  # Placeholder
-    avg_fixing_time = 0  # Placeholder
-
     # Write a header row for the statistics sheet
     ws2.append(['Statistic', 'Count'])
 
@@ -1089,9 +1092,28 @@ def generate_excel_report(tickets):
 
     ws2.append([''])  # Empty row for separation
 
+    # Extract the actual timedelta values from the dictionaries
+    avg_response_time_delta = avg_response_time.get('response_time__avg')
+    avg_fixing_time_delta = avg_fixing_time.get('fixing_time__avg')
+
+    # Convert timedelta to seconds for avg_response_time and avg_fixing_time if they are not None
+    if avg_response_time_delta is not None:
+        avg_response_time_seconds = avg_response_time_delta.total_seconds()
+    else:
+        avg_response_time_seconds = 0
+
+    if avg_fixing_time_delta is not None:
+        avg_fixing_time_seconds = avg_fixing_time_delta.total_seconds()
+    else:
+        avg_fixing_time_seconds = 0
+
+    # Format the average times using convert_duration
+    avg_response_time_formatted = convert_duration(avg_response_time_seconds)
+    avg_fixing_time_formatted = convert_duration(avg_fixing_time_seconds)
+
     # Write average response and fixing time (if any)
-    ws2.append(['Avg Response Time', avg_response_time])
-    ws2.append(['Avg Fixing Time', avg_fixing_time])
+    ws2.append(['Avg Response Time', avg_response_time_formatted])
+    ws2.append(['Avg Fixing Time', avg_fixing_time_formatted])
 
     # Step 10: Add some basic formatting
     from openpyxl.styles import Font, Alignment

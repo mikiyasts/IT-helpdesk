@@ -24,6 +24,7 @@ def create_notification_on_ticket_creation(sender, instance, created, **kwargs):
         #     )
         
         # Notify all admins
+        users=instance.created_by
         admins = User.objects.filter(role='admin')
         for admin in admins:
             Notification.objects.create(

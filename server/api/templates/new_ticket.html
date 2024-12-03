@@ -1,35 +1,100 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>New Support Ticket Request</title>
+    <style>
+        body {
+            background-color: #111827;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            min-width: 450px;
+            padding: 20px;
+            margin: 0;
+        }
+        .container {
+            background-color: #1f2937;
+            color: white;
+            padding: 1rem;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 600px;
+            margin: 2rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+        .header {
+            display: flex;
+            justify-content: center;
+            border-bottom: 1px solid #939ba7;
+            padding-bottom: 1rem;
+            margin-bottom: 1rem;
+        }
+        h1 {
+            font-size: 24px;
+            color: #fff;
+        }
+        .content p {
+            font-size: 16px;
+            line-height: 1.5;
+            margin-bottom: 1rem;
+        }
+        .content ul {
+            color: white;
+            padding-left: 20px;
+        }
+        .content li {
+            margin-bottom: 8px;
+        }
+        .button {
+            display: inline-block;
+            text-decoration: none;
+            background-color: #8470ff;
+            color: white;
+            padding: 10px 25px;
+            font-weight: bold;
+            border-radius: 15px;
+            text-align: center;
+            margin-top: 1rem;
+        }
+        .footer {
+            font-size: 14px;
+            color: #bbb;
+            text-align: center;
+            margin-top: 2rem;
+        }
+        .footer p {
+            margin: 0;
+        }
+        .warning {
+            color: #e54141;
+            font-weight: bold;
+        }
+    </style>
 </head>
-<body style="background-color:#111827; display: flex; align-items: center; justify-content:center; width:100%; overflow: hidden; min-width: 450px;">
-    <div class="container" style="margin:2rem 2rem; background-color:#1f2937; width:50% ;color: white; padding: 1rem; border-radius: 12px; width: fit-content;">
-        <div class="header" style="display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #939ba7;">
+<body>
+    <div class="container">
+        <div class="header">
             <h1>New Support Ticket Request</h1>
         </div>
         <div class="content">
-            <p>Hello IT Support Team,</p>
             <p>You have received a new support ticket request from <strong>{{ user.first_name }} {{ user.last_name }}</strong>.</p>
             <p><strong>Ticket Request Details:</strong></p>
-            <ul style="color: white;">
+            <ul>
                 <li><strong>User:</strong> {{ user.first_name }} {{ user.last_name }}</li>
                 <li><strong>Email:</strong> {{ user.email }}</li>
                 <li><strong>Request Description:</strong> {{ ticket_description }}</li>
                 <li><strong>Requested On:</strong> {{ ticket_created_at }}</li>
             </ul>
-            <p>Click the button below to view or manage the ticket.</p>
-            <a href="{{ ticket_url }}" class="button" style="color: white; text-decoration: none;">
-                <button style="color: white; border: none; padding: 10px 25px !important; background-color: #8470ff; border-radius:15px !important; font-weight: bold !important;">
-                    View Ticket
-                </button>
-            </a>
-            <p style="color:#e54141;">⚠️ If you did not request this, please disregard this email.</p>
+            <p>Please review the details above and take the necessary actions as soon as possible</p>
+            <p>For more information log in to the IT HelpDesk System https://localhost:3000</p>
+           
+          
         </div>
-        <div class="footer" style="line-height: 1.5rem;">
-            <p>Best regards, <br> Your IT Helpdesk Team</p>
+        <div class="footer">
+            <p>Best regards, <br> Awash Wine S.C Helpdesk</p>
         </div>
     </div>
 </body>
