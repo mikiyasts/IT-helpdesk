@@ -165,7 +165,7 @@ function Department() {
       },
     }
     ).then(res=>{
-      setPopup(false)
+      setPopupadd(false)
       setnewDepartment({
         name:"",
     })
@@ -201,6 +201,7 @@ function Department() {
                     <td>No</td>
                     <td>Department Name</td>
                     <td>Users</td>
+                    <td>Action</td>
 
                   </tr>
                 </thead>

@@ -73,11 +73,11 @@ function App() {
         <div className="logo"><img src={Logo} alt="logo" width="45px" /></div>
         <div className="sidebar-main">
           <ul>
-            <Link to="/admin/dashboard" onClick={() => setPage("dashboard")} className={page === "dashboard" ? "active":""}><DashboardIcon/> Dashboard</Link>
-            <Link to="tickets" onClick={() => setPage("tickets")} className={page === "tickets" ? "active":""}><ConfirmationNumberIcon/> Tickets</Link>
-            <Link to="users" onClick={() => setPage("users")} className={page === "users" ? "active":""}><GroupIcon/>Users</Link>
-            <Link to="department" onClick={() => setPage("department")} className={page === "department" ? "active":""}><AssessmentIcon/>Department</Link>
-            <Link to="reports" onClick={() => setPage("reports")} className={page === "reports" ? "active":""}><AssessmentIcon/>Report</Link>
+            <Link to="/admin/dashboard" onClick={() => setPage("dashboard")} className={page === "dashboard" ? "active":""}><DashboardIcon sx={{fontSize:"25px"}}/> Dashboard</Link>
+            <Link to="tickets" onClick={() => setPage("tickets")} className={page === "tickets" ? "active":""}><ConfirmationNumberIcon sx={{fontSize:"25px"}}/> Tickets</Link>
+            <Link to="users" onClick={() => setPage("users")} className={page === "users" ? "active":""}><GroupIcon sx={{fontSize:"25px"}}/>Users</Link>
+            <Link to="department" onClick={() => setPage("department")} className={page === "department" ? "active":""}><AssessmentIcon sx={{fontSize:"25px"}}/>Department</Link>
+            <Link to="reports" onClick={() => setPage("reports")} className={page === "reports" ? "active":""}><AssessmentIcon sx={{fontSize:"25px"}}/>Report</Link>
           </ul>
         </div>
       </div>

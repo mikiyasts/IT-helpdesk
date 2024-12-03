@@ -9,7 +9,8 @@ import axios from 'axios';
 import LoadingBtn from '../../component/LoadingBtn';
 import { ToastContainer,toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
+import ArrowRightIcon from '@mui/icons-material/ArrowRight';
+import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 
 function Tickets() {
 
@@ -301,6 +302,15 @@ function Tickets() {
     
   })
 
+
+  const expandList=()=>{
+    const list=document.getElementById('tickets-list')
+    list.classList.add("expand")
+  }
+  const collapseList=()=>{
+    const list=document.getElementById('tickets-list')
+    list.classList.remove("expand")
+  }
   console.log("solutttttttttttttion",solution);
   
 
@@ -330,13 +340,16 @@ function Tickets() {
       {/* <div className="tickets-header">
         filter and number of tickets
       </div> */}
-      <div className="tickets-list">
+      <div className="tickets-list" id="tickets-list">
+      <div className="expand-ticketlist" onClick={collapseList}><ArrowLeftIcon sx={{fontSize:"25px"}}/></div>
+
         <div className="sort-refresh"><p></p> <div onClick={refreshTicket}><CachedIcon sx={{ fontSize: 20 }} className='refresh-icon' id="refresh-icon" /></div></div>
         <ul>
          {list ? list :<h2>Nothing to show</h2>}
         </ul>
       </div>
-      { activePreview?<div className="tickets-preview">
+      { activePreview?<div className="tickets-preview ">
+        <div className="expand-ticketlist"><ArrowRightIcon sx={{fontSize:"25px"}} onClick={expandList}/></div>
          <div className="ticket-status">{activePreview && activePreview.status}  {activePreview?.attachments.length<1?null:<a href={`${process.env.REACT_APP_URL}${activePreview.attachments[0]?.file}`} target='_blank' title='attachment'><AttachmentIcon/></a>}</div>
         <div className="ticket-title"><h2>{activePreview && activePreview.title}</h2></div>
         <div className="ticket-description">
@@ -388,7 +401,9 @@ function Tickets() {
           
           {States}
         </div>
-      </div>:<div className="tickets-preview"></div>}
+      </div>:<div className="tickets-preview">
+      <div className="expand-ticketlist"><ArrowRightIcon sx={{fontSize:"25px"}} onClick={expandList}/></div>
+        </div>}
 
 
 
