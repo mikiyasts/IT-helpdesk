@@ -15,10 +15,17 @@ class Ticket(models.Model):
         ('Closed', 'Closed'),
         ('Pending', 'Pending'),
     ]
+    PRIORITY_CHOICES = [
+        ('Low', 'Low'),
+        ('Medium', 'Medium'),
+        ('High', 'High'),
+       
+    ]
 
     title = models.CharField(max_length=200)
     description = models.TextField()
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Open')
+    priority = models.CharField(max_length=20, choices=PRIORITY_CHOICES, default='Low')
     created_at = models.DateTimeField(auto_now_add=True)
     category = models.ForeignKey(TicketCategory, related_name='tickets', on_delete=models.CASCADE)
     updated_at = models.DateTimeField(auto_now=True)
@@ -55,4 +62,11 @@ class Attachment(models.Model):
     file = models.FileField(upload_to='attachments/')
     uploaded_at = models.DateTimeField(auto_now_add=True)
     ticket = models.ForeignKey(Ticket, null=True, blank=True, related_name='attachments', on_delete=models.CASCADE)
+
+class Acknowledgement(models.Model):
+    ticket = models.ForeignKey(Ticket, related_name='acknowledgement', on_delete=models.CASCADE)
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    
     

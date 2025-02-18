@@ -29,6 +29,11 @@ urlpatterns = [
   path('create_ticket/', views.create_ticket),
   path('list_ticket/<int:pk>/',views.ticket),
   path('edit_ticket/<int:pk>/',views.edit_ticket),
+  path('acknowledgement/<int:ticket_id>/',views.acknowledgement),
+  path('create_acknowledgement/',views.create_acknowledgement),
+  path('list_acknowledgements/',views.list_acknowledgements),
+  path('reverse_ticket/<int:ticket_id>/',views.reverse_ticket),
+  
   
   
   
@@ -53,6 +58,9 @@ urlpatterns = [
   path('systemusers/', views.get_all_users),
   path('edituser/<str:pk>/', views.edit_user),
   path('create_user/',views.create_user),
+  path('create_user_signup/',views.create_user_signup),
+  path('check_activation_status/<str:user_id>/',views.check_activation_status),
+  path('activate_account/<str:encrypted_user_id>/',views.activate_account),
   
   path('departments/',views.departments),
   path('create_department/',views.create_department),

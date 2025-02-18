@@ -14,17 +14,23 @@ from rest_framework_simplejwt.serializers import TokenRefreshSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 
 
+
 # from django.contrib.auth.models import User
 class DepartmentSerializer(serializers.ModelSerializer):
+    user_count = serializers.SerializerMethodField()
+
     class Meta:
         model = Department
-        fields = ['id', 'name']
+        fields = ['id', 'name', 'user_count']  # Include other fields as necessary
+
+    def get_user_count(self, obj):
+        return obj.users.count() 
 
 #user authentication
 class UserSerializer(serializers.ModelSerializer):
     class Meta(object):
         model = User 
-        fields = ['id', 'username', 'password', 'email',"department","branch","phone_number","role"]
+        fields = ['id', 'username', 'password', 'email',"department","branch","phone_number","role","is_active"]
     
 class UserCreateSerializer(serializers.ModelSerializer):
     class Meta(object):
@@ -51,7 +57,7 @@ class UserGetSerializer(serializers.ModelSerializer):
 
 #ticket app
 from rest_framework import serializers
-from tickets.models import Ticket, TicketCategory, TicketComment, TicketHistory, Attachment
+from tickets.models import Ticket, TicketCategory, TicketComment, TicketHistory, Attachment, Acknowledgement
   # Assuming you have a UserSerializer
 
 class TicketCategorySerializer(serializers.ModelSerializer):
@@ -97,9 +103,10 @@ class TicketSerializer(serializers.ModelSerializer):
     created_at = serializers.DateTimeField(format='%Y-%m-%d %I:%M %p',read_only=True)
 
 
+
     class Meta:
         model = Ticket
-        fields = ['id', 'title', 'description', 'status', 'created_at', 'updated_at', 'category', 'assigned_to', 'created_by','attachments']
+        fields = ['id', 'title', 'description', 'status', 'created_at', 'updated_at', 'category', 'assigned_to', 'created_by','attachments','priority']
 
 class RecentTicketSerializer(serializers.ModelSerializer):
     created_by = serializers.SerializerMethodField()
@@ -175,7 +182,7 @@ class JWTUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id','username', 'email', 'department', 'role']
+        fields = ['id','username', 'email', 'department', 'role','is_active']
 class NotificationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Notification
@@ -218,3 +225,9 @@ class ReportTicketSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ticket
         fields = ['id', 'title', 'description', 'status', 'created_at', 'updated_at', 'category', 'assigned_to', 'created_by','history','solution','attachments']
+
+class AcknowledgementSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Acknowledgement
+        fields = '__all__'
+        read_only_fields = ['author']

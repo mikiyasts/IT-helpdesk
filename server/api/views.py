@@ -31,7 +31,7 @@ from rest_framework.decorators import api_view, authentication_classes, permissi
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.authentication import BaseAuthentication  # Adjust your authentication class here
+from rest_framework.authentication import BaseAuthentication  
 from django.http import Http404
 from rest_framework.decorators import api_view
 from rest_framework.views import APIView
@@ -40,11 +40,11 @@ from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.response import Response
 import secrets
 from .authentication import APIKeyAuthentication
-from tickets.models import Attachment, Ticket,TicketCategory, TicketComment, TicketHistory
-from .serializers import CustomTokenRefreshSerializer, DepartmentSerializer, PasswordResetConfirmSerializer, PasswordResetRequestSerializer, RecentTicketSerializer, ReportTicketSerializer, TicketCategorySerializer, TicketCommentSerializer, TicketHistorySerializer, TicketSerializer, UserCreateSerializer, UserGetSerializer, UserSerializer
+from tickets.models import Attachment, Ticket,TicketCategory, TicketComment, TicketHistory, Acknowledgement
+from .serializers import CustomTokenRefreshSerializer, DepartmentSerializer, PasswordResetConfirmSerializer, PasswordResetRequestSerializer, RecentTicketSerializer, ReportTicketSerializer, TicketCategorySerializer, TicketCommentSerializer, TicketHistorySerializer, TicketSerializer, UserCreateSerializer, UserGetSerializer, UserSerializer, AcknowledgementSerializer
 from rest_framework.authtoken.models import Token
 from rest_framework import status
-from users.models import Department, PasswordReset, User
+from users.models import Department, PasswordReset, User,ActivateAccount
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import authentication_classes, permission_classes
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
@@ -66,6 +66,18 @@ from .serializers import NotificationSerializer
 from notifications.models import Notification
 from django.db import transaction
 import logging
+
+
+from cryptography.fernet import Fernet
+
+key = b'Y2hhbmdlTWVOb3dLZXkxMjM0NTY3ODkwMTIzNDU2Nzg='  
+cipher = Fernet(key)
+
+def encrypt_user_id(user_id):
+    return cipher.encrypt(str(user_id).encode()).decode()
+
+def decrypt_user_id(encrypted_user_id):
+    return int(cipher.decrypt(encrypted_user_id.encode()).decode())
 
 def convert_duration(seconds):
     # Check if the value is None
@@ -249,44 +261,43 @@ class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
 class CustomTokenRefreshView(TokenRefreshView):
     serializer_class = CustomTokenRefreshSerializer
+    
+    
 #views for ticket API
 @api_view(['POST'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 def create_ticket(request):
-    # Serialize the ticket data
+   
     serializer = TicketSerializer(data=request.data)
     
     if serializer.is_valid():
-    # Save the ticket and associate it with the logged-in user
+   
      ticket = serializer.save(created_by=request.user)
 
-    # Handle file attachments
      files = request.FILES.getlist('attachments')
      for file in files:
         Attachment.objects.create(ticket=ticket, file=file)
 
-    # Get the branch of the user who created the ticket
      ticket_branch = ticket.created_by.branch
     
-    # Get all IT officers (admins) in the same branch
-     it_officers = User.objects.filter(role="admin", branch=ticket_branch)
+     it_officers = User.objects.filter(role="it_officer", branch=ticket_branch)
 
-    # For each IT officer, send both SMS and email
-    for it_officer in it_officers:
-        phone_number = it_officer.phone_number  # Assuming phone number is in User model
+     for it_officer in it_officers:
+        phone_number = it_officer.phone_number 
 
-        # Ticket details
-        requestor = request.user  # The user who created the ticket (requestor)
+        
+        requestor = request.user  
         ticket_title = ticket.title
         ticket_description = ticket.description
         ticket_status = ticket.status
-        ticket_category = ticket.category.name  # Assuming 'name' is the field for category
+        ticket_priority=ticket.priority
+        ticket_category = ticket.category.name  
         assigned_to = ticket.assigned_to.first_name if ticket.assigned_to else "Not Assigned"
         requestor_name = f"{requestor.first_name} {requestor.last_name}"
-        requestor_department = requestor.department  # Assuming there's a 'department' field
+        requestor_department = requestor.department  
 
-        # Format SMS message
+ 
         message = f"""
 Awash Wine S.C IT Helpdesk
 ---------------------------
@@ -296,12 +307,13 @@ New Ticket Request
 🔹 Department: {requestor_department}
 🔹 Category: {ticket_category}
 🔹 Description: {ticket_description}
+🔹 Priority: {ticket_priority}
 
 ---------------------------
 Please review the details above and take the necessary actions as soon as possible.
 
 For more information, log in to the IT Helpdesk system:
-https://localhost:3000/
+https://ithelpdesk.awashwines.info/
 
 Best regards,
 Awash Wine S.C IT Helpdesk
@@ -309,11 +321,11 @@ Awash Wine S.C IT Helpdesk
 
         # Send the SMS
         print("Sending SMS to", phone_number)
-        send_message('drinkawash.com', 9797, 'user', 'admin', phone_number, message)  # SMS sending function
+        send_message('drinkawash.com', 9797, 'admin', '@dIff%nSms0', phone_number, message)  # SMS sending function
 
         # Prepare email details for IT officers
         email_subject = 'New Support Ticket Request'
-        ticketurl=f"http://localhost:3000"
+        ticketurl=f"https://ithelpdesk.awashwines.info/"
         # Render the email using the template (pass ticket info and IT officer data)
         email_message = render_to_string('new_ticket.html', {
             'user': ticket.created_by,
@@ -325,10 +337,10 @@ Awash Wine S.C IT Helpdesk
             'ticket_category': ticket_category,
             'requestor_name': requestor_name,
             'requestor_department': requestor_department,
+            'ticket_priority':ticket_priority,
             'ticketurl':ticketurl
         })
         print(f"sending email to {it_officer.email}")
-        # Send the email to the IT officer
         send_mail(
             email_subject,              # Subject of the email
             email_message,              # HTML email content
@@ -451,25 +463,26 @@ def delete_ticket_category(request,pk):
 @authentication_classes([APIKeyAuthentication])
 @permission_classes([IsAuthenticated])
 def admin_dashboard(request):
+    current_month = datetime.now().month
     # Count ticket status
     open_tickets = Ticket.objects.filter(status='Open').count()
     in_progress_tickets = Ticket.objects.filter(status='In Progress').count()
     closed_tickets = Ticket.objects.filter(status='Closed').count()
-    pending_tickets=Ticket.objects.filter(status="Pending").count()
+    pending_tickets=Ticket.objects.filter(status='Pending').count()
 
-    current_month = datetime.now().month
+    
 
 
-    kaliti_requests = Ticket.objects.filter(created_by__branch='Kaliti',created_at__month=current_month ).count()
-    lideta_requests = Ticket.objects.filter(created_by__branch='Lideta', created_at__month=current_month).count()
-    mekanissa_requests = Ticket.objects.filter(created_by__branch='Mekanissa' ,created_at__month=current_month).count()
-    farm_requests = Ticket.objects.filter(created_by__branch='Farm',created_at__month=current_month ).count()
+   
+    lideta_requests = Ticket.objects.filter(created_by__branch='Lideta').count()
+    mekanissa_requests = Ticket.objects.filter(created_by__branch='Mekanissa' ).count()
+    farm_requests = Ticket.objects.filter(created_by__branch='Farm' ).count()
 
     # Get category counts
     categories = TicketCategory.objects.all()
     category_counts = {}
     for category in categories:
-        category_counts[category.name] = Ticket.objects.filter(category=category,created_at__month=current_month).count()
+        category_counts[category.name] = Ticket.objects.filter(category=category).count()
 
     # Get recent 10 requests
     recent_requests = Ticket.objects.all().order_by('-created_at')[:10]
@@ -484,7 +497,7 @@ def admin_dashboard(request):
             'pending':pending_tickets
         },
         'branch_requests': {
-            'Kaliti': kaliti_requests,
+            
             'Lideta': lideta_requests,
             'Mekanissa': mekanissa_requests,
             'Farm': farm_requests
@@ -517,6 +530,7 @@ def get_all_users(request):
             'role': user.role,
             'first_name':user.first_name,
             'last_name':user.last_name,
+            'is_active':user.is_active,
             
         })
     
@@ -528,27 +542,89 @@ def get_all_users(request):
 @permission_classes([IsAuthenticated])
 def edit_user(request, pk):
     try:
-        user = User.objects.get(id=pk)  # Get the user by primary key
+        user = User.objects.get(id=pk)  
     except User.DoesNotExist:
         return Response({'detail': 'User  not found.'}, status=status.HTTP_404_NOT_FOUND)
 
-    # Use a serializer to validate and update the user
-    serializer = UserSerializer(user, data=request.data, partial=True)  # partial=True allows for partial updates
+    
+    serializer = UserSerializer(user, data=request.data, partial=True)  
     if serializer.is_valid():
-        serializer.save()  # Save the updated user
+        serializer.save()  
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    # Return validation errors if the serializer is not valid
+    
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+@api_view(['POST'])
+@authentication_classes([APIKeyAuthentication])
+@permission_classes([IsAuthenticated])
+def create_user_signup(request):
+    serializer = UserCreateSerializer(data=request.data)
+    if serializer.is_valid():
+        user=serializer.save()
+        ActivateAccount.objects.create(user=user)
+
+        encrypted_user_id = encrypt_user_id(user.id)
+
+        
+        activation_link = f"http://yourdomain.com/activate/{encrypted_user_id}/"
+
+        
+        
+        email_subject = 'Activate Your Account'
+        email_message = render_to_string('activation_email.html', {
+            'user': user,
+            'activation_link': activation_link,
+        })
+
+  
+        send_mail(
+            email_subject,
+            email_message,
+            settings.EMAIL_HOST_USER,
+            [user.email],
+            html_message=email_message 
+        )
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
 @api_view(['POST'])
 @authentication_classes([APIKeyAuthentication])
 @permission_classes([IsAuthenticated])
 def create_user(request):
     serializer = UserCreateSerializer(data=request.data)
     if serializer.is_valid():
-        serializer.save()  
+        user=serializer.save()
+        ActivateAccount.objects.create(user=user)
+
+        encrypted_user_id = encrypt_user_id(user.id)
+
+        
+        activation_link = f"https://ithelpdesk.awashwines.info/activate/{encrypted_user_id}/"
+
+        
+        
+        email_subject = 'Activate Your Account'
+        email_message = render_to_string('activation_email.html', {
+            'user': user,
+            'activation_link': activation_link,
+        })
+
+  
+        send_mail(
+            email_subject,
+            email_message,
+            settings.EMAIL_HOST_USER,
+            [user.email],
+            html_message=email_message 
+        )
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
 
 class ListNotificationsView(APIView):
     permission_classes = [IsAuthenticated]
@@ -815,7 +891,7 @@ def password_reset(request):
             password_reset_entry.save() 
         
 
-        reset_url = f"http://localhost:3000/reset/{urlsafe_base64_encode(str(user.pk).encode())}/{password_reset_entry.token}/"
+        reset_url = f"https://ithelpdesk.awashwines.info/reset/{urlsafe_base64_encode(str(user.pk).encode())}/{password_reset_entry.token}/"
 
 
         email_subject = 'Password Reset Request'
@@ -883,7 +959,7 @@ def change_password(request, uidb64, token):
 @authentication_classes([APIKeyAuthentication])
 @permission_classes([IsAuthenticated])
 def TicketReportView(request):
-    # Fetching filters from request
+
     start_date_filter = request.GET.get('start_date', None)
     end_date_filter = request.GET.get('end_date', None)
     status_filter = request.GET.get('status', None)
@@ -891,15 +967,15 @@ def TicketReportView(request):
     department_filter = request.GET.get('department', None)
     assigned_to_filter = request.GET.get('assigned_to', None)
     category_filter = request.GET.get('category', None)
-    export_flag = request.GET.get('export', 'false')  # Check if the user wants to export
+    export_flag = request.GET.get('export', 'false')
 
-    # Build query filters
+
     filters = Q()
 
     if start_date_filter:
         start_date = parse_datetime(start_date_filter)
         if start_date:
-            # Make sure it's timezone-aware
+    
             if timezone.is_naive(start_date):
                 start_date = timezone.make_aware(start_date, timezone.get_current_timezone())
             filters &= Q(created_at__gte=start_date)
@@ -907,7 +983,7 @@ def TicketReportView(request):
     if end_date_filter:
         end_date = parse_datetime(end_date_filter)
         if end_date:
-            # Ensure end date is timezone-aware and at the last moment of the day
+
             end_date = end_date.replace(hour=23, minute=59, second=59, microsecond=999999)
             if timezone.is_naive(end_date):
                 end_date = timezone.make_aware(end_date, timezone.get_current_timezone())
@@ -920,7 +996,7 @@ def TicketReportView(request):
         filters &= Q(created_by__branch=branch_filter)
 
     if department_filter:
-        filters &= Q(assigned_to__department__name=department_filter)
+        filters &= Q(created_by__department__name=department_filter)
 
     if assigned_to_filter:
         filters &= Q(assigned_to__email=assigned_to_filter)
@@ -928,13 +1004,12 @@ def TicketReportView(request):
     if category_filter:
         filters &= Q(category__name=category_filter)
 
-    # Fetch tickets based on filters
     tickets = Ticket.objects.filter(filters).order_by('-created_at')
 
-    # If user wants to export to Excel
+
     
 
-    # If no export, return normal JSON report
+
     ticket_serializer = ReportTicketSerializer(tickets, many=True)
 
     ticket_status_counts = tickets.values('status') \
@@ -1011,92 +1086,70 @@ def TicketReportView(request):
 
     return Response(response_data, status=status.HTTP_200_OK)
 def generate_excel_report(tickets, avg_response_time, avg_fixing_time):
-    # Step 1: Fetch data from the database
     data = list(tickets.values(
         'id', 'status', 'created_by__branch', 'created_at',
-        'assigned_to__department__name', 'assigned_to__first_name',
+        'created_by__department__name', 'assigned_to__first_name',
         'category__name', 'created_by__first_name', 'created_by__last_name'
     ))
 
-    # Step 2: Convert data to DataFrame
     df = pd.DataFrame(data)
-
-    # Step 3: Remove timezone information from 'created_at' column
     df['created_at'] = df['created_at'].apply(lambda x: x.replace(tzinfo=None))
-
-    # Step 4: Create 'Created By' column (combining first name and last name)
     df['Created By'] = df['created_by__first_name'] + ' ' + df['created_by__last_name']
-
-    # Step 5: Drop unnecessary individual columns
     df.drop(['created_by__first_name', 'created_by__last_name'], axis=1, inplace=True)
-
-    # Step 6: Rename columns for better readability
     df.columns = ['Ticket ID', 'Status', 'Branch', 'Created At', 'Department', 'Assigned To', 'Category', 'Created By']
-
-    # Step 7: Ensure row order is preserved
     df.reset_index(drop=True, inplace=True)
-
-    # Ensure column order is as expected
     df = df[['Ticket ID', 'Status', 'Branch', 'Created At', 'Department', 'Assigned To', 'Category', 'Created By']]
-
-    # Step 8: Create an Excel workbook using openpyxl
     wb = Workbook()
     ws1 = wb.active
     ws1.title = "Ticket Report"
 
-    # Write the DataFrame to the first sheet of the Excel file
     for row in dataframe_to_rows(df, index=False, header=True):
         ws1.append(row)
 
-    # Step 9: Generate statistics for the second sheet
+    
     ws2 = wb.create_sheet(title="Statistics")
 
-    # Example statistics (replace with your actual logic)
     ticket_status_counts = df['Status'].value_counts().to_dict()
     department_counts = df['Department'].value_counts().to_dict()
     category_counts = df['Category'].value_counts().to_dict()
     branch_counts = df['Branch'].value_counts().to_dict()
     assigned_to_counts = df['Assigned To'].value_counts().to_dict()
 
-    # Write a header row for the statistics sheet
     ws2.append(['Statistic', 'Count'])
 
-    # Write statistics to be more visually appealing
     ws2.append(['Ticket Status Counts'])
     for status, count in ticket_status_counts.items():
         ws2.append([status, count])
 
-    ws2.append([''])  # Empty row for separation
+    ws2.append([''])  
 
     ws2.append(['Department Counts'])
     for department, count in department_counts.items():
         ws2.append([department, count])
 
-    ws2.append([''])  # Empty row for separation
+    ws2.append([''])  
 
     ws2.append(['Category Counts'])
     for category, count in category_counts.items():
         ws2.append([category, count])
 
-    ws2.append([''])  # Empty row for separation
+    ws2.append([''])  
 
     ws2.append(['Branch Counts'])
     for branch, count in branch_counts.items():
         ws2.append([branch, count])
 
-    ws2.append([''])  # Empty row for separation
+    ws2.append([''])  
 
     ws2.append(['Assigned To Counts'])
     for assignee, count in assigned_to_counts.items():
         ws2.append([assignee, count])
 
-    ws2.append([''])  # Empty row for separation
+    ws2.append([''])  
 
-    # Extract the actual timedelta values from the dictionaries
     avg_response_time_delta = avg_response_time.get('response_time__avg')
     avg_fixing_time_delta = avg_fixing_time.get('fixing_time__avg')
 
-    # Convert timedelta to seconds for avg_response_time and avg_fixing_time if they are not None
     if avg_response_time_delta is not None:
         avg_response_time_seconds = avg_response_time_delta.total_seconds()
     else:
@@ -1107,35 +1160,138 @@ def generate_excel_report(tickets, avg_response_time, avg_fixing_time):
     else:
         avg_fixing_time_seconds = 0
 
-    # Format the average times using convert_duration
+
     avg_response_time_formatted = convert_duration(avg_response_time_seconds)
     avg_fixing_time_formatted = convert_duration(avg_fixing_time_seconds)
 
-    # Write average response and fixing time (if any)
+   
     ws2.append(['Avg Response Time', avg_response_time_formatted])
     ws2.append(['Avg Fixing Time', avg_fixing_time_formatted])
 
-    # Step 10: Add some basic formatting
+   
     from openpyxl.styles import Font, Alignment
 
-    # Apply bold to the header row
+    
     for cell in ws2[1]:
         cell.font = Font(bold=True)
 
-    # Center align the text in the statistics sheet
+   
     for row in ws2.iter_rows(min_row=2, min_col=1, max_col=2):
         for cell in row:
             cell.alignment = Alignment(horizontal='center')
 
-    # Step 11: Save the workbook to a BytesIO object
+   
     file_stream = BytesIO()
     wb.save(file_stream)
 
-    # Step 12: Seek to the beginning of the file stream
+    
     file_stream.seek(0)
 
-    # Step 13: Return the Excel file as an HTTP response
+    
     response = HttpResponse(file_stream, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     response['Content-Disposition'] = 'attachment; filename="ticket_report.xlsx"'
 
     return response
+    
+    
+@api_view(['GET'])
+@authentication_classes([APIKeyAuthentication])
+@permission_classes([IsAuthenticated])
+def check_activation_status(request, user_id):
+    try:
+        user = get_object_or_404(User, id=user_id)
+        activation_record = ActivateAccount.objects.get(user=user)
+        
+
+        return Response({"activated": activation_record.activated}, status=status.HTTP_200_OK)
+    except ActivateAccount.DoesNotExist:
+        return Response({"activated": False}, status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['POST'])
+def activate_account(request, encrypted_user_id):
+    try:
+    
+        user_id = decrypt_user_id(encrypted_user_id)
+
+   
+        user = get_object_or_404(User, id=user_id)
+
+    
+        activation_record, created = ActivateAccount.objects.get_or_create(user=user)
+
+        if activation_record.activated:
+            return Response({"message": "Your account is already activated."}, status=status.HTTP_400_BAD_REQUEST)
+
+        activation_record.activated = True
+        activation_record.save()
+
+        return Response({"message": "Your account has been activated successfully!"}, status=status.HTTP_200_OK)
+
+    except ValueError:
+
+        return Response({"error": "Invalid activation link."}, status=status.HTTP_400_BAD_REQUEST)
+    except User.DoesNotExist:
+
+        return Response({"error": "User  does not exist."}, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+    
+        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+@api_view(['GET'])
+@authentication_classes([APIKeyAuthentication])
+@permission_classes([IsAuthenticated])
+def acknowledgement(request, ticket_id):
+    try:
+        acknowledgements = Acknowledgement.objects.filter(ticket=ticket_id)
+        serializer = AcknowledgementSerializer(acknowledgements, many=True)
+        return Response(serializer.data)
+    except Acknowledgement.DoesNotExist:
+        return Response({'error': 'Acknowledgement not found'}, status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['POST'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+def create_acknowledgement(request):
+    serializer = AcknowledgementSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save(author=request.user)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+@authentication_classes([APIKeyAuthentication])
+@permission_classes([IsAuthenticated])
+def list_acknowledgements(request):
+    acknowledgements = Acknowledgement.objects.all()
+    serializer = AcknowledgementSerializer(acknowledgements, many=True)
+    return Response(serializer.data)
+
+@api_view(['POST'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+def reverse_ticket(request, ticket_id):
+    try:
+       
+        ticket = Ticket.objects.get(id=ticket_id)
+
+        
+        if ticket.status == 'In Progress':
+            return Response({"detail": "Ticket is already in progress."}, status=status.HTTP_400_BAD_REQUEST)
+
+       
+        TicketHistory.objects.create(
+            ticket=ticket,
+            updated_by=request.user, 
+            field_name='status',
+            old_value=ticket.status,
+            new_value='Reversed'
+        )
+
+        
+        ticket.status = 'In Progress'
+        ticket.save()
+
+        return Response({"detail": "Ticket status updated to 'In Progress'."}, status=status.HTTP_200_OK)
+    
+    except Ticket.DoesNotExist:
+        return Response({"detail": "Ticket not found."}, status=status.HTTP_404_NOT_FOUND)
