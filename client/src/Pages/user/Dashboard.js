@@ -14,7 +14,10 @@ function Dashboard() {
   const {isAuth,setIsAuth}=useContext(AuthContext)
   const [pendingavailable,setPendingAvailable]=useState(null)
   const [popup,setPopup]=useState(false);
+  const [acknowledgment,setAcknowledgment]=useState(false)
+  const [ack,setAck]=useState("");
   const [category,setCategory]=useState([])
+  const [closeId,setCloseId]=useState(null)
   const [request,setRequest]=useState({
     title:"",
     description:"",
@@ -144,28 +147,7 @@ const newRequest=async (e)=>{
         .find(row => row.startsWith('access_token='))
         ?.split('=')[1];
         setLoading(true)
-        await axios.post(`${process.env.REACT_APP_URL}/api/close_ticket/${id}/`,request,{headers:{
-          "Content-Type": 'multipart/form-data',
-          Authorization: `API_KEY ${process.env.REACT_APP_API_KEY}`,
-        }}).then(async res=>{
-          await axios.post(`${process.env.REACT_APP_URL}/api/update_ticket_history/${id}/`,{new_value:"Closed",old_value:"Pending",field_updated:"status"},{
-            headers:{
-              Authorization: `Bearer ${acstoken}`,
-            }
-          }).then(res=>{
-           console.log("history updated");
-           getDashdata()
-           setLoading(false)
-          }).catch(err=>{
-            console.log(err)
-           setLoading(false)
-          })
-          console.log(res)
-        }).catch(err=>{
-          console.log(err)
-          setLoading(false)
-
-        })
+        
         getDashdata()
       }
       const downloadImage= async (id,url)=>{
@@ -205,12 +187,85 @@ const newRequest=async (e)=>{
     <div title='Preview' onClick={()=>downloadImage(el.id,`${process.env.REACT_APP_URL}${el?.attachments[0]?.file}`)}>< VisibilityIcon/></div>}
     </td>
     {
-    el?.status==='Pending'?loading?<LoadingBtn/>:<td data-cell="Action"><button className="btn-login" onClick={()=>closeRequest(el.id)}>Close</button></td>:null
+    el?.status==='Pending'?loading?<LoadingBtn/>:<td data-cell="Action"><button className="btn-login" style={{marginInline:".5rem"}} onClick={()=>{
+      setAcknowledgment(true)
+      setCloseId(el.id)
+    }}>Close</button><button className="btn-login"  style={{marginInline:".5rem"}} onClick={()=>{
+      reverseTicket(el.id)
+    }}>{loading?<LoadingBtn/>:<p>Reverse</p>}</button></td>:null
     }
   </tr>)})
 console.log(mytickets,"tov");
+console.log("ack",ack);
+
+const reverseTicket=async (id)=>{
+
+  const acstoken = document.cookie
+  .split('; ')
+  .find(row => row.startsWith('access_token='))
+  ?.split('=')[1];
+  setLoading(true)
+  await axios.post(`${process.env.REACT_APP_URL}/api/reverse_ticket/${id}/`,request,{headers:{
+    "Content-Type": 'multipart/form-data',
+    Authorization: `Bearer ${acstoken}`,
+  }}).then(res=>{
+    console.log(res)
+    setLoading(false)
+  }).catch(err=>{
+    setLoading(false)
+    console.log(err)
+  })
+}
+const addAcknowledgement=async (e)=>{
+  e.preventDefault()
+  const acstoken = document.cookie
+  .split('; ')
+  .find(row => row.startsWith('access_token='))
+  ?.split('=')[1];
+  setLoading(true)
+  await axios.post(`${process.env.REACT_APP_URL}/api/create_acknowledgement/`,{content:ack,ticket:closeId},{
+    headers:{
+      Authorization: `Bearer ${acstoken}`,
+    }
+
+  }).then(async (res)=>{
+    console.log(res)
+
+    await axios.post(`${process.env.REACT_APP_URL}/api/close_ticket/${closeId}/`,request,{headers:{
+      "Content-Type": 'multipart/form-data',
+      Authorization: `API_KEY ${process.env.REACT_APP_API_KEY}`,
+    }}).then(async res=>{
+      await axios.post(`${process.env.REACT_APP_URL}/api/update_ticket_history/${closeId}/`,{new_value:"Closed",old_value:"Pending",field_updated:"status"},{
+        headers:{
+          Authorization: `Bearer ${acstoken}`,
+        }
+      }).then(res=>{
+       console.log("history updated");
+       getDashdata()
+       setLoading(false)
+      setAcknowledgment(false)
+      setCloseId(null)
+      }).catch(err=>{
+        console.log(err)
+       setLoading(false)
+      })
+      console.log(res)
+    }).catch(err=>{
+      console.log(err)
+      setLoading(false)
+
+    })
+
+    
 
 
+
+
+  }).catch(err=>{
+    console.log(err)
+    setLoading(false)
+  })
+}
   return (
     <div className='user-dashboard_page'>
       <ToastContainer />
@@ -287,6 +342,32 @@ console.log(mytickets,"tov");
         </form>
       </div>
       {/* popup*/}
+
+
+      {/* acknowledgment*/}
+
+      <div className={`popup ${acknowledgment &&"active"}`}>
+        <div className="popup-pin" onClick={()=>{
+    setAcknowledgment(false)
+    setCloseId(null)
+  }}></div>
+       
+        <div className="popup_header"><h2>Add Acknowledgement</h2></div>
+
+        <form className="request-form" onSubmit={addAcknowledgement}>
+          <div className="form-ctrl">
+            <label htmlFor="ack">Acknowledgement<span>*</span></label>
+            <textarea name="acknowledgment" id="ack" value={ack} rows={5} placeholder='Enter your acknowlegment here' style={{padding:"1rem",color:"black"}} onChange={(e)=>setAck(e.target.value)}/>
+          </div>
+          <div className="forgot-signin sigup-btn-conatiner">
+                {
+                loading? <LoadingBtn/> :<button className="btn-login">Submit</button>}
+              </div>
+        </form>
+      </div>
+      
+      {/* acknowledgment*/}
+
     </div>
   )
 }

@@ -22,6 +22,7 @@ function Tickets() {
   const [ticketHistory,setTicketHistory]=useState([])
   const [solution,setSolution]=useState({content:""})
   const [ticketSolution,setTicketSolution]=useState("")
+  const [acknowledgement,setAcknowledgement]=useState({})
   const [filter,setFilter]=useState({
     category:"",
     location:"",
@@ -49,6 +50,8 @@ function Tickets() {
   
   
 
+  console.log("acknowledge",acknowledgement);
+  
   useEffect( ()=>{
     // const reftoken = document.cookie
     //     .split('; ')
@@ -111,6 +114,14 @@ function Tickets() {
     }).catch(err=>console.log(err)
     )
 
+    await axios.get(`${process.env.REACT_APP_URL}/api/acknowledgement/${id}/`,{
+      headers:{
+        Authorization: `API_KEY ${process.env.REACT_APP_API_KEY}`,
+      }
+    }).then(res=>{
+      console.log("respo",res);
+      
+      setAcknowledgement(res.data)}).catch(err=>console.log(err))
 
   }
   console.log(ticketHistory,"history");
@@ -291,7 +302,7 @@ function Tickets() {
     delay+=1
     return (
       <div className="state" style={{'--delay':`${delay}s`}} key={el.id}>
-            <div className="state-date">{` ${month[fulldate[1]]} ${fulldate[2]}`}</div>
+            <div className="state-date">{` ${month[Number(fulldate[1])]} ${fulldate[2]}`}</div>
             <div className="state-detail">
               <div className="state-name">{el.new_value}</div>
               <div className="state-description">{el?.updated_by.username}</div>
@@ -312,6 +323,7 @@ function Tickets() {
     list.classList.remove("expand")
   }
   console.log("solutttttttttttttion",solution);
+  // console.log("date",activePreview?.created_at?.split(" ")[0]?.split("-")[1]?.splt(""));
   
 
   return (
@@ -388,10 +400,17 @@ function Tickets() {
         
       </div>
         }
+        {
+          acknowledgement && 
+          <div className="ticket-note">
+              <h4>Acknowledgement</h4>
+              <p>{acknowledgement[0]?.content}</p>
+          </div>
+        }
         <div className="ticket-history">
           <h4>Ticket Timeline</h4>
           <div className="state" style={{'--delay':`0s`}}>
-            <div className="state-date">{activePreview && month[activePreview.created_at.split(" ")[0].split("-")[1]] +" "+activePreview.created_at.split(" ")[0].split("-")[2]}</div>
+            <div className="state-date">{activePreview && month[Number(activePreview.created_at.split(" ")[0].split("-")[1])] +" "+activePreview.created_at.split(" ")[0].split("-")[2]}</div>
             <div className="state-detail">
               <div className="state-name">Opened</div>
               <div className="state-description">{activePreview?.created_by.username}</div>

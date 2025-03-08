@@ -46,7 +46,7 @@ sessionStorage.removeItem('isAdmin');
 
     setLoading(true)
 
-    axios.post("http://localhost:8000/api/token/",loginform,{ withCredentials: true ,headers: {
+    axios.post(`${process.env.REACT_APP_URL}/api/token/`,loginform,{ withCredentials: true ,headers: {
       'X-CSRFToken': getCsrfToken(),
       Authorization: `API_KEY ${process.env.REACT_APP_API_KEY}`,
   }})
