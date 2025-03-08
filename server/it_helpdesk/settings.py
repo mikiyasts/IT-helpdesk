@@ -27,13 +27,15 @@ SECRET_KEY = 'django-insecure-s1r0k1m#_o1wip0letj^a_yd_!7g1ic^a&qt2w(&w03n%@mvfa
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
+    'https://ithelpdesk.awashwines.info'
 ]
 CORS_ORIGIN_WHITELIST = [
-    'http://localhost:3000',  # Adjust this to your React app's URL
+    'http://localhost:3000',
+    'https://ithelpdesk.awashwines.info'# Adjust this to your React app's URL
 ]
 
 # Application definition
@@ -61,6 +63,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
+     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -105,6 +108,8 @@ SIMPLE_JWT = {
     'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,
 }
+import pymysql
+pymysql.install_as_MySQLdb()
 
 WSGI_APPLICATION = 'it_helpdesk.wsgi.application'
 
@@ -117,19 +122,6 @@ SIMPLE_JWT = {
 }
 
 
-# Database
-# https://docs.djangoproject.com/en/5.0/ref/settings/#databases
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'HelpDesk',
-#         'USER': 'postgres',
-#         'PASSWORD': 'admin123',
-#         'HOST': 'localhost',  # Set to your PostgreSQL server's address
-#         'PORT': '5432',       # Default PostgreSQL port
-#     }
-# }
 
 DATABASES = {
     'default': {
@@ -138,8 +130,18 @@ DATABASES = {
     }
 }
 
-# Password validation
-# https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',  # Use MySQL backend
+#         'NAME': 'awashwinesinfo_helpdesk',                # Your MySQL database name
+#         'USER': 'awashwinesinfo_helpdesk_user',                # Your MySQL username
+#         'PASSWORD': 'awashwineithelpdesk',        # Your MySQL password
+#         'HOST': '91.204.209.13',                   # Typically localhost or 127.0.0.1
+#         'PORT': '',                        # Default MySQL port
+#     }
+# }
+
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -172,11 +174,25 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+
+
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),  # Folder for your static files (CSS, JS, etc.)
+]
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
+# Media files (User uploads like blog post images)
+
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field

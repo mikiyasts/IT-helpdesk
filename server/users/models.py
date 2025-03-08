@@ -41,5 +41,9 @@ class PasswordReset(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     token = models.TextField()
     
+class ActivateAccount(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    activated = models.BooleanField(default=False)
+
 
 
