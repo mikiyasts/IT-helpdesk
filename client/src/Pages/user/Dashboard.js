@@ -54,7 +54,6 @@ const nPages = Math.ceil(mytickets.length / recordsPerPage)
     Authorization: `Bearer ${acstoken}`,
       }
       }).then(res=>{
-        console.log("mytickets",res.data);
         setMytickets(res.data)
         
       }).catch(err=>{
@@ -67,7 +66,6 @@ const nPages = Math.ceil(mytickets.length / recordsPerPage)
     Authorization: `Bearer ${acstoken}`,
       }
       }).then(res=>{
-        console.log("mytickets",res.data);
         setPendingAvailable(res.data.has_pending_tickets)
       }).catch(err=>{
         console.log(err);
@@ -104,7 +102,6 @@ const newRequest=async (e)=>{
     "Content-Type": 'multipart/form-data',
     Authorization: `Bearer ${acstoken}`,
   }}).then(res=>{
-    console.log(res)
     getDashdata()
     setRequest({
       title:"",
@@ -122,34 +119,32 @@ const newRequest=async (e)=>{
   })
 }
  
-  console.log(request);
-  console.log("cont",isAuth);
-  console.log(pendingavailable,"asdawdweassaf");
+  
   
   const reqCard=category.map(el=>
   
-    pendingavailable?<div className="card3" onClick={()=>{
+    pendingavailable?<div key={el.id} className="card3" onClick={()=>{
     
     toast.warning("You have unclosed request")
-  }}><div className="card-name" key={el.id}>{el.name}</div></div>
+  }}><div className="card-name">{el.name}</div></div>
   :<div className="card3" onClick={()=>{
     setPopup(true)
     setRequest({
       title:el.name,
       category:el.id
     })
-  }}><div className="card-name" key={el.id}>{el.name}</div></div>)
+  }}  key={el.id}><div className="card-name">{el.name}</div></div>)
 
-      const closeRequest=async (id)=>{
+      // const closeRequest=async (id)=>{
 
-        const acstoken = document.cookie
-        .split('; ')
-        .find(row => row.startsWith('access_token='))
-        ?.split('=')[1];
-        setLoading(true)
+      //   const acstoken = document.cookie
+      //   .split('; ')
+      //   .find(row => row.startsWith('access_token='))
+      //   ?.split('=')[1];
+      //   setLoading(true)
         
-        getDashdata()
-      }
+      //   getDashdata()
+      // }
       const downloadImage= async (id,url)=>{
         const fileName=url.split("/").pop()
         await axios.get(`${process.env.REACT_APP_URL}/api/download_attachment/${id}`,{
@@ -174,9 +169,9 @@ const newRequest=async (e)=>{
 
       let nor=0
 
-  const tableRw=currentRecords && currentRecords.map(el=>{
+  const tableRw=currentRecords && currentRecords.map((el,index)=>{
     nor++
-  return (<tr>
+  return (<tr key={index}>
     <td data-cell="ID">{nor}</td>
     <td data-cell="Title">{el.title}</td>
     <td data-cell="Description">{el.description}</td>
@@ -195,8 +190,7 @@ const newRequest=async (e)=>{
     }}>{loading?<LoadingBtn/>:<p>Reverse</p>}</button></td>:null
     }
   </tr>)})
-console.log(mytickets,"tov");
-console.log("ack",ack);
+
 
 const reverseTicket=async (id)=>{
 
@@ -209,7 +203,6 @@ const reverseTicket=async (id)=>{
     "Content-Type": 'multipart/form-data',
     Authorization: `Bearer ${acstoken}`,
   }}).then(res=>{
-    console.log(res)
     setLoading(false)
   }).catch(err=>{
     setLoading(false)
@@ -240,7 +233,6 @@ const addAcknowledgement=async (e)=>{
           Authorization: `Bearer ${acstoken}`,
         }
       }).then(res=>{
-       console.log("history updated");
        getDashdata()
        setLoading(false)
       setAcknowledgment(false)

@@ -46,11 +46,9 @@ function Tickets() {
     "Dec",
   ];
 
-  console.log(ticketSolution,"solutionnnnnnnnnnnnnnnnnnnnnnnnnnnnnnlkjasodkjasdlkjasd;lakjsd'lajsd'lkajsdl");
   
   
 
-  console.log("acknowledge",acknowledgement);
   
   useEffect( ()=>{
     // const reftoken = document.cookie
@@ -119,12 +117,10 @@ function Tickets() {
         Authorization: `API_KEY ${process.env.REACT_APP_API_KEY}`,
       }
     }).then(res=>{
-      console.log("respo",res);
       
       setAcknowledgement(res.data)}).catch(err=>console.log(err))
 
   }
-  console.log(ticketHistory,"history");
   
   const refreshTicket= async ()=>{
 
@@ -199,7 +195,6 @@ function Tickets() {
 
   // activeTicketdate()
 
-  console.log(activePreview);
   const getCsrfToken = () => {
     const cookieValue = document.cookie
         .split('; ')
@@ -224,25 +219,23 @@ function Tickets() {
         Authorization: `Bearer ${acstoken}`,
       }
     }).then(async res=>{
-      console.log("accepted");
       await axios.post(`${process.env.REACT_APP_URL}/api/update_ticket_history/${id}/`,{new_value:"In Progress",old_value:"Open",field_updated:"status"},{
         headers:{
           Authorization: `Bearer ${acstoken}`,
         }
       }).then(res=>{
-       console.log("history updated");
        window.location.reload()
        setLoading(false)
       }).catch(err=>{
        setLoading(false)
-        console.log(err,"tiktiktik")
+        console.log(err,"error")
       })
      
       
     }).catch(err=>{
       setLoading(false)
       toast.warning(err?.response?.data?.error)        
-      console.log(err,"tiktiktik")
+      console.log(err,"error")
     }
     )
   }
@@ -259,13 +252,11 @@ function Tickets() {
         Authorization: `Bearer ${acstoken}`,
       }
     }).then(async res=>{
-      console.log("closed");
       await axios.post(`${process.env.REACT_APP_URL}/api/update_ticket_history/${id}/`,{new_value:"Pending",old_value:"In Progress",field_updated:"status"},{
         headers:{
           Authorization: `Bearer ${acstoken}`,
         }
       }).then(res=>{
-       console.log("history updated");
        window.location.reload()
        setLoading(false)
       }).catch(err=>console.log(err))
@@ -277,7 +268,6 @@ function Tickets() {
 
     }
     )}else{
-      console.log("solution can not be empty");
       setLoading(false)
     }
   }
@@ -296,9 +286,7 @@ function Tickets() {
   const States=ticketHistory && ticketHistory.map(el=>{
     const fulldate=el.updated_at.split(" ")[0].split("-")
     const fullTime=el.updated_at.split(" ")[1] + " " +el.updated_at.split(" ")[2]
-    console.log(fulldate,"date-splitted");
-    console.log(fullTime,"Time-splitted");
-    console.log(el);
+    
     delay+=1
     return (
       <div className="state" style={{'--delay':`${delay}s`}} key={el.id}>
@@ -322,7 +310,6 @@ function Tickets() {
     const list=document.getElementById('tickets-list')
     list.classList.remove("expand")
   }
-  console.log("solutttttttttttttion",solution);
   // console.log("date",activePreview?.created_at?.split(" ")[0]?.split("-")[1]?.splt(""));
   
 

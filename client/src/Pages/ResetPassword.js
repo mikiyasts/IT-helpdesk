@@ -20,8 +20,8 @@ function ResetPassword() {
 
 
 
-    console.log(param1);
-    console.log(param2);
+    // console.log(param1);
+    // console.log(param2);
 
     const handleInput=(e)=>{
         setPassword(prev=>{
@@ -42,7 +42,7 @@ function ResetPassword() {
                     Authorization: `API_KEY ${process.env.REACT_APP_API_KEY}`,
                 }
             }).then(res=>{
-                console.log(res);
+                // console.log(res);
                 navigate("/")
             }).catch(err=>{
                 toast.error(err.response.data["error"])
@@ -53,7 +53,7 @@ function ResetPassword() {
             toast("New password and Confirm password doesn't match")
         }
     }
-    console.log("password",password);
+    // console.log("password",password);
     
     
   return (

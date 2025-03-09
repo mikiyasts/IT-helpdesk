@@ -39,7 +39,7 @@ function Department() {
         .then((res) => setDepartments(res.data))
         .catch((err) => console.log(err));
     }
-    console.log(departments);
+    // console.log(departments);
     let rwnum=0
     const tableRw = departments.map((el) => {
         rwnum++
@@ -52,10 +52,9 @@ function Department() {
           })
           .then((res) =>{
             users=res.data.filter(fl=>fl.department===el.name).length
-            console.log("users filtter",users);
+            // console.log("users filtter",users);
 
             return users
-            console.log("users length",users.length);
           })
           .catch((err) => console.log(err));
 
@@ -75,7 +74,7 @@ function Department() {
   
    
     const setInput=(e)=>{
-      console.log(e.target.value);
+      // console.log(e.target.value);
       
       setForm(prev=>{
         return {
@@ -90,11 +89,11 @@ function Department() {
           [e.target.name]:e.target.value
         }
       })
-      console.log(form);
+      // console.log(form);
       
     }
     const userInput=(e)=>{
-      console.log(e.target.value);
+      // console.log(e.target.value);
       
       setnewDepartment(prev=>{
         return {
@@ -109,14 +108,14 @@ function Department() {
           [e.target.name]:e.target.value
         }
       })
-      console.log(form);
+      // console.log(form);
       
     }
   
   
-  console.log("inin",form);
-  console.log("ed",edited);
-  console.log("new",newdepartment);
+  // console.log("inin",form);
+  // console.log("ed",edited);
+  // console.log("new",newdepartment);
   
   const submitEdit=(e)=>{
     e.preventDefault()
@@ -140,7 +139,7 @@ function Department() {
       setEdited({})
       setForm({})
       refreshData()
-      console.log("succes",res);
+      // console.log("succes",res);
       
     }).catch(err=>{
       console.log(err,"errr");
@@ -170,7 +169,7 @@ function Department() {
         name:"",
     })
       refreshData()
-      console.log("succes",res);
+      // console.log("succes",res);
       
     }).catch(err=>{
       console.log(err,"errr");
@@ -178,7 +177,7 @@ function Department() {
     })
   }
   
-  console.log("department",departments);
+  // console.log("department",departments);
   
   
     return (

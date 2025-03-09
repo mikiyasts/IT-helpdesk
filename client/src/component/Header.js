@@ -41,7 +41,7 @@ function Header() {
         Authorization:`Bearer ${acstoken}`
       }
     }).then(res=>{
-      console.log("notifications",res.data);
+      // console.log("notifications",res.data);
       setNotifications(res.data)
       
     }).catch(err=>{
@@ -53,7 +53,7 @@ function Header() {
     getNotification()
   },[])
 
-  console.log(notifications);
+  // console.log(notifications);
   const markasRead=async (id)=>{
     const acstoken = document.cookie
         .split('; ')
@@ -66,19 +66,19 @@ function Header() {
           Authorization:`Bearer ${acstoken}`
       }
     }).then(res=>{
-      console.log(res)
+      // console.log(res)
       getNotification()
     }).catch(err=>console.log(err))
 
-    console.log(id);
+    // console.log(id);
     
   }
-  const notificationList=notifications.map(el=>{
+  const notificationList=notifications.map((el,index)=>{
     const requestor=el.message.split(" ")
-    console.log(requestor.length);
+    // console.log(requestor.length);
     
     return(
-      <li>
+      <li key={index}>
         <div className='notification_header'><div className="mark_as_read" title="mark as read" onClick={()=>markasRead(el.id)}><DraftsIcon sx={{fontSize:20}}/></div></div>
         <h5>{el.notification_type}</h5>
         <p>{el.message}</p>
@@ -98,7 +98,7 @@ function Header() {
           Authorization:`Bearer ${acstoken}`
       }
     }).then(res=>{
-      console.log(res)
+      // console.log(res)
       getNotification()
     }).catch(err=>console.log(err))
   }

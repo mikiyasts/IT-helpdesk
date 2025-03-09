@@ -43,10 +43,11 @@ function ProtectedRoutes() {
       setIsAuth(true)
       
       // setisLoading(false)
-      console.log("hellow ac",res.data.access);
-      return console.log("hellow ref",res.data.refresh);
+      // console.log("hellow ac",res.data.access);
+      // return console.log("hellow ref",res.data.refresh);
+      return
     }).catch(err=>{
-      console.log("returnedd");
+      // console.log("returnedd");
       
       setisLoading(false)
       setIsAuth(false)
@@ -54,7 +55,8 @@ function ProtectedRoutes() {
       Cookies.remove('access_token')
       Cookies.remove('refresh_token')
       navigate("/")
-      return console.log("hellow?");
+      // return console.log("hellow?");
+      return
 
       // setisLoading(false)
       

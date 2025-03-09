@@ -51,7 +51,7 @@ sessionStorage.removeItem('isAdmin');
       Authorization: `API_KEY ${process.env.REACT_APP_API_KEY}`,
   }})
     .then(res => {
-      console.log("logged",res.data);
+      // console.log("logged",res.data);
       
       document.cookie=`access_token=${res.data.access}`
       document.cookie=`refresh_token=${res.data.refresh}`
@@ -61,24 +61,24 @@ sessionStorage.removeItem('isAdmin');
       if(res.data?.user?.role==="admin"){
         setIsAdmin(true)
         sessionStorage.setItem("isAdmin",true) 
-        console.log("adddddddddddddddd",res?.data?.user?.username);
+        // console.log("adddddddddddddddd",res?.data?.user?.username);
         
         navigate("/admin/dashboard")
       }else if(res.data?.user?.role==="employee"){
         setIsAuth(true)
         sessionStorage.setItem("isAuth",true) 
-        console.log("emp");
+        // console.log("emp");
         navigate("/dashboard")
       }
       // navigate("/dashboard")
     }).catch(err => {
       setLoading(false)
       if(typeof(err?.response?.data)==="object"){
-        console.log("in iffffffff");
+        // console.log("in iffffffff");
         
         let errors=Object.keys(err?.response?.data)
         errors.forEach(error => {
-        console.log("error",err?.response?.data[error][0]);
+        // console.log("error",err?.response?.data[error][0]);
         if(error!=="non_field_errors"){
         return  toast.warning(`${error}: ${err?.response?.data[error][0]}`)
         }
@@ -112,7 +112,7 @@ sessionStorage.removeItem('isAdmin');
       }
     }).then(res=>{
       setResetLoading(false)
-      console.log(res);
+      // console.log(res);
       
     }).catch(err=>{
       setResetLoading(false)
@@ -121,8 +121,8 @@ sessionStorage.removeItem('isAdmin');
     })
   }
 
-  console.log(loginform)
-console.log("emaiiiiiiiiiiiiiil",email);
+  // console.log(loginform)
+// console.log("emaiiiiiiiiiiiiiil",email);
 
   return (
     <div className="login-page">

@@ -40,7 +40,7 @@ function Header(props) {
         Authorization:`Bearer ${acstoken}`
       }
     }).then(res=>{
-      console.log("notifications",res.data);
+      // console.log("notifications",res.data);
       setNotifications(res.data)
       
     }).catch(err=>{
@@ -65,17 +65,17 @@ function Header(props) {
           Authorization:`Bearer ${acstoken}`
       }
     }).then(res=>{
-      console.log(res)
+      // console.log(res)
       getNotification()
     }).catch(err=>console.log(err))
 
-    console.log(id);
+    // console.log(id);
     
   }
 
   const notificationList=notifications.map(el=>{
     const requestor=el.message.split(" ")
-    console.log(requestor.length);
+    // console.log(requestor.length);
     
     return(
       <li className={`${!el.read && "unread" }`}>
@@ -87,7 +87,7 @@ function Header(props) {
     )
   })
 
-  console.log(notifications);
+  // console.log(notifications);
 
   const markAllasRead=async ()=>{
     const acstoken = document.cookie
@@ -101,7 +101,7 @@ function Header(props) {
           Authorization:`Bearer ${acstoken}`
       }
     }).then(res=>{
-      console.log(res)
+      // console.log(res)
       getNotification()
     }).catch(err=>console.log(err))
   }

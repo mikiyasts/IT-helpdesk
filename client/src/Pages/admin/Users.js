@@ -55,8 +55,7 @@ const nPages = Math.ceil(users.length / recordsPerPage)
         setDept(res.data)
         
       }).catch(err=>{
-        console.log("You are Not Authorized !!");
-        
+          return        
       })
   }, []);
 
@@ -70,8 +69,7 @@ const nPages = Math.ceil(users.length / recordsPerPage)
       .then((res) => setUsers(res.data))
       .catch((err) => console.log(err));
   }
-  console.log(users);
-  console.log(keyword);
+
   const tableRw = currentRecords.filter(fl=>{
 
     return `${fl?.first_name} ${fl?.last_name}`.toLowerCase().includes(keyword.toLowerCase())
@@ -94,7 +92,7 @@ const nPages = Math.ceil(users.length / recordsPerPage)
 
   const deptOption=dept.map(el=><option value={Number(el.id)}>{el.name}</option>)
   const setInput=(e)=>{
-    console.log(e.target.value);
+    // console.log(e.target.value);
     
     setForm(prev=>{
       return {
@@ -109,11 +107,10 @@ const nPages = Math.ceil(users.length / recordsPerPage)
         [e.target.name]:e.target.value
       }
     })
-    console.log(form);
     
   }
   const userInput=(e)=>{
-    console.log(e.target.value);
+    // console.log(e.target.value);
     
     setNewuser(prev=>{
       return {
@@ -128,14 +125,11 @@ const nPages = Math.ceil(users.length / recordsPerPage)
         [e.target.name]:e.target.value
       }
     })
-    console.log(form);
     
   }
 
 
-console.log("inin",form);
-console.log("ed",edited);
-console.log("new",newuser);
+
 
 const submitEdit=(e)=>{
   e.preventDefault()
@@ -160,13 +154,12 @@ const submitEdit=(e)=>{
     setForm({})
     refreshData()
     toast.success("User Editted Successfuly")
-    console.log("succes",res);
     
   }).catch(err=>{
     setPopup(false)
     toast.error("User Edit Failed")
 
-    console.log(err,"errr");
+    console.log(err,"error");
     
   })
 }
@@ -201,7 +194,6 @@ const createUser=(e)=>{
   })
     refreshData()
     toast.success("User Created Successfuly")
-    console.log("succes",res);
     
   }).catch(err=>{
     toast.error("Creating User Failed")

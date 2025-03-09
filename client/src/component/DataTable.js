@@ -50,7 +50,7 @@ export default function DataTable() {
         
     }
     const sample=[1,2,4,5,6]
-    console.log(selected);
+    // console.log(selected);
   return (
     <Paper sx={{ height: 400, width: '100%',backgroundColor:"#1f2937" }}>
       <DataGrid

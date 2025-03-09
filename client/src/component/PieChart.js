@@ -51,8 +51,8 @@ export default function PieChartWithCenterLabel(props) {
 //     { value: 20, label: 'Any Other',color:"#1dc8ba"},
 //   ];
   
-console.log("props",propsObjects);
-console.log("propsdata",props.dataset);
+// console.log("props",propsObjects);
+// console.log("propsdata",props.dataset);
 
 
 

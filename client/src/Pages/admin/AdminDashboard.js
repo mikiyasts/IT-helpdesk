@@ -25,10 +25,10 @@ function AdminDashboard() {
       }
     }).then(res=>{
       setDashdata(res.data)
-      console.log("brr",res.data && res.data.branch_request);
+      // console.log("brr",res.data && res.data.branch_request);
       
     }).catch(err=>{
-      console.log("You are Not Authorized !!");
+      // console.log("You are Not Authorized !!");
       
     })
         }
@@ -36,7 +36,7 @@ function AdminDashboard() {
 
 
   },[])
-console.log("dashjjjjs",dashdata);
+// console.log("dashjjjjs",dashdata);
 
   return (
       <div className="admin-dashboard">

@@ -23,7 +23,6 @@ function Report() {
 
     const exportReport=async ()=>{
 
-      console.log("exportiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiing");
       
       let download=true
       await axios.get(`${process.env.REACT_APP_URL}/api/report/tickets?assigned_to=${filter.assigned_to}&status=${filter?.status}&department=${filter?.department}&branch=${filter?.branch}&category=${filter?.category}&start_date=${filter?.from}&end_date=${filter?.to}&export=${download}`,{
@@ -46,14 +45,12 @@ function Report() {
             Authorization:`API_KEY ${process.env.REACT_APP_API_KEY}`
           }
         }).then(res=>{
-          
-          console.log("report",res);
+          return
         }
         ).catch(err=>{
           console.log(err);
           
         })
-        console.log("report",res);
       }
       ).catch(err=>{
         console.log(err);
@@ -68,8 +65,7 @@ function Report() {
           }).then(res=>{
             setDepartment(res.data)
           }).catch(err=>{
-            console.log("You are Not Authorized !!");
-            
+            return            
           })
           await axios.get(`${process.env.REACT_APP_URL}/api/list_ticket_category/`,{
             headers:{
@@ -86,7 +82,7 @@ function Report() {
         }
       }).then(res=>{
         setReports(res.data)
-        console.log("report",res);
+        // console.log("report",res);
       }
       ).catch(err=>{
         console.log(err);
@@ -102,11 +98,9 @@ function Report() {
         },
       })
       .then((res) =>{
-        console.log("useerklvmvlksd",res.data);
         
                 setAssignedto(res.data.filter(fl=>fl.department==="IT"))
-                console.log("assigned to",assignedto);
-                
+                return
       })
       .catch((err) => console.log(err));
     }
@@ -131,7 +125,6 @@ function Report() {
     </option>)
 
 
-console.log("assgdtebnbujc",assignedto);
 
 
     let rwno=0
@@ -167,12 +160,10 @@ console.log("assgdtebnbujc",assignedto);
         let name
       if(elrw.assigned_to__===" "){
         name="Unkown"
-        console.log("blablablaba");
         
       }else{
         name=elrw?.assigned_to__
       }
-      console.log("naaaaaaaaaaaaa",name);
       
       return <div className="statistics-rws" key={index}>
                 <div className="name">{name?name:"h"}</div>
@@ -180,8 +171,7 @@ console.log("assgdtebnbujc",assignedto);
       </div>})
 
 
-console.log("iuaydoiuasydad",reports);
-console.log("filterrrrrrrrrrrrrrrrrrrrrr",filter);
+
 
 
 const filterReport=(e)=>{
