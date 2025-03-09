@@ -324,6 +324,21 @@ const addAcknowledgement=async (e)=>{
             <input type="text" name="description" id="description" value={request.description} onChange={setInput} required/>
           </div>
           <div className="form-ctrl">
+            <label>Priority <span>*</span></label>
+            <div className="rw">
+              <input type="radio" name="priority" id="priority-high" value="High" onChange={setInput}/>
+              <label htmlFor='priority-high'>High</label>
+            </div>
+            <div className="rw">
+            <input type="radio" name="priority" id="priority-medium" value="Medium" onChange={setInput}/>
+            <label htmlFor='priority-medium'>Medium</label>
+            </div>
+            <div className="rw">
+            <input type="radio" name="priority" id="priority-low" value="Low" onChange={setInput}/>
+            <label htmlFor='priority-low'>Low</label>
+            </div>
+          </div>
+          <div className="form-ctrl">
             <label htmlFor="atch">Attachment <span>*</span></label>
             <input type="file" name="attachments" id="atch" style={{width:"100%",display:"flex",alignItems:"center",paddingBlock:".3rem"}} onChange={setInput}/>
           </div>

@@ -111,6 +111,18 @@
   flex-direction: column;
   gap: 1rem;
 }
+
+.request-form .form-ctrl .rw{
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  justify-content: flex-start;
+
+  input{
+    width: 20px;
+    accent-color: var(--accent-secondary-alpha);
+  }
+}
 .reset-form .form-ctrl label,.request-form .form-ctrl label{
   color: var(--font-color-secondary);
 }

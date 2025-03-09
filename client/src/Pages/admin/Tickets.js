@@ -417,10 +417,12 @@ function Tickets() {
         <div className="flx-row">
           <div><CheckIcon sx={{fontSize:35, backgroundColor:"#8370ff67"}} /></div>
           <div className="ticket-highligh-status">
-            <h4>Status</h4>
+            <h4>Statuss</h4>
             <p>{activePreview && activePreview.status}</p>
           </div>
+          
         </div>
+        
         <div className="flx-row">
           <div>
           <AccountCircleRoundedIcon sx={{fontSize:35}}/>
@@ -429,6 +431,15 @@ function Tickets() {
             <h5 className="requestor-name">{activePreview && activePreview.created_by && activePreview.created_by.username}</h5>
             <p className='highlight-lable'>Requestor</p>
             <p className='highlight-lable'>{activePreview && activePreview.created_by && activePreview.created_by.email}</p>
+          </div>
+        </div>
+        <div className="flx-row">
+        <div>
+          <AccountCircleRoundedIcon sx={{fontSize:35}}/>
+        </div>
+        <div className="ticket-highligh-status">
+            <h4>Priority</h4>
+            <p>{activePreview && activePreview?.priority}</p>
           </div>
         </div>
         <div className="ticket-highlight-datail">
