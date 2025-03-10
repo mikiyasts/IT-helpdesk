@@ -1587,3 +1587,12 @@ svg .css-1qkz8p7{
   /* font-weight: 600; */
   font-size:larger;
 }
+
+
+
+.pie .css-1u0lry5-MuiChartsLegend-root{
+  outline: solid 3px blue;
+    outline-offset: 5px;
+  background-color: red !important;
+  display: none;
+}

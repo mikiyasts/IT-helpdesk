@@ -203,6 +203,7 @@ const reverseTicket=async (id)=>{
     "Content-Type": 'multipart/form-data',
     Authorization: `Bearer ${acstoken}`,
   }}).then(res=>{
+    getDashdata()
     setLoading(false)
   }).catch(err=>{
     setLoading(false)

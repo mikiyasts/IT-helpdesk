@@ -9,21 +9,8 @@ const size = {
   height: 200,
 };
 
-const StyledText = styled('text')(({ theme }) => ({
-  fill: theme.palette.text.primary,
-  textAnchor: 'middle',
-  dominantBaseline: 'central',
-  fontSize: 20,
-}));
 
-// function PieCenterLabel({ children }) {
-  //   const { width, height, left, top } = useDrawingArea();
-  //   return (
-    //     <StyledText x={left + width / 2} y={top + height / 2}>
-//       {children}
-//     </StyledText>
-//   );
-// }
+
 
 export default function PieChartWithCenterLabel(props) {
   let propsObjects
@@ -57,8 +44,7 @@ export default function PieChartWithCenterLabel(props) {
 
 
   return (
-    <PieChart series={[{ data, innerRadius: 80 }]} {...size} sx={{color:"white"}}>
-      {/* <PieCenterLabel>Issues</PieCenterLabel> */}
+    <PieChart series={[{ data, innerRadius: 60 }]} {...size} sx={{color:"white"}}>
     </PieChart>
   );
 }

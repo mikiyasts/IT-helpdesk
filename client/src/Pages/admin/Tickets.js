@@ -11,7 +11,7 @@ import { ToastContainer,toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
-
+import PriorityHighRoundedIcon from '@mui/icons-material/PriorityHighRounded';
 function Tickets() {
 
   const [detailcollapse,setDetailcollapse]=useState(false)
@@ -417,7 +417,7 @@ function Tickets() {
         <div className="flx-row">
           <div><CheckIcon sx={{fontSize:35, backgroundColor:"#8370ff67"}} /></div>
           <div className="ticket-highligh-status">
-            <h4>Statuss</h4>
+            <h4>Status</h4>
             <p>{activePreview && activePreview.status}</p>
           </div>
           
@@ -435,7 +435,7 @@ function Tickets() {
         </div>
         <div className="flx-row">
         <div>
-          <AccountCircleRoundedIcon sx={{fontSize:35}}/>
+          <PriorityHighRoundedIcon sx={{fontSize:35}}/>
         </div>
         <div className="ticket-highligh-status">
             <h4>Priority</h4>
